@@ -1,0 +1,17 @@
+/** @format */
+
+.main_container {
+	width: 100%;
+}
+
+.layout_container {
+	width: 100%;
+	display: flex;
+}
+
+.content {
+	// background-color: var(--destructive-foreground);
+	width: calc(100% - 100px);
+	color: var(--muted-foreground);
+  background-color: var(--background);
+}

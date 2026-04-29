@@ -1,0 +1,37 @@
+@use "../../../styles/variables.scss" as *;
+@use "../../../styles/functions" as fn;
+@use "../../../styles/mixin" as mixin;
+
+/* ---------- ---------------------- ----------------------  
+            search  
+------------------------------------- ---------------------- */
+.list_search_container {
+	display: none;
+
+	@include mixin.sm {
+		position: unset;
+		width: 100%;
+		padding: 0;
+	}
+	.search_none {
+		@include mixin.xxl {
+			display: grid;
+			grid-template-columns: calc(100% - 40px) 35px;
+			gap: 0 5px;
+			z-index: 1002;
+		}
+		@include mixin.sm {
+			grid-template-columns: calc(100% - fn.get-vw(40px)) fn.get-vw(35px);
+			gap: 0 fn.get-vw(5px);
+			width: 100%;
+			margin: 0 fn.get-vw(10px);
+		}
+	}
+}
+
+.btn_filter__sp {
+	font-size: 20px;
+	@include mixin.sm {
+		font-size: fn.get-vw(20px);
+	}
+}

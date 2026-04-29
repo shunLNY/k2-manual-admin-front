@@ -1,0 +1,104 @@
+@use "../../styles/functions" as fn;
+@use "../../styles/mixin" as mixin;
+@use "../../styles/variables.scss" as *;
+@use 'sass:color';
+
+.text_blue {
+	color: var(--primary);
+}
+
+.content {
+	// padding: 15px 20px;
+	width: 410px;
+	border-radius: 10px;
+	background-color: var(--foreground);
+	font-size: 16px;
+	color: var(--subtle-foreground);
+	overflow: hidden;
+
+	@include mixin.sm {
+		padding: fn.get-vw(20px) fn.get-vw(10px);
+		max-width: 85vw;
+		border-radius: fn.get-vw(10px);
+		font-size: fn.get-vw(16px);
+	}
+
+	ul {
+		max-height: 60vh;
+		padding: 15px 20px;
+		overflow-y: auto;
+		scrollbar-width: none;
+	}
+
+	p {
+		padding: 15px 20px;
+	}
+
+	ul li {
+		padding-bottom: 10px;
+		margin-bottom: 20px;
+		border-bottom: 1px solid var(--muted-foreground);
+	}
+}
+
+.padding {
+	padding: 15px 20px;
+}
+
+.title {
+	padding-bottom: 20px;
+	margin-bottom: 20px;
+	border-bottom: 1px solid var(--muted-foreground);
+}
+
+.item_name {
+	color: var(--destructive);
+}
+
+.footer_btn {
+	display: flex;
+	justify-content: center;
+	gap: 0 20px;
+
+	// padding-bottom: 20px;
+	button {
+		border-radius: 30px;
+	}
+}
+
+%btn_shared {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 150px;
+	height: 38px;
+	font-size: 13px;
+	border-radius: 5px;
+	color: var(--subtle-foreground);
+	box-shadow: 0px 3px 6px var(--muted-foreground);
+
+	@include mixin.sm {
+		width: fn.get-vw(100px);
+		height: fn.get-vw(30px);
+		font-size: fn.get-vw(13px);
+	}
+}
+
+// .btn_cancel {
+// 	@extend %btn-shared;
+// 	color: var(--muted-foreground);
+
+// 	&:hover {
+// 		color: mix(var(--muted-foreground),$white, 75);
+// 	}
+// }
+
+.btn_delete {
+	@extend %btn_shared;
+	color: var(--subtle-foreground);
+	background-color: $red;
+
+	&:hover {
+		color: color.mix($white, $red, 75%);
+	}
+}

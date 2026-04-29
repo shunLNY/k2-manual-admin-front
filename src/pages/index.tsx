@@ -1,18 +1,24 @@
-import Image from "next/image";
-import { Geist, Geist_Mono } from "next/font/google";
+import MainLayout from "@/components/layout/main-layout";
+import Head from "next/head";
+import { ReactElement } from "react";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-export default function Home() {
+import DashBoardPage from "./dashboard";
+ 
+ 
+export default function Page() {
   return (
-    <div>K2 manual admin front</div>
+    <>
+      <Head>
+        <title>Admin - K2 マニュアル</title>
+      </Head>
+      <DashBoardPage></DashBoardPage>
+
+    </>
   );
+}
+ 
+Page.getLayout = function getLayout(page: ReactElement) {
+  return (
+    <MainLayout title="Admin - K2 マニュアル">{page}</MainLayout>
+  )
 }

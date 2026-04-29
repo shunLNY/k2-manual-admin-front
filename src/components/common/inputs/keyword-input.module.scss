@@ -1,0 +1,130 @@
+@use "../../../styles/functions" as fn;
+@use "../../../styles/mixin" as mixin;
+@use "../../../styles/variables.scss" as *;
+@use 'sass:color';
+
+//  Styles for <SearchInput/>, <KeywordInput/>
+
+%bar-shared {
+	display: grid;
+	//   height: 35px;
+	width: 100%;
+	// background: #d7d8e2;
+	border-radius: 5px;
+	border: 1px solid var(--muted-foreground);
+	// box-shadow: 0 3px 6px rgba($color: #333333, $alpha: 0.16);
+	//   overflow: hidden;
+	align-items: center;
+	color: var(--muted-foreground);
+
+	input {
+		width: 100%;
+		height: 40px;
+		font-size: 13px;
+		padding: 4px 8px;
+		background-color: transparent;
+		border: none;
+		// background: #d7d8e2;
+		border-radius: 5px;
+		color: var(--foreground);
+
+		@include mixin.sm {
+			font-size: fn.get-vw(13px);
+			padding: fn.get-vw(4px);
+		}
+
+		&:focus-visible {
+			outline: none !important;
+		}
+	}
+
+	@include mixin.sm {
+		height: fn.get-vw(45px);
+		border-radius: fn.get-vw(5px);
+	}
+
+	svg {
+		padding-left: 10px;
+		font-size: 20px;
+		color: var(--muted-foreground);
+
+		@include mixin.sm {
+			padding-left: fn.get-vw(10px);
+			font-size: fn.get-vw(20px);
+		}
+	}
+}
+
+.search_bar {
+	@extend %bar-shared;
+	grid-template-columns: auto 1fr auto;
+	//   height: 35px;
+	border-radius: 5px;
+
+	@include mixin.xxl {
+		// width: 266px;
+	}
+
+	@include mixin.sm {
+		width: auto;
+		height: fn.get-vw(35px);
+		border-radius: fn.get-vw(5px);
+	}
+}
+
+.search_withicon_bar {
+	@extend %bar-shared;
+	grid-template-columns: 1fr auto auto;
+}
+
+.search_clear {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 100%;
+	margin-right: 10px;
+	background-color: initial;
+
+	.col_xmark {
+		font-size: 24;
+		fill: var(--muted-foreground);
+	}
+
+	@include mixin.sm {
+		margin-right: fn.get-vw(10px);
+
+		.col_xmark {
+			font-size: 10vw;
+		}
+	}
+}
+
+.search_button {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 100%;
+	width: 50px;
+	border-radius: 5px;
+	background: $blue;
+	transition: background-color 0.2s ease;
+
+	&:hover {
+		background: color.mix($white, $blue, 15%);
+	}
+
+	svg {
+		padding: 0;
+		font-size: 16px;
+		color: var(--subtle-foreground);
+	}
+
+	@include mixin.sm {
+		width: fn.get-vw(45px);
+		border-radius: fn.get-vw(5px);
+
+		svg {
+			font-size: 5wv;
+		}
+	}
+}

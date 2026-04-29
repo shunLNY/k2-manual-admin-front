@@ -1,0 +1,398 @@
+/** @format */
+
+@use '../../../styles/functions' as fn;
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as mixin;
+@use "sass:color";
+
+%btn_shared {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 150px;
+  height: 38px;
+  font-size: 13px;
+  border-radius: 5px;
+  color: var(--primary-foreground);
+  box-shadow: var(--shadow-lg);
+
+  @include mixin.sm {
+    width: fn.get-vw(100px);
+    height: fn.get-vw(30px);
+    border-radius: fn.get-vw(5px);
+    font-size: fn.get-vw(13px);
+  }
+}
+
+.btn_login {
+  @extend %btn_shared;
+  background-color: $blue;
+  width: 100%;
+  height: 40px;
+  border-radius: 30px;
+  margin-bottom: 20px;
+
+  &:hover {
+    background-color: color.mix($black, $blue, 15%);
+  }
+}
+
+.btn_save {
+  @extend %btn_shared;
+  border-radius: 30px;
+  background-color: $blue;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+
+  &:hover {
+    background-color: color.mix($white, $blue, 15%);
+  }
+
+  // @include mixin.md {
+  //     width: fn.get-vw(120px);
+  //     border-radius: fn.get-vw(20px);
+  //     height: fn.get-vw(20px);
+  // }
+  @include mixin.sm {
+    width: fn.get-vw(100px);
+    border-radius: fn.get-vw(20px);
+    height: fn.get-vw(30px);
+  }
+}
+
+.btn_search {
+  @extend %btn_shared;
+  border-radius: 30px;
+  background-color: $blue;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+
+  &:hover {
+    background-color: color.mix($white, $blue, 15%);
+  }
+}
+
+.btn_create {
+  @extend %btn_shared;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  font-size: 30px;
+  background-color: $blue;
+  cursor: pointer;
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  z-index: 99;
+
+  &:hover {
+    background-color: color.mix($white, $blue, 15%);
+    cursor: pointer;
+  }
+}
+
+.btn_send {
+  @extend %btn_shared;
+  background-color: $blue;
+
+  &:hover {
+    background-color: color.mix($white, $blue, 15%);
+  }
+}
+
+.btn_cancel {
+  @extend %btn_shared;
+  background-color: $gray-200;
+  border-radius: 30px;
+
+  &:hover {
+    background-color: color.mix($white, $gray-200, 15%);
+  }
+
+  // @include mixin.md {
+  //     width: fn.get-vw(100px);
+  //     border-radius: fn.get-vw(20px);
+  //     height: fn.get-vw(20px);
+  // }
+  @include mixin.sm {
+    width: fn.get-vw(100px);
+    border-radius: fn.get-vw(20px);
+    height: fn.get-vw(30px);
+  }
+}
+
+.btn_preview {
+  @extend %btn_shared;
+  background-color: $blue;
+  border-radius: 30px;
+
+  &:hover {
+    background-color: color.mix($white, $blue, 15%);
+  }
+
+  // @include mixin.md {
+  //     width: fn.get-vw(100px);
+  //     border-radius: fn.get-vw(20px);
+  //     height: fn.get-vw(20px);
+  // }
+  @include mixin.sm {
+    width: fn.get-vw(100px);
+    border-radius: fn.get-vw(20px);
+    height: fn.get-vw(30px);
+  }
+}
+
+.btn_edit {
+  @extend %btn_shared;
+  background-color: $blue;
+
+  &:hover {
+    background-color: color.mix($white, $blue, 15%);
+  }
+}
+
+.btn_delete {
+  @extend %btn_shared;
+  box-shadow: 0px 3px 6px transparent;
+  background-color: $blue;
+  width: 66px;
+  height: 26px;
+
+  &:hover {
+    background-color: color.mix($white, $blue, 15%);
+  }
+
+  @include mixin.sm {
+    width: fn.get-vw(66px);
+    height: fn.get-vw(26px);
+    font-size: fn.get-vw(13px);
+  }
+}
+
+.btn_copy {
+  @extend %btn_shared;
+  background-color: $blue;
+  box-shadow: 0px 3px 6px transparent;
+  width: 66px;
+  height: 26px;
+
+  &:hover {
+    background-color: color.mix($white, $blue, 15%);
+  }
+
+  @include mixin.sm {
+    width: fn.get-vw(66px);
+    height: fn.get-vw(25px);
+    font-size: fn.get-vw(13px);
+  }
+}
+
+.btn_close {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: $gray-200;
+  color: var(--subtle-foreground);
+  border-radius: 30px;
+  text-align: center;
+
+  @include mixin.sm {
+    width: fn.get-vw(30px);
+    height: fn.get-vw(30px);
+    margin-left: auto;
+    border-radius: fn.get-vw(30px);
+  }
+
+  @include mixin.md {
+    margin-left: auto;
+  }
+
+  svg {
+    // height: 24px;
+    // margin-left: 4px;
+    font-size: 10px;
+
+    @include mixin.sm {
+      font-size: fn.get-vw(10px);
+    }
+  }
+
+  &:hover {
+    background-color: color.mix($white, $gray-200, 15%);
+  }
+}
+
+.pc {
+  @include mixin.sm {
+    display: none !important;
+  }
+}
+
+// .btn_filter_clear_md {
+//   display: none;
+//   color: var(--subtle-foreground);
+//   width: 300px;
+//   border: 1px solid var(--subtle-foreground);
+//   border-radius: 20px;
+//   padding: 5px 10px;
+//   color: var(--muted-foreground);
+//   font-weight: normal;
+//   font-size: 13px;
+
+//   svg {
+//     font-size: 10px;
+//     padding-right: 10px;
+
+//     @include mixin.sm {
+//       display: block;
+//       font-size: 10px !important;
+//     }
+//   }
+
+//   &:hover {
+//     background-color: var(--subtle-foreground);
+//     color: var(--foreground);
+//   }
+
+//   //   &.active {
+//   //     display: none !important;
+//   //     @include mixin.md {
+//   //       display: flex !important;
+//   //       justify-content: center;
+//   //       align-items: center;
+//   //       font-weight: 500;
+//   //       font-size: 13px !important;
+//   //       transition: background-color 0.3s ease;
+//   //     }
+//   //   }
+
+//   @include mixin.sm {
+//     padding-right: 3vw;
+//     font-weight: 500;
+//     font-size: 13px !important;
+//     transition: background-color 0.3s ease;
+//   }
+// }
+
+.btn_filter_clear {
+  width: 150px;
+  display: none;
+  color: var(--foreground);
+  background-color: var(--subtle-foreground);
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  // border: 1px solid var(--subtle-foreground);
+  border-radius: 20px;
+  padding: 5px 10px;
+  font-weight: normal;
+  font-size: 13px;
+
+  @include mixin.md {
+    // width: fn.get-vw(120px);
+    border-radius: fn.get-vw(20px);
+    // height: fn.get-vw(20px);
+  }
+
+  // @include mixin.sm{
+  //     width: fn.get-vw(100px);
+  //     height: fn.get-vw(30px);
+  // }
+
+  @include mixin.es {
+    width: fn.get-vw(100px);
+    border-radius: fn.get-vw(20px);
+    height: fn.get-vw(30px);
+  }
+
+  // @include mixin.md{
+  //     width: fn.get-vw(120px);
+  //     border-radius: fn.get-vw(20px);
+  //     height: fn.get-vw(20px);
+  // }
+  // @include mixin.sm{
+  //     width: fn.get-vw(120px);
+  //     border-radius: fn.get-vw(20px);
+  //     height: fn.get-vw(25px);
+  // }
+
+  @include mixin.es {
+    width: fn.get-vw(120px);
+    border-radius: fn.get-vw(20px);
+    height: fn.get-vw(30px);
+  }
+
+  svg {
+    font-size: 10px;
+    padding-right: 10px;
+
+    @include mixin.es {
+      font-size: fn.get-vw(10px);
+      padding-right: fn.get-vw(5px);
+    }
+  }
+
+  &:hover {
+    // background-color: var(--muted-foreground);
+    background-color: color.mix($white, $gray-200, 15%);
+    color: var(--foreground);
+  }
+
+  &.active {
+    width: 150px;
+    display: block;
+
+    // @include mixin.md{
+    //     width: fn.get-vw(120px);
+    //     border-radius: fn.get-vw(20px);
+    //     height: fn.get-vw(20px);
+    // }
+    // @include mixin.sm{
+    //     width: fn.get-vw(120px);
+    //     border-radius: fn.get-vw(20px);
+    //     height: fn.get-vw(25px);
+    // }
+    @include mixin.es {
+      width: fn.get-vw(100px);
+      border-radius: fn.get-vw(20px);
+      height: fn.get-vw(30px);
+    }
+  }
+
+  @include mixin.sm {
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+    // margin: 40px 0 0 auto;
+  }
+}
+
+.btn_filter {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 35px;
+  font-size: 16px;
+  border-radius: 5px;
+  color: var(--muted-foreground);
+  box-shadow: 0px 3px 6px $gray-200;
+  background-color: var(--subtle-foreground);
+
+  &:hover {
+    background-color: color.mix($white, $gray-200, 15%);
+  }
+
+  &.is_active {
+    border-color: var(--muted-foreground);
+    background-color: var(--muted-foreground);
+
+    * {
+      color: var(--subtle-foreground);
+    }
+  }
+
+  @include mixin.es {
+    height: fn.get-vw(35px);
+    padding: fn.get-vw(6px) fn.get-vw(8px);
+    font-size: fn.get-vw(16px);
+    border-radius: fn.get-vw(5px);
+  }
+}

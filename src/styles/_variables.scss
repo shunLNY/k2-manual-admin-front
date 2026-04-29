@@ -1,0 +1,52 @@
+@use './functions' as fn;
+@use 'sass:color';
+
+$white: #fff;
+$blue: #3b82f6;
+$red: #ef4444;
+$black: #333333;
+$gray-600: #555b76;
+$gray-500: #606ba7;
+$gray-200: #999fc0;
+
+// Shared CSS
+%btn_darkblue-shared {
+  background-color: var(--foreground);
+  transition: all 0.2s ease;
+  outline: none;
+
+  &:hover {
+    color: var(--subtle-foreground);
+    border-color: var(--primary);
+    background-color: var(--primary);
+  }
+}
+
+%btn_gray-shared {
+  background-color: $gray-600;
+  transition: all 0.2s ease;
+  outline: none;
+
+  &:hover {
+    background-color: color.mix($white, $gray-600, 15%);
+  }
+}
+
+$bg-avatar: rgba(240, 248, 255, 0.9);
+
+%scroll__shared {
+  &::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 3px hsla(0, 0%, 0%, 0.3);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    -webkit-box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.3);
+    background-color: rgba(166, 166, 166, 0.55) !important;
+    margin-top: 10px;
+    transition: background-color 0.3s ease;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.56) !important;
+    }
+  }
+}

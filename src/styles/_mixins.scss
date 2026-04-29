@@ -1,0 +1,52 @@
+// Desktop First Breakpoints
+@mixin xs() {
+  @media (max-width: 480px) {
+    @content;
+  }
+}
+
+@mixin es() {
+  @media (max-width: 600px) {
+    @content;
+  }
+}
+
+@mixin sm() {
+  @media only screen and (max-width: 767px) {
+    @content;
+  }
+}
+
+@mixin md() {
+  @media only screen and (max-width: 991px) {
+    @content;
+  }
+}
+
+// Tablet
+@mixin lg() {
+  @media only screen and (max-width: 1180px) {
+    @content;
+  }
+}
+
+@mixin xl() {
+  @media only screen and (max-width: 1199px) {
+    @content;
+  }
+}
+
+@mixin xxl() {
+  @media only screen and (max-width: 1399px) {
+    @content;
+  }
+}
+
+
+@mixin xxxl() {
+  @media (min-width: 1400px) {
+    @content;
+  }
+}
+
+

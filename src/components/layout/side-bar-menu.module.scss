@@ -1,0 +1,38 @@
+/** @format */
+@use '../../styles/variables.scss' as *;
+@use '../../styles/functions' as fn;
+@use '../../styles/mixins' as mixin;
+
+.side_menu_container {
+  width: 100px;
+  height: 100vh;
+  background-color: var(--sidebar);
+}
+
+.nav_item {
+  color: var(--sidebar-foreground);
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: var(--text-sm);
+  height: 100px;
+  justify-content: center;
+  align-items: center;
+  transition: 0.3s;
+
+  &:hover {
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+  }
+
+  p {
+    font-size: var(--text-xs);
+    transition: 0.3s;
+  }
+
+  &.active {
+    background-color: var(--sidebar-primary-background);
+    color: var(--sidebar-primary-foreground);
+  }
+}

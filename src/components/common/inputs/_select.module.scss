@@ -1,0 +1,301 @@
+@use '../../../styles/functions' as fn;
+@use '../../../styles/mixin' as mixin;
+@use '../../../styles/variables' as *;
+
+.select_label {
+  display: inline-block;
+  cursor: unset;
+  font-size: 13px;
+  font-family: sans-serif;
+
+  @include mixin.xs {
+    margin-bottom: fn.get-vw(3px);
+    font-size: fn.get-vw(13px);
+  }
+}
+
+.react_select {
+  width: 100%;
+  border: 1px solid transparent;
+  border-radius: 5px;
+
+  * {
+    outline: none;
+  }
+
+  :global(.react-select__control) {
+    width: 100%;
+    min-height: 35px;
+    // max-height: 50px;
+    background-color: var(--input-background);
+    border: none;
+    box-shadow: none;
+    cursor: pointer;
+    overflow-y: auto;
+    // @include mixin.md {
+    //   overflow-y: unset;
+    // }
+  }
+
+  :global(.react-select__value-container) {
+    padding: 2px 8px;
+    // 選択項目が複数行になっても表示できるように
+    flex-wrap: wrap;
+  }
+
+  :global(.react-select__multi-value) {
+    background-color: var(--secondary);
+    border-radius: 15px;
+    padding: 2px 5px;
+    margin: 2px 5px 2px 0;
+  }
+
+  :global(.react-select__multi-value__remove) {
+    // 背景色を透明に設定
+    background-color: transparent;
+    color: var(--muted-foreground); // Xマークの色
+    padding: 0; // パディングを調整
+
+    // ホバー時のスタイルを上書き
+    &:hover {
+      background-color: transparent;
+      color: var(--foreground); // ホバー時のXマークの色
+    }
+  }
+
+  :global(.react-select__indicator-separator) {
+    background-color: transparent;
+  }
+
+  :global(.react-select__indicator) {
+    color: var(--muted-foreground);
+    padding: 5px 3px;
+
+    &:hover {
+      color: var(--muted-foreground);
+    }
+  }
+
+  :global(.react-select__placeholder) {
+    color: var(--muted-foreground);
+    overflow: hidden;
+  }
+
+  :global(.react-select__clear-indicator) {
+    svg {
+      width: 15px;
+      height: 15px;
+    }
+  }
+
+  :global(.react-select__dropdown-indicator) {
+    // svg {
+    //   margin-right: 5px;
+    // }
+    padding: 0 8px;
+    color: var(--secondary-foreground);
+    transition: transform 0.2s ease-in-out;
+
+    .react_select--is-open & {
+      transform: rotate(180deg);
+    }
+
+    svg {
+      margin-right: 0;
+      width: 18px;
+      height: 18px;
+    }
+
+    &:hover {
+      color: var(--foreground);
+    }
+  }
+
+  @include mixin.sm {
+    :global(.react-select__control) {
+      min-height: fn.get-vw(35px);
+    }
+
+    :global(.react-select__clear-indicator),
+    :global(.react-select__dropdown-indicator) {
+      svg {
+        width: auto;
+        height: auto;
+      }
+    }
+  }
+
+  :global(.react-select__single-value),
+  :global(.react-select__placeholder),
+  :global(.react-select__menu-portal) {
+    font-size: 13px;
+
+    @include mixin.xs {
+      font-size: fn.get-vw(12px);
+    }
+  }
+
+  :global(.react-select__option) {
+    color: var(--foreground);
+  }
+}
+
+.create_select {
+  color: var(--foreground);
+  text-align: left;
+
+  :global(.css-13cymwt-control) {
+    min-height: 18px;
+    height: 18px;
+    background: var(--background);
+    margin: 4px 0;
+    border-radius: 30px;
+    border-color: transparent;
+    border-width: 0;
+    border-style: none;
+    // overflow-y: scroll;
+  }
+
+  :global(.css-1dimb5e-singleValue) {
+    margin-top: -2px;
+  }
+
+  :global(.css-t3ipsp-control) {
+    min-height: 18px;
+    height: 18px;
+    background: var(--background);
+    margin: 4px 0;
+    border-radius: 30px;
+    border-color: transparent;
+    border-width: 0;
+    border-style: none;
+    box-shadow: none;
+    // overflow-y: scroll;
+  }
+
+  :global(.css-16xfy0z-control) {
+    min-height: 18px;
+    height: 18px;
+    background: var(--background);
+    margin: 4px 0;
+    border-radius: 30px;
+    border-color: transparent;
+    border-width: 0;
+    border-style: none;
+  }
+
+  :global(.css-pogzpp-loadingIndicator) {
+    padding: 0 8px;
+  }
+
+  :global(.css-1hb7zxy-IndicatorsContainer) {
+    min-height: 18px;
+    height: 18px;
+  }
+
+  :global(.css-1xc3v61-indicatorContainer) {
+    padding: 0 8px;
+    color: var(--secondary-foreground);
+
+    svg {
+      margin-right: 0;
+      font-size: 8px;
+      color: var(--secondary-foreground) !important;
+    }
+
+    &:first-child {
+      svg {
+        width: 18px;
+
+        path {
+          stroke-width: 0;
+        }
+      }
+    }
+
+    &:last-child {
+      svg path {
+        stroke-width: 5px;
+      }
+    }
+  }
+
+  :global(.css-15lsz6c-indicatorContainer) {
+    padding: 0 8px;
+    color: var(--secondary-foreground);
+
+    svg {
+      margin-right: 0;
+      font-size: 8px;
+      color: var(--secondary-foreground) !important;
+    }
+
+    &:first-child {
+      svg {
+        width: 18px;
+
+        path {
+          stroke-width: 0;
+        }
+      }
+    }
+
+    &:last-child {
+      svg path {
+        stroke-width: 5px;
+      }
+    }
+  }
+
+  :global(.css-1fdsijx-ValueContainer) {
+    padding: 0 8px;
+    height: 18px;
+    font-size: 10px;
+
+    .btn_delete {
+      display: none;
+    }
+  }
+
+  //   :global(.css-1jqq78o-placeholder) {
+  //     margin-top: -2px;
+  //   }
+  //   :global(.css-1cfo1cf) {
+  //     margin-top: -2px;
+  //   }
+  :global(.css-1nmdiq5-menu) {
+    border: 1px solid var(--border);
+    background: var(--background);
+  }
+
+  :global(.css-hlgwow) {
+    padding: 0 8px;
+    font-size: 10px;
+  }
+
+  :global(.css-qbdosj-Input) {
+    margin: 0;
+  }
+
+  :global(.css-qbdosj-Input) input {
+    // width: -webkit-fill-available !important;
+    opacity: 1 !important;
+  }
+
+  :global(.css-19bb58m) {
+    margin: 0;
+  }
+
+  :global(.css-1u9des2-indicatorSeparator) {
+    display: none;
+  }
+}
+
+.btn_delete {
+  color: var(--destructive);
+  font-size: 12px;
+
+  &:hover {
+    color: var(--foreground);
+  }
+}

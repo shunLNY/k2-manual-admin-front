@@ -1,0 +1,343 @@
+/** @format */
+
+@use '../../../styles/functions' as fn;
+@use '../../../styles/mixin' as mixin;
+@use '../../../styles/variables' as *;
+@use "sass:color";
+
+%icon-shared {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  min-width: 50px;
+  height: 35px;
+  margin-left: 10px;
+  border-radius: 5px;
+  border: 1px solid var(--subtle-foreground);
+  background-color: var(--subtle-foreground);
+  transition: background-color 0.2s ease;
+
+  @include mixin.sm {
+    width: fn.get-vw(35px);
+    min-width: fn.get-vw(35px);
+    height: fn.get-vw(35px);
+    margin-left: fn.get-vw(10px);
+    border-radius: fn.get-vw(5px);
+  }
+
+  &:hover {
+    background-color: color.mix($white, $gray-500, 15%);
+  }
+
+  svg {
+    font-size: 13px;
+    fill: var(--subtle-foreground);
+    color: var(--subtle-foreground);
+
+    @include mixin.sm {
+      font-size: fn.get-vw(13px);
+    }
+  }
+}
+
+.checkbox_container {
+  position: relative;
+  display: block;
+  width: 25px;
+  height: 25px;
+
+  overflow: hidden;
+
+  @include mixin.sm {
+    width: fn.get-vw(25px);
+    flex: 0 0 fn.get-vw(25px);
+    height: fn.get-vw(25px);
+  }
+
+  &.radio_container {
+    border-radius: 50%;
+
+    @include mixin.sm {
+      width: fn.get-vw(25px);
+      height: fn.get-vw(25px);
+      flex: auto;
+    }
+  }
+
+  input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    width: 25px;
+    height: 25px;
+    z-index: 2;
+  }
+
+  /* Create a custom checkbox */
+  .checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    transition: all 0.3s ease;
+    border-radius: 5px;
+    border: 1px solid var(--muted-foreground);
+    z-index: 1;
+  }
+
+  /* Create the checkmark/indicator (hidden when not checked) */
+  .checkmark:after {
+    content: '';
+    position: absolute;
+    display: none;
+    left: 40%;
+    top: 15%;
+    width: 15%;
+    height: 50%;
+    border: solid var(--background);
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+
+  /* Show the checkmark when checked */
+  input:checked~.checkmark:after {
+    display: block;
+  }
+
+  input:disabled~.checkmark {
+    // background-color: var(--primary);
+    background-color: var(--subtle-foreground);
+    border: 1px solid var(--muted-foreground);
+  }
+
+  input:disabled~.checkmark:after {
+    content: '';
+    position: absolute;
+    display: none;
+    left: 40%;
+    top: 15%;
+    width: 15%;
+    height: 50%;
+    border: solidvar(--subtle-foreground);
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+
+  input:checked~.checkmark {
+    background-color: var(--primary);
+  }
+
+  .checknumber {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    transition: all 0.3s ease;
+    border-radius: 5px;
+    border: 1px solid var(--border);
+    z-index: 1;
+  }
+
+  input:checked~.checknumber {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    font-size: 16px;
+    background-color: var(--primary);
+    border: 1px solid var(--primary);
+    color: var(--subtle-foreground);
+
+    @include mixin.sm {
+      font-size: fn.get-vw(16px);
+    }
+  }
+}
+
+input:checked+.checkmark {
+  border: 1px solid var(--primary);
+}
+
+input:disabled+.checkmark {
+  border: 1px solid var(--primary);
+}
+
+.input_error:not([disabled]) {
+  border: 2px solid var(--destructive) !important;
+}
+
+.input_error {
+  border: 2px solid var(--destructive) !important;
+}
+
+.error_message {
+  margin-top: 5px;
+  font-size: 13px;
+  color: var(--destructive);
+  line-height: 1;
+
+  @include mixin.sm {
+    margin-top: fn.get-vw(5px);
+    font-size: fn.get-vw(12px);
+  }
+}
+
+.input_field {
+  margin-top: 10px;
+  margin-bottom: 15px;
+
+  input:not([role='combobox']),
+  select {
+    padding: 0 fn.rem(10px);
+    height: fn.rem(35px);
+    line-height: fn.rem(35px);
+    border-radius: 5px;
+    font-size: 13px;
+    border: 1px solid var(--border);
+    background-color: var(--background);
+  }
+
+  textarea {
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 13px;
+  }
+
+  a {
+    @extend %icon-shared;
+  }
+
+  @include mixin.sm {
+    margin-top: fn.get-vw(5px);
+
+    // overflow: hidden;
+
+    input:not([role='combobox']),
+    select {
+      width: 100%;
+      height: fn.get-vw(35px);
+      padding: fn.get-vw(8px) fn.get-vw(10px);
+      background-color: var(--subtle-foreground);
+      border-radius: fn.get-vw(5px);
+      font-size: fn.get-vw(14px);
+      outline: none;
+    }
+
+    textarea {
+      width: 100%;
+      padding: fn.get-vw(8px) fn.get-vw(10px);
+      background-color: var(--subtle-foreground);
+      border-radius: fn.get-vw(5px);
+      font-size: fn.get-vw(14px);
+      outline: none;
+      resize: none;
+      // resize: vertical;
+    }
+  }
+}
+
+.error_ico {
+  position: absolute;
+  top: 11px;
+  right: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  color: var(--subtle-foreground);
+  background-color: var(--destructive);
+}
+
+.form_group {
+  width: 100%;
+  margin-bottom: 20px;
+
+  .required {
+    font-size: 13px;
+    color: var(--yellow);
+    font-weight: bold;
+  }
+
+  .input_any {
+    color: var(--muted-foreground);
+  }
+
+  .form_label {
+    width: 100%;
+  }
+
+  .label_txt {
+    margin-bottom: 10px;
+    color: var(--foreground);
+  }
+
+  .helper_text {
+    margin-left: 10px;
+    font-size: 13px;
+    color: var(--list-foreground);
+  }
+}
+
+.text_input {
+  width: 100%;
+  padding: 0 10px;
+  height: 40px;
+  line-height: 30px;
+  border-radius: 5px;
+  font-size: 13px;
+  background-color: var(--input-background);
+  border: 2px solid var(--border);
+  outline: none;
+
+  // @include mixin.md{
+  //     min-height: fn.get-vw(15px);
+  // }
+  @include mixin.sm {
+    min-height: fn.get-vw(25px);
+  }
+}
+
+.row {
+  @include mixin.xxxl {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+  }
+
+  @include mixin.xxl {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+  }
+
+  @include mixin.sm {
+    display: block;
+  }
+
+  .label_txt {
+    margin-bottom: fn.get-vw(5px);
+
+    @include mixin.xxxl {
+      margin-bottom: 0px;
+      // width: 15%;
+    }
+  }
+}
+
+.footer_container {
+  width: 100%;
+  height: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  background-color: var(--background);
+  position: absolute;
+  bottom: 0;
+}

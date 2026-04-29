@@ -1,0 +1,54 @@
+@use "../../../styles/variables.scss" as *;
+@use "../../../styles/functions" as fn;
+@use "../../../styles/mixin" as mixin;
+
+.pagination_container {
+  display: flex;
+  list-style: none;
+  padding: 0;
+  margin-bottom: 30px;
+}
+
+.pagination_item {
+  margin: 0 4px;
+  padding: 8px 12px;
+  cursor: pointer;
+  border: 1px solid var(--foreground);
+  color: var(--foreground);
+  border-radius: 3px;
+  background: var(--background);
+  min-width: 32px;
+  text-align: center;
+  user-select: none;
+  transition: background 0.2s, color 0.2s;
+
+  &:hover {
+    background: var(--subtle-foreground);
+  }
+
+  &.active {
+    background: var(--foreground);
+    color: var(--background);
+    border-color: var(--foreground);
+    cursor: default;
+
+    &:hover {
+      background: var(--foreground);
+    }
+  }
+
+  &.dots {
+    pointer-events: none;
+    background: transparent;
+    border: none;
+    color: var(--muted-foreground);
+    font-size: 16px;
+    padding: 0;
+  }
+
+  &.disabled {
+    pointer-events: none;
+    color: var(--muted-foreground);
+    border-color: var(--muted-foreground);
+  }
+}
