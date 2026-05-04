@@ -1,0 +1,60 @@
+/** @format */
+@use '../../../styles/variables.scss' as *;
+@use '../../../styles/mixins' as mixin;
+
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(#333333, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.modal {
+  background: var(--secondary);
+  color: var(--muted-foreground);
+  padding: 24px;
+  border-radius: 6px;
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.title {
+  margin-bottom: 20px;
+  font-size: 1.25rem;
+}
+
+.message {
+  margin-bottom: 24px;
+  color: var(--destructive);
+}
+
+.buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+}
+
+.cancel {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--muted-foreground);
+  padding: 8px 16px;
+  border-radius: 4px;
+}
+
+.confirm {
+  background: var(--destructive);
+  color: var(--subtle-foreground);
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+}

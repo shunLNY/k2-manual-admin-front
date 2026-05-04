@@ -1,8 +1,6 @@
 /** @format */
 
 'use client';
-import { useFetch } from '@/lib/hooks/common-hooks';
-import { fetcher } from '@/utils/fetcher';
 import type React from 'react';
 import {
   createContext,
@@ -12,12 +10,13 @@ import {
   useState,
   SetStateAction,
 } from 'react';
-// import { fetcher } from '@/utils/fetcher';
-// import { useFetch } from '@/lib/hooks/common-hooks';
+import { fetcher } from '@/utils/fetcher';
+import { useFetch } from '@/lib/hooks/common-hooks';
+import { ArticlesInfoType } from '@/utils/types';
 
-type BlogContextData = {
+type ArticleContextData = {
   listCount: number;
-  items: any[];
+  items: ArticlesInfoType[];
   setItems: Dispatch<any>;
   editItem: any;
   setEditItem: Dispatch<any>;
@@ -68,7 +67,7 @@ type BlogContextData = {
   setIsPublished: Dispatch<any>;
 };
 
-const ArticleContext = createContext<BlogContextData>({
+const BlogContext = createContext<ArticleContextData>({
   listCount: 0,
   items: [],
   setItems: () => { },
@@ -125,7 +124,7 @@ type Props = {
   children: React.ReactNode;
 };
 
-export function ArticleContextProvider({ children }: Props) {
+export function BlogContextProvider({ children }: Props) {
   const [blogCreate, setBlogCreate] = useState(false);
   const [pageLoaded, setPageLoaded] = useState(false);
   const [keyword, setKeyword] = useState('');
@@ -134,7 +133,7 @@ export function ArticleContextProvider({ children }: Props) {
   const [orderBy, setOrderBy] = useState('');
   const [totalItems, setTotalItems] = useState(0);
   const [selectedStatus, setSelectedStatus] = useState('');
-  const [items, setItems] = useState<any[]>([]);
+  const [items, setItems] = useState<ArticlesInfoType[]>([]);
   const [editItem, setEditItem] = useState([]);
   const [isEdit, setIsEdit] = useState<boolean>(false);
   const [blogIdsUrl, setBlogIdsUrl] = useState<URL | null>(null)
@@ -295,7 +294,7 @@ export function ArticleContextProvider({ children }: Props) {
   }
 
 
-  const context: BlogContextData = {
+  const context: ArticleContextData = {
     listCount: totalItems,
     items,
     setItems,
@@ -347,10 +346,10 @@ export function ArticleContextProvider({ children }: Props) {
   };
 
   return (
-    <ArticleContext.Provider value={context}>
+    <BlogContext.Provider value={context}>
       {children}
-    </ArticleContext.Provider>
+    </BlogContext.Provider>
   );
 }
 
-export default ArticleContext;
+export default BlogContext;

@@ -1,5 +1,10 @@
+import ListPage from "./list-page";
+
 export default function CategoriesList() {
   return (
-    <div>CategoriesList</div>
+    // <div>CategoriesList</div>
+    <>
+    <ListPage/>
+    </>
   )
 }

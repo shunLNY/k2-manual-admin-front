@@ -1,0 +1,122 @@
+@use "../../../styles/variables.scss" as *;
+@use "../../../styles/mixins";
+
+%gridColumn {
+  grid-auto-columns: 50px 100px 100px 100px 150px 200px 1fr 50px;
+
+}
+
+.list_header {
+  @extend %gridColumn;
+}
+
+.item_wrapper {
+  @extend %gridColumn;
+}
+
+.height_auto {
+  height: auto !important;
+}
+
+.list_search_box {
+  display: flex;
+  // flex-direction: column !important;
+}
+
+.date_input {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-left: 10px;
+}
+
+.drag_handle {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 30px !important;
+  height: 30px !important;
+  border-radius: 4px !important;
+  transition: background-color 0.2s ease !important;
+  cursor: grab !important;
+  touch-action: none !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  position: relative !important;
+  z-index: 10 !important;
+
+  &:hover {
+    background-color: var(--secondary) !important;
+  }
+
+  &:active {
+    cursor: grabbing !important;
+    background-color: var(--sidebar-border) !important;
+  }
+
+  // svg {
+  //   color: var(--subtle-foreground) !important;
+  //   font-size: 14px !important;
+  //   pointer-events: none !important;
+  // }
+
+  // &:hover svg {
+  //   color: #6b7280 !important;
+  // }
+}
+
+// Simple drag container
+.drag_container {
+  position: relative;
+
+  &.dragging {
+    .item_wrapper:not(.item_dragging) {
+      opacity: 0.8;
+      transition: opacity 0.2s ease;
+    }
+  }
+}
+
+// Sortable list styles
+.sortable_list {
+  position: relative;
+
+  li {
+    list-style: none;
+    margin: 0;
+    padding: 5px 0;
+  }
+}
+
+.list_search {
+  width: 100% !important;
+}
+
+.tabs_container {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding: 0 16px;
+}
+
+.tab {
+  padding: 4px 16px;
+  border-radius: 4px;
+  font-size: 13px;
+  cursor: pointer;
+  background-color: #e5e7eb;
+  color: #6b7280;
+  border: none;
+  transition: all 0.2s ease;
+  font-weight: 500;
+
+  &:hover {
+    background-color: #d1d5db;
+  }
+
+  &.active {
+    background-color: #d1d5db;
+    color: #111827;
+    font-weight: 700;
+  }
+}

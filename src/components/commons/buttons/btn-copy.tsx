@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import styles from "@/components/common/buttons/_buttons.module.scss";
+import styles from "@/components/commons/buttons/_buttons.module.scss";
 
 type Props = {
   onClick?: () => void;
@@ -10,15 +10,15 @@ type Props = {
   className?: string;
 };
 
-export default function ButtonDelete(props: Props, color?: string) {
+export default function ButtonCopy(props: Props, color?: string) {
   return (
     <button
       {...props}
-      className={classNames(styles.btn_delete, [props.className], {
+      className={classNames(styles.btn_copy, [props.className], {
         [styles.btn_transparent]: color === "transparent",
       })}
     >
-      {props.text || "削除"}
+      {props.text || "複製"}
     </button>
   );
 }

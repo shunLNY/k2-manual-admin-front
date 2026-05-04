@@ -1,6 +1,5 @@
 /** @format */
-
-
+import type { Category } from './types';
 
 export const API_URL =
   process.env.NEXT_PUBLIC_API_ENDPOINT || 'http://localhost:4000';
@@ -126,56 +125,106 @@ export const BlogsListInfo = [
 
 
 export enum CategoryStatus {
-  PUBLISHED = 'published',
+  PUBLISHED = 'public',
   PRIVATE = 'private',
 }
 
-export const CategoryListInfo = [
+export const Category_list_info: Category[] = [
   {
     id: '1',
-    sortOrder: 3,
+    sort_order: 1,
     status: CategoryStatus.PUBLISHED,
-    categoryName: "K2",
-    creatorId: "2",
-    editorId: "1",
-    createdAt:"2025/3/4",
-    updatedAt:"2025/1/2",
-    numberOfBlogs: 2
+    category_name: 'K2 (Main)',
+    category_slug: 'k2',
+    creatorId: '2',
+    editorId: '1',
+    blog_categories: [{}, {}],
+    createdAt: '2026/04/20',
+    updatedAt: '2026/04/20',
+    creator: { id: '2', account_id: '2', role: 'admin', account_name: 'John', email: 'john@abc.com', password: 'password' },
+    editor: { id: '1', account_id: '1', role: 'admin', account_name: 'SHUN LAE', email: 'shunlae@abc.com', password: 'password' },
+    category_id: '1',
+    // LEVEL 2
+    child_categories: [
+      {
+        id: '1-1',
+        sort_order: 1,
+        status: CategoryStatus.PUBLISHED,
+        category_name: 'Child Category (Level 2)',
+        category_slug: 'child-2',
+        blog_categories: [{}],
+        // LEVEL 3
+        child_categories: [
+          {
+            id: '1-1-1',
+            sort_order: 1,
+            status: CategoryStatus.PUBLISHED,
+            category_name: 'Grandchild Category (Level 3)',
+            category_slug: 'child-3',
+            blog_categories: [{}, {}],
+            // LEVEL 4 (MAX)
+            child_categories: [
+              {
+                id: '1-1-1-1',
+                sort_order: 1,
+                status: CategoryStatus.PUBLISHED,
+                category_name: 'Great-Grandchild Category (Level 4)',
+                category_slug: 'child-4',
+                blog_categories: [{}],
+                child_categories: [] // Limit reached
+              }
+            ]
+          }
+        ],
+    createdAt: '2026/04/20',
+    updatedAt: '2026/04/20',
+    creator: { id: '2', account_id: '2', role: 'admin', account_name: 'John', email: 'john@abc.com', password: 'password' },
+    editor: { id: '1', account_id: '1', role: 'admin', account_name: 'SHUN LAE', email: 'shunlae@abc.com', password: 'password' },
+      }
+    ]
   },
-    {
+  {
     id: '2',
-    sortOrder: 2,
+    sort_order: 2,
     status: CategoryStatus.PRIVATE,
-    categoryName: "S1",
-    creatorId: "2",
-    editorId: "1",
-    createdAt:"2025/1/31",
-    updatedAt:"2025/2/1",
-    numberOfBlogs: 5
+    category_name: 'S1 (Main)',
+    category_slug: 's1',
+    creatorId: '2',
+    editorId: '1',
+    blog_categories: Array(5).fill({}),
+    createdAt: '2026/04/20',
+    updatedAt: '2026/04/20',
+    creator: { id: '2', account_id: '2', role: 'admin', account_name: 'John', email: 'john@abc.com', password: 'password' },
+    editor: { id: '1', account_id: '1', role: 'admin', account_name: 'SHUN LAE', email: 'shunlae@abc.com', password: 'password' },
+    category_id: '2',
+    child_categories: []
   },
-    {
+  {
     id: '3',
-    sortOrder: 1,
+    sort_order: 3,
     status: CategoryStatus.PUBLISHED,
-    categoryName: "SEO",
-    creatorId: "2",
-    editorId: "1",
-    createdAt:"2025/12/2",
-    updatedAt:"2025/12/3",
-    numberOfBlogs: 21
-  },
-    {
-    id: '4',
-    sortOrder: 21,
-    status: CategoryStatus.PRIVATE,
-    categoryName: "Sales",
-    creatorId: "2",
-    editorId: "1",
-    createdAt:"2025/12/31",
-    updatedAt:"2025/12/31",
-    numberOfBlogs: 9
-  },
-
+    category_name: 'SEO (Main)',
+    category_slug: 'seo',
+    creatorId: '2',
+    editorId: '1',
+    blog_categories: Array(21).fill({}),
+    createdAt: '2026/04/20',
+    updatedAt: '2026/04/20',
+    creator: { id: '2', account_id: '2', role: 'admin', account_name: 'John', email: 'john@abc.com', password: 'password' },
+    editor: { id: '1', account_id: '1', role: 'admin', account_name: 'SHUN LAE', email: 'shunlae@abc.com', password: 'password' },
+    category_id: '3',
+    child_categories: [
+      {
+        id: '3-1',
+        sort_order: 1,
+        status: CategoryStatus.PUBLISHED,
+        category_name: 'SEO Sub Category',
+        category_slug: 'seo-sub',
+        blog_categories: Array(5).fill({}),
+        child_categories: []
+      }
+    ]
+  }
 ];
 
 export enum AccountStatus{

@@ -1,6 +1,6 @@
 @use "../../../styles/functions" as fn;
 @use "../../../styles/variables.scss" as *;
-@use "../../../styles/mixin" as mixin;
+@use "../../../styles/mixins" as mixin;
 
 .main_tab_container {
 	position: relative;
@@ -29,86 +29,11 @@
 	justify-content: space-between;
 	width: 100%;
 	padding: 20px 20px 0 20px;
-	// @include mixin.md{
-	//     padding:fn.get-vw(10px) fn.get-vw(20px);
-	// }
-	// font-size: 16px;
-	// .page_count {
-	// 	display: grid;
-	// 	grid-auto-flow: column;
-	// 	grid-template-columns: auto 1fr auto;
-	// 	gap: 5px;
-	// 	justify-items: center;
-	// 	align-items: center;
-	// 	color: var(--foreground);
-	// 	span:not(:first-child):not(:last-child) {
-	// 		min-width: 110px;
-	// 		display: flex;
-	// 		justify-content: center;
-	// 		align-items: center;
-	// 		@include mixin.es {
-	// 			min-width: fn.get-vw(100px);
-	// 		}
-	// 	}
-	// 	// min-width: 140px;
-	// 	@include mixin.sm {
-	// 		font-size: fn.get-vw(11px);
-	// 	}
-	// 	.prev_ico {
-	// 		width: 25px;
-	// 		display: flex;
-	// 		align-self: center;
-	// 		justify-content: center;
-	// 		opacity: 0;
-	// 		visibility: hidden;
-	// 		//   margin-right: 10px;
-	// 		cursor: pointer;
-	// 		&.active_icon {
-	// 			opacity: 1;
-	// 			visibility: visible;
-	// 		}
-	// 		@include mixin.sm {
-	// 			width: fn.get-vw(20px);
-	// 			// margin-right: fn.get-vw(10px);
-	// 		}
-	// 	}
-	// 	// .prev_ico:hover,
-	// 	// .next_ico:hover {
-	// 	//         color:var(--muted-foreground) !important;
-	// 	// }
-	// 	// .prev_ico.active_icon:hover {
-	// 	//   color:var(--subtle-foreground);
-	// 	// }
-	// 	// .next_ico.active_icon:hover {
-	// 	//   color:var(--subtle-foreground);
-	// 	// }
-	// 	.next_ico {
-	// 		width: 25px;
-	// 		display: flex;
-	// 		align-self: center;
-	// 		justify-content: center;
-	// 		//   margin-left: 10px;
-	// 		cursor: pointer;
-	// 		@include mixin.sm {
-	// 			width: fn.get-vw(20px);
-	// 			// margin-left: fn.get-vw(10px);
-	// 		}
-	// 	}
-	// 	svg {
-	// 		font-size: 13px;
-	// 		@include mixin.sm {
-	// 			font-size: fn.get-vw(11px);
-	// 		}
-	// 	}
-	// }
+  @include mixin.sm {
+			padding: 10px 10px 0 10px;
 
-	// @include mixin.xxl {
-	// 	padding-top: 27px;
-	// 	margin-bottom: 20px;
-	// }
-	// @include mixin.sm {
-	// 	padding: fn.get-vw(10px);
-	// }
+		}
+
 	span {
 		margin-left: 20px;
 
@@ -137,7 +62,7 @@
 
 	@include mixin.sm {
 		margin-right: fn.get-vw(25px);
-		font-size: fn.get-vw(11px);
+		// font-size: fn.get-vw(11px);
 	}
 
 	svg {

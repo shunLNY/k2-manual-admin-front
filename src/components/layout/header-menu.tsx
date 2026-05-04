@@ -15,7 +15,7 @@ import { LayoutProps } from '@/utils/types';
 import styles from './header-menu.module.scss';
 import { IconArrowLeft, IconFilter, IconFilterDown, IconKenkoukanri, IconLogout, IconUserMenu } from '../icons/icons';
 import { useContext, useEffect, useState } from 'react';
-import ButtonSave from '@/components/common/buttons/btn-save';
+import ButtonSave from '@/components/commons/buttons/btn-save';
 import ArticleContext from '@/store/articles-context';
 // import ListPageContext from '@/store/list-page-context';
 // import CategoryListContext from '@/store/categories-context';
@@ -34,6 +34,7 @@ export default function Header(props: LayoutProps) {
   const router = useRouter();
   console.log(router.asPath, "...................path name ")
   const pathname = router.asPath;
+  
   const searchParams = useSearchParams();
   const filterParams = searchParams.get("filter") ?? "";
   // const authContext = useContext(AuthContext);
@@ -53,6 +54,7 @@ export default function Header(props: LayoutProps) {
 
 
   const { title, className } = props;
+  const isDashboard = pathname === '/dashboard' || pathname === '/';
   let classes = [styles.header, className].join(" ");
   const [isShowSetting, setIsShowSetting] = useState<boolean>(false);
 
@@ -118,29 +120,19 @@ export default function Header(props: LayoutProps) {
     <header className={className}>
       <div className={styles.menu_bar + ' d-flex items-center hide-menu-sp'}>
         <div className={styles.menu_left}>
-          <div className={styles.logo}>
-            {/* <Image
-              src={'/images/common/グループ_34.png'}
-              width='30'
-              height='30'
-              sizes='100vw'
-              style={{ maxWidth: '100%' }}
-              alt='建工管理'
-              priority={true}
-            /> */}
+          <div className={`${styles.logo} ${isDashboard ? styles.show_logo_sp : ''}`}>
             <IconKenkoukanri />
           </div>
           {/* Header Title & Back Icon */}
           <div className={styles.left}>
             {props.title && (
               <>
-                {pathname !== "/dashboard" && (
-                  <span onClick={handleNavigateLink}>
+                {!isDashboard && (
+                  <span onClick={handleNavigateLink} className={styles.back_icon}>
                     <IconArrowLeft />
                   </span>
                 )}
-
-                <span>{props.title}</span>
+                <span className={styles.header_title}>{props.title}</span>
               </>
             )}
           </div>

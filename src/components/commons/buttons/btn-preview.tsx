@@ -1,7 +1,7 @@
 /** @format */
 
 import classNames from 'classnames';
-import styles from '@/components/common/buttons/_buttons.module.scss';
+import styles from '@/components/commons/buttons/_buttons.module.scss';
 
 type Props = {
   onClick: () => void;
@@ -16,7 +16,7 @@ export default function ButtonCancel(props: Props, color?: string) {
   return (
     <button
       {...props}
-      className={classNames(styles.btn_cancel, [props.className], {
+      className={classNames(styles.btn_preview, [props.className], {
         [styles.btn_transparent]: color === 'transparent',
       })}>
       {props.text || '戻る'}

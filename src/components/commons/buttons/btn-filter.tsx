@@ -3,7 +3,7 @@
 import classNames from 'classnames';
 
 import { IconFilter } from '@/components/icons/icons';
-import styles from '@/components/common/buttons/_buttons.module.scss';
+import styles from '@/components/commons/buttons/_buttons.module.scss';
 
 export default function ButtonFilter(props: any) {
   const { handleModal } = props;

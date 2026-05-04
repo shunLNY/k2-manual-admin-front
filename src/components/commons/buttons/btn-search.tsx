@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import styles from "@/components/common/buttons/_buttons.module.scss";
+import styles from "@/components/commons/buttons/_buttons.module.scss";
 
 type Props = {
   onClick?: () => void;

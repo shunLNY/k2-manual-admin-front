@@ -35,7 +35,12 @@
   }
 
   @include mixin.sm {
-    display: none;
+    display: none; 
+    width: auto;
+    
+    &.show_logo_sp {
+      display: flex; 
+    }
   }
 }
 
@@ -131,7 +136,7 @@
 
     @include mixin.sm {
       margin-left: fn.get-vw(20px);
-      height: fn.get-vw(28px);
+      height: fn.get-vw(130px);
       // margin-top: fn.get-vw(5px);
     }
 
@@ -139,7 +144,7 @@
       font-size: 34px;
 
       @include mixin.sm {
-        font-size: fn.get-vw(28px);
+        font-size: 30px;
       }
 
       // @include mixin.es {
@@ -216,6 +221,9 @@
   @include mixin.sm {
     // display: none;
     margin-left: 0;
+    .header_title{
+      font-size: var(--text-base);
+    }
   }
 }
 
@@ -285,6 +293,12 @@
     justify-content: flex-end;
     margin-top: 0;
     margin-bottom: 0;
+    a, button {
+      min-width: 100px !important;
+      padding: 4px 10px !important;
+      font-size: 10px !important;
+      height: 28px !important;
+    }
   }
 
   a {
@@ -436,7 +450,7 @@
 
 // ****************
 .menu_bar {
-  z-index: 1;
+  z-index: 1001;
   background-color: var(--header-background);
   border-bottom: 2px solid var(--header-border);
   height: 50px;
@@ -444,7 +458,16 @@
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
   display: flex;
   justify-content: space-between;
-  // padding: 0 20px;
+  align-items: center;
+  padding: 0 15px;
+
+  @include mixin.sm {
+    height: 50px;
+    position: sticky;
+    top: 0;
+    width: 100%;
+    padding: 0 10px;
+  }
 }
 
 .overlay {
@@ -465,6 +488,10 @@
   z-index: 111;
   box-shadow: var(--shadow-lg);
   padding: 20px;
+  @include mixin.sm {
+    width: 80%;
+    height: 100%;
+  }
 }
 
 .user_account_container,

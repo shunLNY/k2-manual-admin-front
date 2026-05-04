@@ -7,6 +7,28 @@
   width: 100px;
   height: 100vh;
   background-color: var(--sidebar);
+
+  @include mixin.sm() {
+    width: 100%;
+    height: 70px; // Fixed height for bottom bar
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    z-index: 1000;
+    border-top: 1px solid var(--border);
+  }
+}
+
+.nav_list_container {
+  display: flex;
+  flex-direction: column;
+
+  @include mixin.sm() {
+    flex-direction: row; 
+    height: 100%;
+    align-items: center;
+    justify-content: space-around; 
+  }
 }
 
 .nav_item {
@@ -20,6 +42,16 @@
   justify-content: center;
   align-items: center;
   transition: 0.3s;
+
+  @include mixin.sm() {
+    height: 100%;
+    flex: 1;     
+    gap: 2px;
+    
+    p {
+      font-size: 10px;
+    }
+  }
 
   &:hover {
     background-color: var(--primary);

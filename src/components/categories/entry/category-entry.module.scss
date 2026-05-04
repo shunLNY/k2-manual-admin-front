@@ -1,0 +1,179 @@
+/** @format */
+@use '../../../styles/variables.scss' as *;
+@use '../../../styles/mixins' as mixin;
+
+.main_container {
+  display: flex;
+  width: 100%;
+  height: calc(100vh - 50px);
+  flex-direction: column;
+  position: relative;
+}
+
+.row {
+  &_one {
+    width: 100%;
+    background-color: var(--list-header-background);
+    padding: 30px;
+    flex: 1;
+  }
+
+  // &_two {
+  //   width: 30%;
+  //   background-color: var(--secondary);
+  //   padding: 30px;
+  // }
+}
+
+.textboxContainer {
+  width: 40%;
+
+  @include mixin.sm {
+    width: 100%;
+  }
+}
+
+.status_container {
+  margin-top: 10px;
+  // width: fit-content;
+  border: 2px solid var(--muted-foreground);
+  border-radius: 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: fit-content;
+  color: var(--foreground);
+
+  >div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100px;
+    height: 40px;
+    border-radius: 30px;
+    // border: 1px solid var(--muted-foreground);
+    transition: 0.5s;
+    cursor: pointer;
+
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+
+  // @include mixin.lg {
+  //   width: 100%;
+  // }
+}
+
+.public {
+  background-color: var(--primary);
+  color: var(--button-foreground);
+}
+
+.private {
+  background-color: var(--button-background-gray);
+  color: var(--button-foreground);
+}
+
+.publish_date_container {
+  display: flex;
+  gap: 20px;
+}
+
+// Additional styles for the info section
+.info_section {
+  margin-top: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.info_item {
+  align-items: center;
+  gap: 16px;
+  display: flex;
+  flex-direction: row;
+}
+
+.info_label {
+  font-size: 14px;
+  color: var(--secondary-foreground);
+  min-width: 80px;
+  font-weight: 500;
+}
+
+.info_value {
+  font-size: 14px;
+  color: var(--foreground);
+  font-weight: 600;
+}
+
+.submitBtn {
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.iconDelete {
+  cursor: pointer;
+  position: absolute;
+  right: 20px;
+
+  svg {
+    font-size: 25px;
+    color: var(--destructive);
+  }
+
+  &:hover {
+    background-color: rgba(var(--destructive), 0.1);
+  }
+}
+
+.error_message {
+  color: red;
+  font-size: 0.8rem;
+  margin-top: 4px;
+}
+
+// Responsive design using your existing mixin
+@include mixin.sm {
+  .info_item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .info_label {
+    min-width: auto;
+  }
+}
+
+.flexRow {
+  display: grid;
+  grid-template-columns: 30% 1fr;
+  gap: 30px; // Radio နဲ့ Dropdown ကြားအကွာအဝေး
+  // align-items: flex-start;
+  margin-bottom: 20px;
+
+  @include mixin.sm {
+    grid-template-columns: 1fr;
+  }
+}
+
+.radio_group {
+  display: flex;
+  gap: 20px;
+  margin-top: 10px;
+
+  label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+  }
+}
+
+.dropdown_side {
+  // လိုအပ်တဲ့ width သို့မဟုတ် margin ထပ်ထည့်နိုင်ပါတယ်
+}

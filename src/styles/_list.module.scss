@@ -2,7 +2,7 @@
 
 @use './variables' as *;
 @use './functions' as fn;
-@use './mixin' as mixin;
+@use './mixins' as mixin;
 @use 'sass:color';
 
 $table-width: 100%;
