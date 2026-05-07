@@ -20,7 +20,7 @@
     width: fn.get-vw(100px);
     height: fn.get-vw(30px);
     border-radius: fn.get-vw(5px);
-    font-size: fn.get-vw(13px);
+    font-size: fn.get-vw(60px);
   }
 }
 
@@ -53,9 +53,9 @@
   //     height: fn.get-vw(20px);
   // }
   @include mixin.sm {
-    width: fn.get-vw(100px);
+    width: 100%;
     border-radius: fn.get-vw(20px);
-    height: fn.get-vw(30px);
+    height: fn.get-vw(150px);
   }
 }
 
@@ -113,9 +113,9 @@
   //     height: fn.get-vw(20px);
   // }
   @include mixin.sm {
-    width: fn.get-vw(100px);
+    width: 100%;
     border-radius: fn.get-vw(20px);
-    height: fn.get-vw(30px);
+    height: fn.get-vw(150px);
   }
 }
 
@@ -163,7 +163,7 @@
   @include mixin.sm {
     width: fn.get-vw(66px);
     height: fn.get-vw(26px);
-    font-size: fn.get-vw(13px);
+    font-size: fn.get-vw(30px);
   }
 }
 
@@ -181,7 +181,7 @@
   @include mixin.sm {
     width: fn.get-vw(66px);
     height: fn.get-vw(25px);
-    font-size: fn.get-vw(13px);
+    font-size: fn.get-vw(30px);
   }
 }
 

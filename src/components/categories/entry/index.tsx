@@ -268,58 +268,58 @@ const watchHasChild = watch("has_child");
           </div>
 
           {/* --- Parent Category Section --- */}
-<div className={styles.flexRow}>
-  <FormControl label="親カテゴリはありますか？" required>
-    <div className={styles.radio_group}>
-      <label>
-        <input {...register("has_parent")} type="radio" value="yes" /> はい
-      </label>
-      <label>
-        <input {...register("has_parent")} type="radio" value="no" /> いいえ
-      </label>
-    </div>
-  </FormControl>
+          <div className={styles.flexRow}>
+            <FormControl label="親カテゴリはありますか？" required>
+              <div className={styles.radio_group}>
+                <label>
+                  <input {...register("has_parent")} type="radio" value="yes" /> はい
+                </label>
+                <label>
+                  <input {...register("has_parent")} type="radio" value="no" /> いいえ
+                </label>
+              </div>
+            </FormControl>
 
-  {/* watchHasParent က "yes" ဖြစ်မှ Dropdown ပေါ်မည် */}
-  {watchHasParent === "yes" && (
-    <div className={styles.dropdown_side}>
-      <FormControl label="親カテゴリー名" required>
-        <ReactSelect
-          options={listCtx.items.map(item => ({ value: item.id, label: item.category_name }))}
-          placeholder="---親カテゴリーを選択します---"
-          onChange={(opt: any) => setValue("parent_id", opt.value)}
-        />
-      </FormControl>
-    </div>
-  )}
-</div>
+            {/* watchHasParent က "yes" ဖြစ်မှ Dropdown ပေါ်မည် */}
+            {watchHasParent === "yes" && (
+              <div className={styles.dropdown_side}>
+                <FormControl label="親カテゴリー名" required>
+                  <ReactSelect
+                    options={listCtx.items.map(item => ({ value: item.id, label: item.category_name }))}
+                    placeholder="---親カテゴリーを選択します---"
+                    onChange={(opt: any) => setValue("parent_id", opt.value)}
+                  />
+                </FormControl>
+              </div>
+            )}
+        </div>
 
-{/* --- Child Category Section --- */}
-<div className={styles.flexRow}>
-  <FormControl label="子カテゴリはありますか？" required>
-    <div className={styles.radio_group}>
-      <label>
-        <input {...register("has_child")} type="radio" value="yes" /> はい
-      </label>
-      <label>
-        <input {...register("has_child")} type="radio" value="no" /> いいえ
-      </label>
-    </div>
-  </FormControl>
+          {/* --- Child Category Section --- */}
+          <div className={styles.flexRow}>
+            <FormControl label="子カテゴリはありますか？" required>
+              <div className={styles.radio_group}>
+                <label>
+                  <input {...register("has_child")} type="radio" value="yes" /> はい
+                </label>
+                <label>
+                  <input {...register("has_child")} type="radio" value="no" /> いいえ
+                </label>
+              </div>
+            </FormControl>
 
-  {/* watchHasChild က "yes" ဖြစ်မှ Dropdown ပေါ်မည် */}
-  {watchHasChild === "yes" && (
-    <div className={styles.dropdown_side}>
-      <FormControl label="子カテゴリー名" required>
-        <ReactSelect
-          options={listCtx.items.map(item => ({ value: item.id, label: item.category_name }))}
-          placeholder="---子カテゴリーを選択します---"
-          onChange={(opt: any) => setValue("child_id", opt.value)}
-        />
-      </FormControl>
-    </div>
-  )}
-</div>
+            {/* watchHasChild က "yes" ဖြစ်မှ Dropdown ပေါ်မည် */}
+            {watchHasChild === "yes" && (
+              <div className={styles.dropdown_side}>
+                <FormControl label="子カテゴリー名" required>
+                  <ReactSelect
+                    options={listCtx.items.map(item => ({ value: item.id, label: item.category_name }))}
+                    placeholder="---子カテゴリーを選択します---"
+                    onChange={(opt: any) => setValue("child_id", opt.value)}
+                  />
+                </FormControl>
+              </div>
+            )}
+          </div>
 
           <FormControl label="公開設定" required>
             <div className={styles.status_container}>

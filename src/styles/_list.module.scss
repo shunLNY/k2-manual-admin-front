@@ -208,12 +208,12 @@ $table-width: 100%;
     color: var(--foreground);
 
     @include mixin.sm {
-      width: fn.get-vw(60px);
+      width: fn.get-vw(200px);
       height: auto;
       padding: 6px 0;
       margin-bottom: 5px;
-      font-size: fn.get-vw(10px);
-      border-radius: fn.get-vw(5px);
+      font-size: 10px;
+      border-radius: fn.get-vw(10px);
       // border-width: fn.get-vw(1px);
     }
   }

@@ -1,0 +1,184 @@
+/** @format */
+@use '../../../styles/variables.scss' as *;
+@use '../../../styles/mixins' as mixin;
+
+.main_container {
+  display: flex;
+  width: 100%;
+  height: calc(100vh - 50px);
+  position: relative;
+  // padding-bottom: 80px;
+  @include mixin.md {
+      flex-direction: column-reverse;
+      overflow-y: auto;
+  }
+  @include mixin.sm {
+    padding-bottom: 30px;
+  }
+}
+
+.row {
+  &_one {
+    width: 70%;
+    background-color: var(--list-header-background);
+    padding: 30px;
+
+    @include mixin.md {
+      width: 100%;
+      padding: 10px 10px 100px 10px;
+    }
+  }
+
+  &_two {
+    width: 30%;
+    background-color: var(--filter-background);
+    padding: 30px;
+
+    @include mixin.md {
+      width: 100%;
+      padding: 10px;
+    }
+  }
+}
+
+.textareaInput {
+  width: 100%;
+  min-height: 90px;
+  padding: 10px;
+  border: 2px solid var(--border);
+  border-radius: 5px;
+  background-color: var(--subtle-foreground);
+  color: var(--secondary-foreground);
+}
+
+.status_container {
+  margin-top: 10px;
+  // width: fit-content;
+  border: 2px solid var(--muted-foreground);
+  border-radius: 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: fit-content;
+  color: var(--foreground);
+
+  >div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100px;
+    height: 40px;
+    border-radius: 30px;
+    // border: 1px solid var(--muted-foreground);
+    transition: 0.5s;
+  }
+
+  @include mixin.lg {
+    width: 100%;
+  }
+  @include mixin.md {
+    width: 40%;
+  }
+  @include mixin.sm {
+    width: 100%;
+  }
+}
+
+.public {
+  background-color: var(--button-background-blue);
+  color: var(--button-foreground);
+}
+
+.private {
+  background-color: var(--button-background-lightgray);
+  color: var(--button-foreground);
+}
+
+.draft {
+  background-color: var(--button-background-gray);
+  color: var(--button-foreground);
+}
+
+.publish_date_container {
+  display: flex;
+  gap: 20px;
+  cursor: pointer;
+}
+
+
+.iconDelete {
+  cursor: pointer;
+  position: absolute;
+  right: 20px;
+
+  svg {
+    font-size: 25px;
+    color: var(--primary);
+  }
+}
+
+.iconDelete {
+  cursor: pointer;
+  position: absolute;
+  right: 20px;
+
+  svg {
+    font-size: 25px;
+    color: var(--destructive);
+  }
+
+  &:hover {
+    background-color: rgba(var(--destructive), 0.1);
+  }
+}
+
+.thumbnail_container {
+  position: relative;
+}
+
+.thumbnail_upload {
+  color: var(--foreground);
+  border: 2px solid var(--bs-gray-400);
+  border-radius: 5px;
+  width: 100%;
+  height: 125px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+
+.close_ic {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--bs-gray-400);
+  position: absolute;
+  z-index: 11;
+  right: -18px;
+  top: -18px;
+  border-radius: 50px;
+
+}
+
+.img_relative {
+  position: relative !important;
+  height: 200px !important;
+  width: 100% !important;
+}
+
+.thumbnail_btn {
+  font-size: var(--text-sm);
+  background-color: var(--button-background-blue);
+  color: var(--button-foreground);
+  padding: 10px;
+  border-radius: 40px;
+  box-shadow: 1px 3px 7px #00000063;
+  transition: 0.3s;
+
+  &:hover {
+    background-color: var(--primary);
+  }
+}

@@ -10,13 +10,13 @@
 
   @include mixin.xs {
     margin-bottom: fn.get-vw(3px);
-    font-size: fn.get-vw(13px);
+    font-size: fn.get-vw(30px);
   }
 }
 
 .react_select {
   width: 100%;
-  border: 1px solid transparent;
+  border: 2px solid var(--border);
   border-radius: 5px;
 
   * {
@@ -113,7 +113,7 @@
 
   @include mixin.sm {
     :global(.react-select__control) {
-      min-height: fn.get-vw(35px);
+      // min-height: fn.get-vw(35px);
     }
 
     :global(.react-select__clear-indicator),
@@ -131,7 +131,7 @@
     font-size: 13px;
 
     @include mixin.xs {
-      font-size: fn.get-vw(12px);
+      font-size: fn.get-vw(50px);
     }
   }
 
@@ -151,7 +151,7 @@
     margin: 4px 0;
     border-radius: 30px;
     border-color: transparent;
-    border-width: 0;
+    // border-width: 0;
     border-style: none;
     // overflow-y: scroll;
   }

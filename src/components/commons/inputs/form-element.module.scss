@@ -50,9 +50,9 @@
   overflow: hidden;
 
   @include mixin.sm {
-    width: fn.get-vw(25px);
+    width: fn.get-vw(70px);
     flex: 0 0 fn.get-vw(25px);
-    height: fn.get-vw(25px);
+    height: fn.get-vw(70px);
   }
 
   &.radio_container {
@@ -340,4 +340,13 @@ input:disabled+.checkmark {
   background-color: var(--background);
   position: absolute;
   bottom: 0;
+  z-index: 10;
+
+  @include mixin.sm {
+    flex-direction: column;
+    gap: 10px;
+    height: fit-content;
+    padding: 10px;
+    bottom: 70px;
+  }
 }

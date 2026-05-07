@@ -80,7 +80,7 @@ const ListItem = (props: Props) => {
     >
       <div 
         className={`${styles.item_wrapper} ${categoryListStyles.item_wrapper}`}
-        style={{ paddingLeft: `${(level - 1) * 40}px` }}
+        style={{ paddingLeft: `${(level - 1) * 20}px` }}
       >
         <div
           {...attributes}
@@ -112,6 +112,7 @@ const ListItem = (props: Props) => {
           )}
         </div>
         <div>{item?.createdAt ? dayjs(item.createdAt).format("YYYY-MM-DD") : "—"}</div>
+        <div>{item?.category_name}</div>
         <div>
           <span className={styles.client_name}>
             {item?.creator?.account_name}
@@ -121,7 +122,7 @@ const ListItem = (props: Props) => {
             {item?.editor?.account_name}
           </span>
         </div>
-        <div>{item?.category_name}</div>
+        
         <div>{item?.blog_categories?.length ?? 0}</div>
         <div className={styles.detail_ico} onClick={(e) => {
           if (hasChildren) {

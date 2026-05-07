@@ -1,6 +1,6 @@
 /** @format */
 @use '../../styles/variables.scss' as *;
-@use '../../styles/mixin' as mixin;
+@use '../../styles/mixins' as mixin;
 
 .main_container {
   display: flex;
@@ -16,6 +16,9 @@
     background-color: var(--list-header-background);
     padding: 30px;
     flex: 1;
+    @include mixin.md{
+   padding: 10px;
+  }
   }
 
   // &_two {
@@ -35,6 +38,9 @@
 
 .textboxContainer {
   width: 40%;
+  @include mixin.md{
+    width: 100%;
+  }
 }
 
 .status_container {

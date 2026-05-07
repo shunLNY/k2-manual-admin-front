@@ -136,7 +136,7 @@
 
     @include mixin.sm {
       margin-left: fn.get-vw(20px);
-      height: fn.get-vw(130px);
+      // height: fn.get-vw(130px);
       // margin-top: fn.get-vw(5px);
     }
 

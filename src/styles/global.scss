@@ -62,6 +62,9 @@
   --auth-background: #f2f3f7;
 
   --input-background: #ffffff;
+  --auth-logo-filter: none;
+  --auth-icon-fill: #9fa2af;
+  --toggle: var(--primary);
 
   --button-background-gray: #7a8196;
   --button-background-blue: var(--primary);
@@ -104,7 +107,7 @@
   --muted-background: #999FC0;
 
   --foreground: #FFFFFF;
-  --muted-foreground: #C2C5D9;
+  --muted-foreground: #4a4a4a;
   --subtle-foreground: #999FC0;
   --border: var(--muted-background);
 
@@ -153,6 +156,10 @@
   --auth-background: #f2f3f7;
 
   --input-background: #C2C5D9;
+  --auth-logo-filter: invert(1) brightness(1.5);
+  --auth-icon-fill: var(--subtle-foreground);
+  --toggle: var(--list-border);
+
 
   --button-background-gray: #7a8196;
   --button-background-blue: var(--primary);

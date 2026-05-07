@@ -1,0 +1,16 @@
+@use "../../../styles/variables.scss" as *;
+
+%gridColumn {
+	grid-auto-columns: 100px 100px 1fr 1fr;
+}
+
+.list_header {
+	@extend %gridColumn;
+}
+
+.item_wrapper {
+	@extend %gridColumn;
+}
+.height_auto{
+    height: auto !important;
+}
