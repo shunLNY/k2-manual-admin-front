@@ -26,6 +26,7 @@ type ListBodyProps = {
   pageNumber?: number;
   onOpenMultipleCopySubmit?: () => void;
   onOpenMultipleDelete?: () => void;
+  extraHeaderContent?: React.ReactNode;
 };
 
 export default function ListBody(props: ListBodyProps) {
@@ -39,6 +40,7 @@ export default function ListBody(props: ListBodyProps) {
     pageNumber,
     onOpenMultipleCopySubmit,
     onOpenMultipleDelete,
+    extraHeaderContent,
   } = props;
 
 
@@ -71,7 +73,7 @@ export default function ListBody(props: ListBodyProps) {
       >
         <div className={styles.count_container}>
 
-          <div className={styles.count_container}>
+          <div>
             {totalCategories ? (
               <div className={styles.total_count}>
                 {countIcon}
@@ -89,6 +91,7 @@ export default function ListBody(props: ListBodyProps) {
 
 
           <div className={styles.btn_container}>
+            {extraHeaderContent}
             {/* {[
               "/blogs"
             ].includes(pathname) && (

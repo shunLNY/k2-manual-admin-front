@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { IconArrowDown, IconArrowRight, IconArrowUp, IconYellowAlert } from "@/components/icons/icons"
+import { IconArrowDown, IconArrowRight, IconArrowUp, IconYellowAlert, IconPlus } from "@/components/icons/icons"
 import { useRouter } from "next/router"
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
@@ -31,14 +31,16 @@ const ListItem = (props: Props) => {
   const { item, currentPage, pageSize, index, level } = props
   const { checkedItems, setCheckedItems, selectedCategories, setSelectedCategories } = listCtx
 
-  const [isOpen, setIsOpen] = useState(level === 1)
-  const hasChildren = item.child_categories && item.child_categories.length > 0 && level < 4 // Max depth check
+  const [isOpen, setIsOpen] = useState(level > 1)
+  const hasChildren = item.child_categories && item.child_categories.length > 0
+  const canExpand = level === 1 && hasChildren
 
   // Use the sortable hook
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: item.id })
 
   const style = {
     transform: CSS.Transform.toString(transform),
+    padding: "0px !important",
     transition,
     opacity: isDragging ? 0.5 : 1,
   }
@@ -76,7 +78,7 @@ const ListItem = (props: Props) => {
       ref={setNodeRef}
       style={style}
       onClick={() => navigateToEditEntry(item.id)}
-      className={isDragging ? "dragging" : ""}
+      className={isDragging ? "category_list_item dragging" : "category_list_item"}
     >
       <div 
         className={`${styles.item_wrapper} ${categoryListStyles.item_wrapper}`}
@@ -124,20 +126,25 @@ const ListItem = (props: Props) => {
         </div>
         
         <div>{item?.blog_categories?.length ?? 0}</div>
+        {level < 3 && (
+          <div onClick={(e) => e.stopPropagation()}>
+            <button className={categoryListStyles.btn_add_child} onClick={() => router.push(`/categories/entry?parentId=${item.id}`)}>
+              +サブカテゴリー
+            </button>
+          </div>
+        )}
         <div className={styles.detail_ico} onClick={(e) => {
-          if (hasChildren) {
+          if (canExpand) {
             e.stopPropagation()
             setIsOpen(!isOpen)
           }
         }}>
-          {hasChildren ? (
+          {canExpand ? (
             isOpen ? <IconArrowUp /> : <IconArrowDown />
-          ) : (
-            <IconArrowRight />
-          )}
+          ) : null}
         </div>
       </div>
-      {hasChildren && isOpen && (
+      {(canExpand || level > 1) && hasChildren && isOpen && (
         <ul className={categoryListStyles.sortable_list}>
           {item.child_categories.map((child: any, childIndex: number) => (
             <ListItem

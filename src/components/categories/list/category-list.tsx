@@ -25,6 +25,10 @@ import { toast } from "react-toastify"
 import { fetcher } from "@/utils/fetcher"
 import { deleteSuccessfulMessage, failMessage } from "@/utils/constants"
 import DeleteModal from "@/components/modals/delete-modal"
+import { Category_list_info } from "@/utils/constants"
+import classNames from "classnames"
+import { useRouter } from "next/navigation"
+
 
 type Props = {
   count: number
@@ -36,6 +40,7 @@ type Props = {
 const CategoryList = (props: Props) => {
   const listCtx = useContext(CategoryListContext)
   const pageCtx = useContext(ListPageContext)
+  const router = useRouter()
 
   const {
     items,
@@ -64,7 +69,7 @@ const CategoryList = (props: Props) => {
   // Update local list when items change or tab changes
   useEffect(() => {
     const selectedRoot = items.find((c: any) => c.id === listCtx.selectedTabId)
-    setList(selectedRoot ? [selectedRoot] : [])
+    setList(selectedRoot?.child_categories || [])
   }, [items, listCtx.selectedTabId])
 
   const handleAllCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -120,8 +125,29 @@ const CategoryList = (props: Props) => {
       count={count}
       countIcon={<IconOrder />}
       pageNumber={currentPage}
-    // onOpenMultipleDelete={onOpenMultipleDelete}
+      // onOpenMultipleDelete={onOpenMultipleDelete}
+      extraHeaderContent={
+        <button
+          className={CategoryListStyles.btn_add_child}
+          onClick={() => router.push("/categories/entry")}
+        >
+          +メインカテゴリー
+        </button>
+      }
     >
+    <div className={CategoryListStyles.tabs_container}>
+						{Category_list_info.map((category) => (
+							<button
+								key={category.id}
+								className={classNames(CategoryListStyles.tab, {
+									[CategoryListStyles.active]: listCtx.selectedTabId === category.id,
+								})}
+								onClick={() => listCtx.setSelectedTabId(category.id)}
+							>
+								{category.category_name}
+							</button>
+						))}
+					</div>
       <div className={`${styles.table_wrapper} ${CategoryListStyles.drag_container}`}>
         <div className={`${styles.table_header} ${CategoryListStyles.list_header}`}>
           <div className={styles.table_head}></div>
@@ -145,6 +171,9 @@ const CategoryList = (props: Props) => {
           </div>
           <div role="button" className={styles.table_head}>
             記事件数
+          </div>
+          <div role="button" className={styles.table_head}>
+            
           </div>
           <div className={styles.table_head}></div>
         </div>
@@ -173,6 +202,7 @@ const CategoryList = (props: Props) => {
               ) : null}
             </DragOverlay>
           </DndContext>
+          {list.length === 0 && <p className="p-8 text-center text-gray-500">子カテゴリーがありません</p>}
           {items.length === 0 && <div className="p-8 text-center text-gray-500">カテゴリーが見つかりません</div>}
         </div>
       </div>

@@ -215,7 +215,7 @@ const ListPage = () => {
 			>
 				
 				<>
-					<div className={styles.tabs_container}>
+					{/* <div className={styles.tabs_container}>
 						{Category_list_info.map((category) => (
 							<button
 								key={category.id}
@@ -227,7 +227,7 @@ const ListPage = () => {
 								{category.category_name}
 							</button>
 						))}
-					</div>
+					</div> */}
 					<CategoryList
 						count={listCount}
 						currentPage={currentPage}
