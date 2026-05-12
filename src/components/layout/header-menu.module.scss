@@ -127,7 +127,7 @@
   .btn_user_menu {
     margin-left: 20px;
     height: 34px;
-    color: var(--header-foreground);
+    // color: var(--header-foreground);
     background-color: var(--header-background);
 
     @include mixin.lg {

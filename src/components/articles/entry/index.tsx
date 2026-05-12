@@ -140,43 +140,43 @@ const ArticleEntry = () => {
   }, [_id])
 
   let mappedCategories: [];
-  useEffect(() => {
-    if (blogInfo && _id) {
+  // useEffect(() => {
+  //   if (blogInfo && _id) {
 
-      setImage(blogInfo.thumbnail_path);
-      mappedCategories =
-        blogInfo.blog_categories?.map((cat: any) => ({
-          value: cat.category?.id,
-          label: cat.category?.category_name,
-        })) || [];
+  //     setImage(blogInfo.thumbnail_path);
+  //     mappedCategories =
+  //       blogInfo.blog_categories?.map((cat: any) => ({
+  //         value: cat.category?.id,
+  //         label: cat.category?.category_name,
+  //       })) || [];
 
-      setSelectedCategories(mappedCategories)
-      console.log(mappedCategories);
+  //     setSelectedCategories(mappedCategories)
+  //     console.log(mappedCategories);
 
-      if (blogInfo.content) {
+  //     if (blogInfo.content) {
 
-        setContent(blogInfo.content)
-      }
+  //       setContent(blogInfo.content)
+  //     }
 
-      reset({
-        title: blogInfo.title ?? "",
-        status: blogInfo.status ?? "draft",
-        publish_start_at: blogInfo.publish_start_at ?? null,
-        publish_end_at: blogInfo.publish_end_at ?? null,
-        content: blogInfo.content ?? "",
-        thumbnail_path: blogInfo.thumbnail_path ?? "",
-        blog_categories: mappedCategories,
-      });
+  //     reset({
+  //       title: blogInfo.title ?? "",
+  //       status: blogInfo.status ?? "draft",
+  //       publish_start_at: blogInfo.publish_start_at ?? null,
+  //       publish_end_at: blogInfo.publish_end_at ?? null,
+  //       content: blogInfo.content ?? "",
+  //       thumbnail_path: blogInfo.thumbnail_path ?? "",
+  //       blog_categories: mappedCategories,
+  //     });
 
 
-      setSelectedStatus(blogInfo.status as "published" | "private" | "draft");
+  //     setSelectedStatus(blogInfo.status as "published" | "private" | "draft");
 
-    } else if (!_id) {
-      setSelectedCategories([]);
-      reset();
-      setSelectedStatus("draft");
-    }
-  }, [blogInfo, _id, reset]);
+  //   } else if (!_id) {
+  //     setSelectedCategories([]);
+  //     reset();
+  //     setSelectedStatus("draft");
+  //   }
+  // }, [blogInfo, _id, reset]);
 
   console.log(selectedCategories, ".....")
 

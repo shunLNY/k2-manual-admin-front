@@ -12,6 +12,11 @@
 
 .item_wrapper {
   @extend %gridColumn;
+  transition: background-color 0.2s ease;
+  
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.05) !important; 
+  }
 }
 
 .height_auto {
@@ -109,14 +114,15 @@
   align-items: center;
   gap: 0;
   border-radius: 4px 4px 0px 0px;
-  background-color: #e5e7eb;
-  color: #6b7280;
+  background-color: var(--sidebar);
+  color: var(--text-sm);
   transition: all 0.2s ease;
   font-weight: 500;
   padding: 0 8px 0 0;
 
   &:hover {
-    background-color: #d1d5db;
+    background-color: var(--sidebar-primary-background);
+    color: var(--sidebar-primary-foreground);
     
     .tab_edit_icon {
       opacity: 1;
@@ -124,8 +130,8 @@
   }
 
   &.active {
-    background-color: #d1d5db;
-    color: #111827;
+    background-color: var(--sidebar-primary-background);
+    color: var(--sidebar-primary-foreground);
     font-weight: 700;
 
     .tab_edit_icon {
@@ -139,7 +145,7 @@
   font-size: 13px;
   cursor: pointer;
   background: transparent;
-  color: inherit;
+  color: var(--text-sm);
   border: none;
   font-weight: inherit;
   white-space: nowrap;
@@ -155,18 +161,17 @@
   transition: opacity 0.2s ease;
   padding: 2px;
   border-radius: 3px;
-  color: #9ca3af;
+  color: var(--text-sm);
 
   &:hover {
     // background-color: rgba(0, 0, 0, 0.1);
-    color: #374151;
+    color: var(--primary);
   }
 }
 
 .btn_add_child {
   padding: 5px 10px;
   border-radius: 5px;
-  border: 1px solid #d1d5db;
   display: inline-block;
   color: #ffffff;
   background-color: var(--primary);

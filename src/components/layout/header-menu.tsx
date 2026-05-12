@@ -17,7 +17,7 @@ import { IconArrowLeft, IconFilter, IconFilterDown, IconKenkoukanri, IconLogout,
 import { useContext, useEffect, useState } from 'react';
 import ButtonSave from '@/components/commons/buttons/btn-save';
 import ArticleContext from '@/store/articles-context';
-// import ListPageContext from '@/store/list-page-context';
+import { useListPage } from '@/store/list-page-context';
 // import CategoryListContext from '@/store/categories-context';
 // import { signOut } from 'next-auth/react';
 import { NEXT_PUBLIC_APP_URL } from '@/utils/constants';
@@ -45,7 +45,7 @@ export default function Header(props: LayoutProps) {
 
 
   const articleListCtx = useContext(ArticleContext)
-  // const pageCtx = useContext(ListPageContext)
+  const pageCtx = useListPage();
   // const categoryCtx = useContext(CategoryListContext)
   // const accountCtx = useContext(AccountContext);
   // const { getAccountInfo, accountInfo } = accountCtx;
@@ -174,7 +174,7 @@ export default function Header(props: LayoutProps) {
 
             )}
 
-            {/* {
+            {
               !isEntryPage && !isEditEntryPage && pathname !== "/dashboard" && pathname !== "/my-profile" && pathname !== "/" && (
                 <div className={`${styles.filter_container} ${pageCtx.openFilterModal ? styles.active : ""}`} onClick={() => pageCtx.setOpenFilterModal(!pageCtx.openFilterModal)}>
                   <IconFilter />
@@ -182,7 +182,7 @@ export default function Header(props: LayoutProps) {
                   <IconFilterDown />
                 </div>
               )
-            } */}
+            }
 
 
 

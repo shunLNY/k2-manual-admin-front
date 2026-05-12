@@ -59,16 +59,7 @@ const ListItem = (props: Props) => {
     router.push(`/categories/edit/${id}`)
   }
 
-  // const handleCheckboxChange = (category: Category, itemId: string, e: React.ChangeEvent<HTMLInputElement>) => {
-  //   const checked = e.target.checked
-  //   setSelectedCategories((prev: any) => {
-  //     if (checked) {
-  //       return [...prev, category]
-  //     }
-  //     return prev.filter((c: any) => c.id !== category.id)
-  //   })
-  //   setCheckedItems((prev: any) => (checked ? [...prev, itemId] : prev.filter((id: any) => id !== itemId)))
-  // }
+  const dynamicOpacity = (level - 1) * 0.05;
 
   return (
     <li
@@ -80,7 +71,7 @@ const ListItem = (props: Props) => {
     >
       <div 
         className={`${styles.item_wrapper} ${categoryListStyles.item_wrapper}`}
-        style={{ paddingLeft: `${(level - 1) * 20}px` }}
+        style={{ paddingLeft: `${(level - 1) * 20}px`, backgroundColor: `rgba(0, 0, 0, ${dynamicOpacity})` }}
       >
         <div
           {...attributes}

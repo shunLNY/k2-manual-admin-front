@@ -255,18 +255,27 @@ const CategoriesEntry = () => {
   const getAvailableParents = (categories: any[], depth = 1): any[] => {
     let result: any[] = [];
     for (const cat of categories) {
-      // Cannot select itself (or its children) as a parent
+      // Cannot select itself (or its children)
       if (categoryInfo && cat.id === categoryInfo.id) continue;
       
-      // Cannot select a category that is already at Level 4 (depth limit)
+      // Cannot select a category that is already at Level 4 
       if (depth < 4) {
-        // Visual indicator for depth
-        const prefix = depth > 1 ? "　".repeat(depth - 1) + "└ " : "";
-        result.push({
-          value: cat.id,
-          label: prefix + cat.category_name,
-        });
+      // Different icon for each level
+      let prefix = "";
+
+      if (depth === 1) {
+        // Parent category (top level)
+        prefix = "▣ ";
+      } else {
+        // Child categories
+        prefix = "　".repeat(depth - 1) + "↳ ";
       }
+
+      result.push({
+        value: cat.id,
+        label: prefix + cat.category_name,
+      });
+    }
       
       // Recursively add children
       if (cat.child_categories && cat.child_categories.length > 0) {

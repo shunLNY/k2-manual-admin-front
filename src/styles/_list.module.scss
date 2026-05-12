@@ -27,7 +27,7 @@ $table-width: 100%;
 
   // font-weight: 600;
   font-size: var(--text-sm);
-  color: var(--foreground);
+  color: var(--auth-icon-fill);
 
   @include mixin.xxl {
     font-size: 13px;
