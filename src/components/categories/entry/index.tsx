@@ -5,12 +5,12 @@ import styles from "./category-entry.module.scss"
 import { useState, useContext, useEffect } from "react"
 import { useForm } from "react-hook-form"
 import classNames from "classnames"
-import ListPageContext from "@/store/list-page-context"
+import { useListPage } from "@/store/list-page-context"
 import { useParams } from "next/navigation"
 import { fetcher } from "@/utils/fetcher"
 import { createSuccessfulMessage, failMessage, updateSuccessfulMessage } from "@/utils/constants"
 import FormControl from "@/components/commons/inputs/form-control"
-import CategoryContext from "@/store/categories-context"
+import { useCategoryList } from "@/store/categories-context"
 import ButtonSave from "@/components/commons/buttons/btn-save"
 import ButtonCancel from "@/components/commons/buttons/btn-cancel"
 import FormFooter from "@/components/commons/inputs/form-footer"
@@ -21,7 +21,7 @@ import { toast } from "react-toastify"
 import dayjs from "dayjs"
 import ConfirmModal from "./confirm-model"
 import { useRouter } from "next/router"
-import AuthContext from "@/store/auth-context"
+import { useAuth } from "@/store/auth-context"
 import ReactSelect from "@/components/commons/inputs/_select"
 
 const CategoriesEntry = () => {
@@ -32,10 +32,10 @@ const CategoriesEntry = () => {
   const showInfo = pathname !== "/categories/new"
   const _id: string = params?.id as string
 
-  const listCtx = useContext(CategoryContext)
-  const pageCtx = useContext(ListPageContext)
+  const listCtx = useCategoryList()
+  const pageCtx = useListPage()
   const { categoryInfo, refreshCategoryRows, getCategoryInfo } = listCtx;
-  const authCtx = useContext(AuthContext);
+  const authCtx = useAuth();
 
   const [isLoading, setIsLoading] = useState(false)
   const [isBtnDisable, setIsBtnDisable] = useState(false)
@@ -69,7 +69,8 @@ const CategoriesEntry = () => {
   })
 
   const watchHasParent = watch("has_parent");
-const watchHasChild = watch("has_child");
+  const watchHasChild = watch("has_child");
+  const watchParentId = watch("parent_id");
 
   useEffect(() => {
     async function fetchData() {
@@ -88,20 +89,31 @@ const watchHasChild = watch("has_child");
         pageCtx.setEntryMode("new")
         reset()
         setSelectedStatus("public")
+
+        // Handle parentId from query params
+        if (router.query.parentId) {
+          setValue("has_parent", "yes");
+          setValue("parent_id", router.query.parentId as string);
+        }
       }
     }
     fetchData()
-  }, [_id])
+  }, [_id, router.query.parentId])
 
   useEffect(() => {
     if (categoryInfo && _id) {
+      // Determine if there is a parent ID from either the relation object or the raw ID field
+      const parentId = (categoryInfo as any).parentCategory?.id || (categoryInfo as any).parent_category_id;
+      const hasParent = parentId ? "yes" : "no";
+
       const formData = {
         category_name: categoryInfo.category_name ?? "",
         category_slug: categoryInfo.category_slug ?? "",
         status: categoryInfo.status ?? "public",
         sort_order: categoryInfo.sort_order ?? 0,
         createdAt: categoryInfo.createdAt ?? "",
-        blogCategories: categoryInfo.blogCategories ?? [],
+        has_parent: hasParent,
+        parent_id: parentId ?? "",
       }
 
       reset(formData)
@@ -127,28 +139,56 @@ const watchHasChild = watch("has_child");
     let submitMsg = ""
 
     if (pageCtx.entryMode === "new") {
-      url = "/api/proxy/admin/categories/"
+      url = "/api/proxy/categories/"
+      const submitData: any = {
+        category_name: data.category_name,
+        category_slug: data.category_slug,
+        status: data.status,
+        sort_order: data.sort_order,
+        creator_id: authCtx.user.id,
+        editor_id: authCtx.user.id,
+      }
+      if (data.has_parent === "yes" && data.parent_id) {
+        submitData.parent_category_id = data.parent_id
+      }
+      console.log("Submitting new category:", submitData)
+      
       fetchConfig = {
         method: "POST",
         headers: {
           "content-type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(submitData),
       }
       submitMsg = createSuccessfulMessage
     } else {
-      data = {
+      const submitData = {
         ...data,
         id: categoryInfo.id,
+        editor_id: authCtx.user.id,
       }
+      if (data.has_parent === "yes" && data.parent_id) {
+        (submitData as any).parent_category_id = data.parent_id
+      } else {
+        (submitData as any).parent_category_id = null // Explicitly clear parent if changed to 'no'
+      }
+
+      // Remove internal UI fields
+      delete (submitData as any).has_parent
+      delete (submitData as any).has_child
+      delete (submitData as any).parent_id
+      delete (submitData as any).child_id
+
+      console.log("Updating category:", submitData)
+
       fetchConfig = {
         method: "PUT",
         headers: {
           "content-type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(submitData),
       }
-      url = new URL(window.location.origin + "/api/proxy/admin/categories/" + categoryInfo.id)
+      url = new URL(window.location.origin + "/api/proxy/categories/" + categoryInfo.id)
       submitMsg = updateSuccessfulMessage
     }
 
@@ -180,7 +220,7 @@ const watchHasChild = watch("has_child");
     setShowModal(false)
     setIsBtnDisable(true)
     try {
-      await fetcher(`/api/proxy/admin/categories/${categoryInfo.id}`, { method: "DELETE" })
+      await fetcher(`/api/proxy/categories/${categoryInfo.id}`, { method: "DELETE" })
       toast.success("カテゴリーを削除しました")
       router.push("/categories")
       refreshCategoryRows()
@@ -211,6 +251,32 @@ const watchHasChild = watch("has_child");
       </div>
     )
   }
+
+  const getAvailableParents = (categories: any[], depth = 1): any[] => {
+    let result: any[] = [];
+    for (const cat of categories) {
+      // Cannot select itself (or its children) as a parent
+      if (categoryInfo && cat.id === categoryInfo.id) continue;
+      
+      // Cannot select a category that is already at Level 4 (depth limit)
+      if (depth < 4) {
+        // Visual indicator for depth
+        const prefix = depth > 1 ? "　".repeat(depth - 1) + "└ " : "";
+        result.push({
+          value: cat.id,
+          label: prefix + cat.category_name,
+        });
+      }
+      
+      // Recursively add children
+      if (cat.child_categories && cat.child_categories.length > 0) {
+        result = result.concat(getAvailableParents(cat.child_categories, depth + 1));
+      }
+    }
+    return result;
+  };
+
+  const parentOptions = getAvailableParents(listCtx.items);
 
   return (
     <>
@@ -279,14 +345,14 @@ const watchHasChild = watch("has_child");
                 </label>
               </div>
             </FormControl>
-
             {/* watchHasParent က "yes" ဖြစ်မှ Dropdown ပေါ်မည် */}
             {watchHasParent === "yes" && (
               <div className={styles.dropdown_side}>
                 <FormControl label="親カテゴリー名" required>
                   <ReactSelect
-                    options={listCtx.items.map(item => ({ value: item.id, label: item.category_name }))}
+                    options={parentOptions}
                     placeholder="---親カテゴリーを選択します---"
+                    value={parentOptions.find(opt => opt.value === watchParentId) || null}
                     onChange={(opt: any) => setValue("parent_id", opt.value)}
                   />
                 </FormControl>
@@ -295,7 +361,7 @@ const watchHasChild = watch("has_child");
         </div>
 
           {/* --- Child Category Section --- */}
-          <div className={styles.flexRow}>
+          {/* <div className={styles.flexRow}>
             <FormControl label="子カテゴリはありますか？" required>
               <div className={styles.radio_group}>
                 <label>
@@ -307,7 +373,6 @@ const watchHasChild = watch("has_child");
               </div>
             </FormControl>
 
-            {/* watchHasChild က "yes" ဖြစ်မှ Dropdown ပေါ်မည် */}
             {watchHasChild === "yes" && (
               <div className={styles.dropdown_side}>
                 <FormControl label="子カテゴリー名" required>
@@ -319,7 +384,7 @@ const watchHasChild = watch("has_child");
                 </FormControl>
               </div>
             )}
-          </div>
+          </div> */}
 
           <FormControl label="公開設定" required>
             <div className={styles.status_container}>
@@ -360,7 +425,12 @@ const watchHasChild = watch("has_child");
         <FormFooter>
           <ButtonCancel onClick={() => router.back()} text="戻る" type="button" />
           <ButtonSave type="submit" text="保存" className={styles.submitBtn} disabled={isBtnDisable} />
-          {showInfo && authCtx.user.role === 'admin' && (
+          {/* {showInfo && authCtx.user.role === 'admin' && (
+            <span className={styles.iconDelete} onClick={handleDelete} role="button" style={{ cursor: "pointer" }}>
+              <IconDelete />
+            </span>
+          )} */}
+          {showInfo && (
             <span className={styles.iconDelete} onClick={handleDelete} role="button" style={{ cursor: "pointer" }}>
               <IconDelete />
             </span>

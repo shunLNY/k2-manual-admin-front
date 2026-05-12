@@ -12,20 +12,16 @@ const CategoryPageIndex = () => {
       <Head>
         <title>カテゴリー作成 | Admin - K2 マニュアル</title>
       </Head>
-      <CategoriesEntry />
+      <CategoryListContextProvider>
+        <CategoriesEntry />
+      </CategoryListContextProvider>
     </>
   );
 };
 
 CategoryPageIndex.getLayout = function getLayout(page: JSX.Element) {
   return (
-    <>
-      <CategoryListContextProvider>
-        <ListPageContextProvider>
-          <MainLayout title='カテゴリー作成'>{page}</MainLayout>
-        </ListPageContextProvider>
-      </CategoryListContextProvider>
-    </>
+    <MainLayout title='カテゴリー作成'>{page}</MainLayout>
   );
 };
 

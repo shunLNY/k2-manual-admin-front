@@ -11,6 +11,11 @@ import { useState } from "react";
 
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6"
 
+type LoginFormData = {
+  email: string;
+  password: string;
+}
+
 const Login = () => {
   const router = useRouter();
 
@@ -34,15 +39,14 @@ const Login = () => {
     register,
     handleSubmit,
     setError,
-    setValue,
-    formState: { errors, isSubmitting } } = useForm({
+    formState: { errors, isSubmitting } } = useForm<LoginFormData>({
       defaultValues: {
         email: "",
         password: "",
       }
     })
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: LoginFormData) => {
     console.log(data, "in login form");
 
 

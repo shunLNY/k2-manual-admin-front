@@ -1,10 +1,10 @@
 "@use client"
 import { useCallback, useContext, useEffect, useRef, useState } from "react"
 
-import ListPageContext from "@/store/list-page-context"
+import { useListPage } from "@/store/list-page-context"
 import search from "../../commons/lists/list-filter-pc.module.scss"
 import CategoryList from "./category-list"
-import CategoryListContext from "@/store/categories-context"
+import { useCategoryList } from "@/store/categories-context"
 import { Controller, useForm } from "react-hook-form"
 import ListPageLayout from "@/components/commons/lists/list-page-layout"
 import ButtonFilterClear from "@/components/commons/buttons/btn-filter-clear"
@@ -40,13 +40,13 @@ interface InputData {
 	category_id?: string;
 	creator_name?: string;
 	editor_name?: string;
-	startDate?: string;
-	endDate?: string;
+	start_date?: string;
+	end_date?: string;
 }
 
 const ListPage = () => {
-	const pageCtx = useContext(ListPageContext)
-	const listCtx = useContext(CategoryListContext)
+	const pageCtx = useListPage()
+	const listCtx = useCategoryList()
 
 	const {
 		listCount,
@@ -80,8 +80,8 @@ const ListPage = () => {
 			category_id: "",
 			creator_name: "",
 			editor_name: "",
-			startDate: "",
-			endDate: "",
+			start_date: "",
+			end_date: "",
 		}
 	})
 
@@ -104,9 +104,6 @@ const ListPage = () => {
 		onClose();
 	}, [handleSearch, onClose]);
 
-	let PageSize: number = 10;
-	const groupsRef = useRef<SelectInstance>(null);
-	const [currentPage, setCurrentPage] = useState<number>(1);
 	const [showSubmissionStatusFilter, setShowSubmissionStatusFilter] = useState<boolean>(false);
 	useEffect(() => {
 		const hasCategoryCreate =
@@ -161,16 +158,16 @@ const ListPage = () => {
 	);
 
 	useEffect(() => {
-		listCtx.setCategoryInfo("")
-	}, [listCtx])
+		listCtx.setCategoryInfo({})
+	}, [])
 
 	const clearFilterData = useCallback(() => {
 		reset({
 			category_id: "",
 			creator_name: "",
 			editor_name: "",
-			startDate: "",
-			endDate: "",
+			start_date: "",
+			end_date: "",
 		});
 		resetFilter();
 		onClose();
@@ -196,15 +193,6 @@ const ListPage = () => {
 				isActive={pageCtx.showSpFilter}
 				count={listCount}
 				isPagination={false}
-				pagination={{
-					currentPage: currentPage,
-					totalCount: listCount,
-					pageSize: PageSize,
-					onPageChange: (page: number) => {
-						setCurrentPage(page);
-						listCtx.pagination(page);
-					},
-				}}
 			// onSubmit={
 			// pageCtx.listFilter === "invoice"
 			// 	? handleInvoiceCreate
@@ -230,8 +218,6 @@ const ListPage = () => {
 					</div> */}
 					<CategoryList
 						count={listCount}
-						currentPage={currentPage}
-						pageSize={PageSize}
 					/>
 					<Modal
 						isOpen={pageCtx.openFilterModal}
@@ -302,25 +288,25 @@ const ListPage = () => {
 												<div className={styles.publish_date_container}>
 													<div className={styles.date_input}>
 														<Controller
-															name='startDate'
+															name='start_date'
 															control={control}
 															render={({ field }) => (
 																<DateInput
 																	{...field}
 																	onClick={() => {
 																		setIsOpenDatePicker(true);
-																		setInputDateName('startDate');
+																		setInputDateName('start_date');
 																	}}
 																	onClear={() => {
-																		setValue('startDate', "");
+																		setValue('start_date', "");
 																		setQueryParams((prevState: any) => {
-																			delete prevState.startDate;
+																			delete prevState.start_date;
 																			return { ...prevState };
 																		});
 																	}}
 																	value={
-																		queryParams.startDate
-																			? dayjs(new Date(queryParams.startDate)).format('YYYY/MM/DD')
+																		queryParams.start_date
+																			? dayjs(new Date(queryParams.start_date as string)).format('YYYY/MM/DD')
 																			: ''
 																	}
 																	placeholder={'2025/01/01'}
@@ -330,25 +316,25 @@ const ListPage = () => {
 														/>
 														<div>~</div>
 														<Controller
-															name='endDate'
+															name='end_date'
 															control={control}
 															render={({ field }) => (
 																<DateInput
 																	{...field}
 																	onClick={() => {
 																		setIsOpenDatePicker(true);
-																		setInputDateName('endDate');
+																		setInputDateName('end_date');
 																	}}
 																	onClear={() => {
-																		setValue('endDate', "");
+																		setValue('end_date', "");
 																		setQueryParams((prevState: any) => {
-																			delete prevState.endDate;
+																			delete prevState.end_date;
 																			return { ...prevState };
 																		});
 																	}}
 																	value={
-																		queryParams.endDate
-																			? dayjs(new Date(queryParams.endDate)).format('YYYY/MM/DD')
+																		queryParams.end_date
+																			? dayjs(new Date(queryParams.end_date as string)).format('YYYY/MM/DD')
 																			: ''
 																	}
 																	placeholder={'2025/01/01'}
@@ -426,7 +412,7 @@ const ListPage = () => {
 						<Modal isOpen={isOpenDatePicker} shouldCloseOnOverlayClick={true} onRequestClose={() => setIsOpenDatePicker(false)}>
 							<ReactDatepicker
 								onSelect={(e) => {
-									if (inputDateName === "startDate" || inputDateName === "endDate") {
+									if (inputDateName === "start_date" || inputDateName === "end_date") {
 										const formattedDate = dayjs(e).format("YYYY-MM-DD");
 										setValue(inputDateName, formattedDate, {
 											shouldValidate: true,

@@ -7,7 +7,7 @@ import { useState, useContext, useEffect, useMemo } from 'react';
 import { useForm, FormProvider, Controller } from 'react-hook-form';
 import classNames from 'classnames';
 import React from 'react';
-import ListPageContext from '@/store/list-page-context';
+import { useListPage } from '@/store/list-page-context';
 
 
 import formStyles from '../../commons/inputs/form-element.module.scss';
@@ -23,7 +23,7 @@ import {
   updateSuccessfulMessage,
 } from '@/utils/constants';
 import FormControl from '@/components/commons/inputs/form-control';
-import ArticleContext from '@/store/articles-context';
+import { useBlog } from '@/store/articles-context';
 import ButtonSave from '@/components/commons/buttons/btn-save';
 import ButtonCancel from '@/components/commons/buttons/btn-cancel';
 import FormFooter from '@/components/commons/inputs/form-footer';
@@ -40,14 +40,14 @@ import ReactDatepicker from '@/components/commons/datepicker/react-datepicker';
 import { ArticlesInfoType } from '@/utils/types';
 // import { Option } from '@/components/commons/inputs/multi-select-box';
 
-import CategoryListContext from '@/store/categories-context';
+import { useCategoryList } from '@/store/categories-context';
 import ConfirmModal from './confirm-model';
 import MultiSelect from '@/components/commons/inputs/multi-select-box';
 import dynamic from 'next/dynamic';
 import inputStyles from '../../commons/inputs/form-element.module.scss'
 import Image from 'next/image';
 import { resizeMainImage } from '@/utils/helpers';
-import AuthContext from '@/store/auth-context';
+import { useAuth } from '@/store/auth-context';
 
 
 
@@ -64,12 +64,12 @@ const ArticleEntry = () => {
   const showInfo = pathname !== "/articles/new"
   const _id: string = params?.id as string;
 
-  const listCtx = useContext(ArticleContext);
-  const categoryListCtx = useContext(CategoryListContext)
-  const pageCtx = useContext(ListPageContext);
+  const listCtx = useBlog();
+  const categoryListCtx = useCategoryList();
+  const pageCtx = useListPage();
   const { blogInfo, refreshBlogRows, getBlogInfo } = listCtx;
   const { items } = categoryListCtx;
-  const AuthCtx = useContext(AuthContext);
+  const AuthCtx = useAuth();
 
   const categoryOptions: any[] =
     items?.map((cat) => ({

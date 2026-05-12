@@ -1,7 +1,4 @@
 /** @format */
-
-'use client';
-
 import {
   createContext,
   Dispatch,
@@ -9,6 +6,7 @@ import {
   SetStateAction,
   useEffect,
   useState,
+  useContext,
 } from 'react';
 import { isLaptopView, isMobileView } from '@/utils/helpers';
 
@@ -52,38 +50,38 @@ type PageContextData = {
   showSpFilter: boolean;
   toggleSpFilter: () => void;
   entryMode: 'new' | 'edit' | 'preview';
-  setEntryMode: Dispatch<any>;
+  setEntryMode: Dispatch<SetStateAction<'new' | 'edit' | 'preview'>>;
   openEditForm: boolean;
-  setOpenEditForm: Dispatch<any>;
-  clearFilter: Dispatch<any>;
+  setOpenEditForm: Dispatch<SetStateAction<boolean>>;
+  clearFilter: () => void;
   headerTitle: string;
-  setHeaderTitle: Dispatch<any>;
+  setHeaderTitle: Dispatch<SetStateAction<string>>;
   listFilter: string;
-  setListFilter: Dispatch<any>;
+  setListFilter: Dispatch<SetStateAction<string>>;
   openFilterModal: boolean;
-  setOpenFilterModal: Dispatch<any>;
+  setOpenFilterModal: Dispatch<SetStateAction<boolean>>;
   isOpenMultipleCostModal: boolean;
-  setIsOpenMultipleCostModal: Dispatch<any>;
+  setIsOpenMultipleCostModal: Dispatch<SetStateAction<boolean>>;
   showCostMultipleButton: boolean;
-  setShowCostMultipleButton: Dispatch<any>;
+  setShowCostMultipleButton: Dispatch<SetStateAction<boolean>>;
   showConstructionCreate: boolean;
-  setShowConstructionCreate: Dispatch<any>;
+  setShowConstructionCreate: Dispatch<SetStateAction<boolean>>;
   showSaveButton: boolean;
-  setShowSaveButton: Dispatch<any>;
+  setShowSaveButton: Dispatch<SetStateAction<boolean>>;
   isMultipleCopy: MultipleCopy;
-  setIsMultipleCopy: Dispatch<any>;
+  setIsMultipleCopy: Dispatch<SetStateAction<MultipleCopy>>;
   openTermEntryModal: boolean;
-  setOpenTermEntryModal: Dispatch<any>;
+  setOpenTermEntryModal: Dispatch<SetStateAction<boolean>>;
   openConstructionTypeEntryModal: boolean;
-  setOpenConstructionTypeEntryModal: Dispatch<any>;
+  setOpenConstructionTypeEntryModal: Dispatch<SetStateAction<boolean>>;
   openUnitPriceEntryPage: boolean;
-  setOpenUnitPriceEntryPage: Dispatch<any>;
+  setOpenUnitPriceEntryPage: Dispatch<SetStateAction<boolean>>;
   openBusinessPartnerEntryPage: boolean;
-  setOpenBusinessPartnerEntryPage: Dispatch<any>;
+  setOpenBusinessPartnerEntryPage: Dispatch<SetStateAction<boolean>>;
   openCustomerEntryPage: boolean;
-  setOpenCustomerEntryPage: Dispatch<any>;
+  setOpenCustomerEntryPage: Dispatch<SetStateAction<boolean>>;
   isNewCreate: NewCreate;
-  setIsNewCreate: Dispatch<any>;
+  setIsNewCreate: Dispatch<SetStateAction<NewCreate>>;
   breadCrumbTitle: string;
   setBreadCrumbTitle: Dispatch<string>;
   constructionData: constructionData | null; // Allow it to be null
@@ -91,56 +89,7 @@ type PageContextData = {
   companyRoundingMethod: Record<string, string>;
 };
 
-const ListPageContext = createContext<PageContextData>({
-  showSearchForm: false,
-  toggleSearchForm: () => { },
-  showSpFilter: false,
-  toggleSpFilter: () => { },
-  entryMode: 'new',
-  setEntryMode: () => { },
-  openEditForm: false,
-  setOpenEditForm: () => { },
-  clearFilter: () => { },
-  headerTitle: '',
-  setHeaderTitle: () => { },
-  listFilter: '',
-  setListFilter: () => { },
-  openFilterModal: false,
-  setOpenFilterModal: () => { },
-  isOpenMultipleCostModal: false,
-  setIsOpenMultipleCostModal: () => { },
-  showCostMultipleButton: false,
-  setShowCostMultipleButton: () => { },
-  showConstructionCreate: false,
-  setShowConstructionCreate: () => { },
-  showSaveButton: false,
-  setShowSaveButton: () => { },
-  isMultipleCopy: {
-    isTermCopy: true,
-    isConstructionTypeCopy: true,
-    isUnitPriceCopy: true,
-    isBusinessPartnerCopy: true,
-    isCustomerCopy: true,
-  },
-  setIsMultipleCopy: () => { },
-  openTermEntryModal: false,
-  setOpenTermEntryModal: () => { },
-  openConstructionTypeEntryModal: false,
-  setOpenConstructionTypeEntryModal: () => { },
-  openUnitPriceEntryPage: false,
-  setOpenUnitPriceEntryPage: () => { },
-  openBusinessPartnerEntryPage: false,
-  setOpenBusinessPartnerEntryPage: () => { },
-  openCustomerEntryPage: false,
-  setOpenCustomerEntryPage: () => { },
-  isNewCreate: {},
-  setIsNewCreate: () => { },
-  breadCrumbTitle: '',
-  setBreadCrumbTitle: () => { },
-  constructionData: null,
-  setConstructionData: () => { },
-  companyRoundingMethod: {},
-});
+const ListPageContext = createContext<PageContextData | undefined>(undefined);
 
 interface Props {
   children: ReactNode;
@@ -207,7 +156,7 @@ export function ListPageContextProvider({ children }: Props) {
 
   // list searching & filter form
   // const [keyword, setKeyword] = useState('');
-  const [queryParams, setQueryParams] = useState({});
+  const [queryParams, setQueryParams] = useState<Record<string, string | string[]>>({});
 
   // clear query params
   const [isSubmitClear, setIsSubmitClear] = useState(true);
@@ -292,5 +241,13 @@ export function ListPageContextProvider({ children }: Props) {
     </ListPageContext.Provider>
   );
 }
+
+export const useListPage = () => {
+  const context = useContext(ListPageContext);
+  if (context === undefined) {
+    throw new Error('useListPage must be used within a ListPageContextProvider');
+  }
+  return context;
+};
 
 export default ListPageContext;

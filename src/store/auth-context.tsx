@@ -1,20 +1,14 @@
 import { getSession, useSession } from "next-auth/react";
-import { Dispatch } from "react";
-import React, { createContext, useMemo, useState, useEffect } from "react";
+import React, { createContext, useMemo, useState, useEffect, useContext, type Dispatch, type SetStateAction } from "react";
 
 type AuthContextData = {
-  user: any;
-  setUser: Dispatch<any>;
-  refreshUser: Dispatch<any>;
+  user: any; // next-auth user type is complex, leaving as any for now but could be refined
+  setUser: Dispatch<SetStateAction<any>>;
+  refreshUser: () => Promise<void>;
   hasOwnerPermission: boolean;
 }
 
-const AuthContext = createContext<AuthContextData>({
-  user: {},
-  setUser: () => { },
-  refreshUser: () => { },
-  hasOwnerPermission: true,
-});
+const AuthContext = createContext<AuthContextData | undefined>(undefined);
 
 type Props = {
   children: React.ReactNode
@@ -23,7 +17,7 @@ type Props = {
 export function AuthContextProvider({ children }: Props) {
   const { data: session } = useSession();
   const [user, setUser] = useState<any>({});
-  // set user
+  
   useEffect(() => {
     if (session && session.user) {
       if (user === session.user) return;
@@ -33,9 +27,9 @@ export function AuthContextProvider({ children }: Props) {
 
   const refreshUser = async () => {
     const newSession = await getSession();
-    setUser((u: any) => {
-      return { ...u, ...newSession?.user };
-    });
+    if (newSession?.user) {
+      setUser((u: any) => ({ ...u, ...newSession.user }));
+    }
   };
 
   const hasOwnerPermission = useMemo(() => {
@@ -45,7 +39,6 @@ export function AuthContextProvider({ children }: Props) {
     return false;
   }, [user]);
 
-  // console.log(user, "...user....");
   const context: AuthContextData = {
     setUser,
     user,
@@ -55,4 +48,13 @@ export function AuthContextProvider({ children }: Props) {
 
   return <AuthContext.Provider value={context}>{children}</AuthContext.Provider>;
 }
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthContextProvider');
+  }
+  return context;
+};
+
 export default AuthContext;

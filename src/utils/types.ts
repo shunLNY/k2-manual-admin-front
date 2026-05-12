@@ -23,7 +23,7 @@ export type ArticlesInfoType = {
   creator: Account,
   editor: Account,
   blog_categories: { value: string; label: string }[]
-  categoryIds: any[]
+  categoryIds: string[]
   categories: Category[]
 };
 
@@ -52,3 +52,18 @@ export type Account = {
   email: string;
   password: string;
 }
+
+export type Tenant = {
+  id: string;
+  name: string;
+  domain?: string;
+}
+
+export type PageMeta = {
+  current_page: number;
+  last_page: number;
+  per_page: number;
+  total: number;
+}
+
+export type AuthScreen = 'emailScreen' | 'passwordScreen' | 'successScreen';

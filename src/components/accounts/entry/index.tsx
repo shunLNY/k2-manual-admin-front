@@ -5,12 +5,12 @@ import styles from "./account-entry.module.scss"
 import { useState, useContext, useEffect, use } from "react"
 import { useForm } from "react-hook-form"
 import classNames from "classnames"
-import ListPageContext from "@/store/list-page-context"
+import { useListPage } from "@/store/list-page-context"
 import { useParams } from "next/navigation"
 import { fetcher } from "@/utils/fetcher"
 import { createSuccessfulMessage, emailRegex, failMessage, invalidEmail, NEXT_PUBLIC_APP_URL, updateSuccessfulMessage } from "@/utils/constants"
 import FormControl from "@/components/commons/inputs/form-control"
-import AccountContext from "@/store/accounts-context"
+import AccountContext, { useAccount } from "@/store/accounts-context"
 import ButtonSave from "@/components/commons/buttons/btn-save"
 import ButtonCancel from "@/components/commons/buttons/btn-cancel"
 import FormFooter from "@/components/commons/inputs/form-footer"
@@ -31,9 +31,9 @@ const AccountEntry = ({ mode }: { mode: 'new' | 'edit' }) => {
 
   // const params = useParams();
   // const _id: string = params.slug as string
-  const listCtx = useContext(AccountContext)
+  const listCtx = useAccount();
   const { getAccountInfo, accountInfo, setAccountInfo, refreshAccountRows } = listCtx;
-  const pageCtx = useContext(ListPageContext)
+  const pageCtx = useListPage();
 
   // const [accountInfo, setAccountInfo] = useState<Account | null>(null)
   const [isLoading, setIsLoading] = useState(false)

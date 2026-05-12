@@ -162,7 +162,7 @@ export default function Header(props: LayoutProps) {
 
             {pathname === "/categories" && (
               <>
-                <Link href="/categories/new">新規作成</Link>
+                <Link href="/categories/new">メインカテゴリー作成</Link>
               </>
 
             )}

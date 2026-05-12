@@ -2,7 +2,7 @@
 import type React from "react"
 import { useContext, useEffect, useState } from "react"
 import ListItem from "./list-item"
-import CategoryListContext from "@/store/categories-context"
+import { useCategoryList } from "@/store/categories-context"
 import ListBody from "@/components/commons/lists/list-body"
 import { IconOrder } from "@/components/icons/icons"
 import { Checkbox } from "@/components/commons/inputs/checkbox"
@@ -15,31 +15,30 @@ import {
   useSensors,
   type DragEndEvent,
   DragOverlay,
+  UniqueIdentifier,
 } from "@dnd-kit/core"
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers"
 import styles from "../../../styles/_list.module.scss"
 import CategoryListStyles from "./category-list.module.scss"
-import ListPageContext from "@/store/list-page-context"
+import { useListPage } from "@/store/list-page-context"
 import { toast } from "react-toastify"
 import { fetcher } from "@/utils/fetcher"
 import { deleteSuccessfulMessage, failMessage } from "@/utils/constants"
 import DeleteModal from "@/components/modals/delete-modal"
-import { Category_list_info } from "@/utils/constants"
 import classNames from "classnames"
 import { useRouter } from "next/navigation"
+import { Category } from "@/utils/types"
 
 
 type Props = {
   count: number
   limit?: number
-  currentPage: number
-  pageSize: number
 }
 
 const CategoryList = (props: Props) => {
-  const listCtx = useContext(CategoryListContext)
-  const pageCtx = useContext(ListPageContext)
+  const listCtx = useCategoryList()
+  const pageCtx = useListPage()
   const router = useRouter()
 
   const {
@@ -54,7 +53,7 @@ const CategoryList = (props: Props) => {
     setCheckedUiItems,
   } = listCtx
 
-  const { count, currentPage, pageSize } = props
+  const { count } = props
   const [list, setList] = useState(items)
   const [activeId, setActiveId] = useState(null)
 
@@ -75,7 +74,7 @@ const CategoryList = (props: Props) => {
   const handleAllCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const isChecked = e.target.checked
     if (isChecked) {
-      setCheckedItems(list.map((item) => item.id))
+      setCheckedItems(list.map((item: { id: any }) => item.id))
       setSelectedCategories(list)
     } else {
       setCheckedItems([])
@@ -99,53 +98,103 @@ const CategoryList = (props: Props) => {
 
     if (!over || active.id === over.id) return
 
-    const oldIndex = list.findIndex((i) => i.id === active.id)
-    const newIndex = list.findIndex((i) => i.id === over.id)
-    const newList = arrayMove(list, oldIndex, newIndex)
-    setList(newList)
+    // Find the list that contains the dragged item
+    let foundList: any[] | null = null
+    let parentItem: any = null
 
-    const ids = newList.map((i) => i.id)
-    fetch("/api/proxy/admin/categories/reorder", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ids }),
-    })
-      .then(() => {
-        refreshCategoryRows()
-      })
-      .catch((error) => {
-        console.error("Failed to reorder categories:", error)
-        // Revert the local state on error
-        setList(items)
-      })
+    const findAndReorder = (currentItems: any[]) => {
+      const index = currentItems.findIndex((i) => i.id === active.id)
+      if (index !== -1) {
+        foundList = currentItems
+        return true
+      }
+      for (const item of currentItems) {
+        if (item.child_categories && findAndReorder(item.child_categories)) {
+          return true
+        }
+      }
+      return false
+    }
+
+    // Check top level first (which is the current visible list)
+    if (list.findIndex((i) => i.id === active.id) !== -1) {
+      foundList = list
+    } else {
+      // Check nested levels
+      findAndReorder(items)
+    }
+
+    if (foundList) {
+      const oldIndex = foundList.findIndex((i: any) => i.id === active.id)
+      const newIndex = foundList.findIndex((i: any) => i.id === over.id)
+      
+      if (newIndex !== -1) {
+        const newList = arrayMove(foundList, oldIndex, newIndex)
+        
+        // Update local state for immediate feedback
+        if (foundList === list) {
+          setList(newList)
+        } else {
+          // If it's a nested list, we need to refresh or update the main items
+          // For now, refreshCategoryRows will handle the permanent state
+        }
+
+        const ids = newList.map((i: any) => i.id)
+        fetch("/api/proxy/categories/reorder", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ids }),
+        })
+          .then(() => {
+            refreshCategoryRows()
+          })
+          .catch((error) => {
+            console.error("Failed to reorder categories:", error)
+            toast.error("並び替えに失敗しました")
+          })
+      }
+    }
   }
 
   return (
     <ListBody
       count={count}
       countIcon={<IconOrder />}
-      pageNumber={currentPage}
       // onOpenMultipleDelete={onOpenMultipleDelete}
       extraHeaderContent={
         <button
           className={CategoryListStyles.btn_add_child}
-          onClick={() => router.push("/categories/entry")}
+          onClick={() => router.push(`/categories/new?parentId=${listCtx.selectedTabId}`)}
         >
-          +メインカテゴリー
+          +サブカテゴリー
         </button>
       }
     >
     <div className={CategoryListStyles.tabs_container}>
-						{Category_list_info.map((category) => (
-							<button
+						{items.map((category: Category) => (
+							<div
 								key={category.id}
-								className={classNames(CategoryListStyles.tab, {
+								className={classNames(CategoryListStyles.tab_wrapper, {
 									[CategoryListStyles.active]: listCtx.selectedTabId === category.id,
 								})}
-								onClick={() => listCtx.setSelectedTabId(category.id)}
 							>
-								{category.category_name}
-							</button>
+								<button
+									className={CategoryListStyles.tab_button}
+									onClick={() => listCtx.setSelectedTabId(category.id)}
+								>
+									{category.category_name}
+								</button>
+								<span 
+									className={CategoryListStyles.tab_edit_icon}
+									onClick={(e) => {
+										e.stopPropagation();
+										router.push(`/categories/edit/${category.id}`);
+									}}
+									title="編集"
+								>
+									✎
+								</span>
+							</div>
 						))}
 					</div>
       <div className={`${styles.table_wrapper} ${CategoryListStyles.drag_container}`}>
@@ -185,10 +234,10 @@ const CategoryList = (props: Props) => {
             onDragEnd={handleDragEnd}
             modifiers={[restrictToVerticalAxis]}
           >
-            <SortableContext items={list.map((i) => i.id)} strategy={verticalListSortingStrategy}>
+            <SortableContext items={list.map((i: { id: any }) => i.id)} strategy={verticalListSortingStrategy}>
               <ul className={`${styles.list_item} ${CategoryListStyles.sortable_list} noscroll`}>
                 {list.map((item: any, index: number) => (
-                  <ListItem key={item.id} item={item} index={index} currentPage={currentPage} pageSize={pageSize} level={1} />
+                  <ListItem key={item.id} item={item} index={index} level={1} />
                 ))}
               </ul>
             </SortableContext>
@@ -197,7 +246,7 @@ const CategoryList = (props: Props) => {
                 <div className={`${styles.item_wrapper} ${CategoryListStyles.item_wrapper} opacity-50`}>
                   {/* Render a simplified version of the dragged item */}
                   <div className={CategoryListStyles.drag_handle}>≡</div>
-                  <div>{list.find((item) => item.id === activeId)?.category_name}</div>
+                  <div>{list.find((item: { id: any }) => item.id === activeId)?.category_name}</div>
                 </div>
               ) : null}
             </DragOverlay>

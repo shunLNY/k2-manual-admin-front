@@ -13,25 +13,20 @@ type Props = {
 	title: string;
 };
 
-export default function MainLayout({ children, title = 'HOME' }: Props) {
-	// const [isMenuOpen, setIsMenuOpen] = useState(false);
+import { ListPageContextProvider } from '@/store/list-page-context';
 
-	// const toggleAppMenu = (value: boolean) => {
-	//     setIsMenuOpen(value);
-	// };
+export default function MainLayout({ children, title = 'HOME' }: Props) {
 	const pathname = usePathname();
-	// const pageTitle = pathname.includes('/edit') ? `${title}` : pathname.includes('/new') ? `${title}` : title;
 	return (
-		<>
+		<ListPageContextProvider>
 			<div className='main_container'>
 				<Header title={title} className={'relative'}>
-					{/* <SlideMenu toggleAppMenu={toggleAppMenu} /> */}
 				</Header>
 				<div className={styles.layout_container}>
 					<SideBarMenu />
 					<div className={styles.content}>{children}</div>
 				</div>
 			</div>
-		</>
+		</ListPageContextProvider>
 	);
 }

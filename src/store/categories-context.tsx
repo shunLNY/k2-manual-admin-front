@@ -1,112 +1,55 @@
-"use client"
 import { useFetch } from "@/lib/hooks/common-hooks"
 import { fetcher } from "@/utils/fetcher"
 import type React from "react"
-import { createContext, type Dispatch, type SetStateAction, useCallback, useEffect, useState } from "react"
-import type { Category } from "@/utils/types"
-import { Category_list_info } from "@/utils/constants"
+import { createContext, type Dispatch, type SetStateAction, useCallback, useContext, useEffect, useState } from "react"
+import type { Category, PageMeta } from "@/utils/types"
 
 type CategoryContextData = {
   listCount: number
-  items: any[]
-  setItems: Dispatch<any>
-  editItem: any
-  setEditItem: Dispatch<any>
+  items: Category[]
+  setItems: Dispatch<SetStateAction<Category[]>>
+  editItem: Category[]
+  setEditItem: Dispatch<SetStateAction<Category[]>>
   isEdit: boolean
-  setIsEdit: Dispatch<any>
+  setIsEdit: Dispatch<SetStateAction<boolean>>
   keyword: string
-  setKeyword: Dispatch<any>
-  queryParams: any
-  setQueryParams: Dispatch<any>
+  setKeyword: Dispatch<SetStateAction<string>>
+  queryParams: Record<string, string | string[]>
+  setQueryParams: Dispatch<SetStateAction<Record<string, string | string[]>>>
   handleSearch: () => void
   resetFilter: () => void
   isFilterActive: boolean
-  pageMeta: {}
-  pageNumber: number
-  setPageNumber: Dispatch<any>
-  prevPage: () => void
-  nextPage: () => void
-  pagination: (value: number) => void
-  getCategoryInfo: (value: string) => void
-  categoryInfo: any
-  setCategoryInfo: Dispatch<any>
+  getCategoryInfo: (value: string) => Promise<Category | Error>
+  categoryInfo: Partial<Category>
+  setCategoryInfo: Dispatch<SetStateAction<Partial<Category>>>
   refreshCategoryRows: () => void
   isLoading: boolean
   isError: boolean
   sortBy: string
-  setSortBy: Dispatch<any>
+  setSortBy: Dispatch<SetStateAction<string>>
   orderBy: string
-  setOrderBy: Dispatch<any>
+  setOrderBy: Dispatch<SetStateAction<string>>
   selectedStatus: string
-  setSelectedStatus: Dispatch<any>
+  setSelectedStatus: Dispatch<SetStateAction<string>>
   checkedItems: string[]
-  setCheckedItems: Dispatch<any>
-  selectedCategories: { categoryName: string }[]
-  setSelectedCategories: Dispatch<any>
-  setCheckedUiItems: Dispatch<any>
-  setUrlPath: Dispatch<any>
+  setCheckedItems: Dispatch<SetStateAction<string[]>>
+  selectedCategories: Category[]
+  setSelectedCategories: Dispatch<SetStateAction<Category[]>>
+  setCheckedUiItems: Dispatch<SetStateAction<string[]>>
+  setUrlPath: Dispatch<SetStateAction<URL | null>>
   isAllChecked: boolean
   setIsAllChecked: Dispatch<SetStateAction<boolean>>
   categoryCreate: boolean
-  setCategoryCreate: Dispatch<any>
+  setCategoryCreate: Dispatch<SetStateAction<boolean>>
   isPrivate: boolean;
-  setIsPrivate: Dispatch<any>;
+  setIsPrivate: Dispatch<SetStateAction<boolean>>;
   isPublished: boolean;
-  setIsPublished: Dispatch<any>;
+  setIsPublished: Dispatch<SetStateAction<boolean>>;
   selectedTabId: string;
   setSelectedTabId: Dispatch<SetStateAction<string>>;
 }
 
-const CategoryListContext = createContext<CategoryContextData>({
-  listCount: 0,
-  items: [],
-  setItems: () => { },
-  editItem: [],
-  setEditItem: () => { },
-  isEdit: false,
-  setIsEdit: () => { },
-  keyword: "",
-  setKeyword: () => { },
-  queryParams: {},
-  setQueryParams: () => { },
-  handleSearch: () => { },
-  resetFilter: () => { },
-  isFilterActive: false,
-  pageMeta: {},
-  pageNumber: 1,
-  setPageNumber: () => { },
-  prevPage: () => { },
-  nextPage: () => { },
-  pagination: () => { },
-  getCategoryInfo: () => { },
-  categoryInfo: {},
-  setCategoryInfo: () => { },
-  refreshCategoryRows: () => { },
-  isLoading: true,
-  isError: false,
-  sortBy: "",
-  setSortBy: () => { },
-  orderBy: "",
-  setOrderBy: () => { },
-  selectedStatus: "",
-  setSelectedStatus: () => { },
-  checkedItems: [],
-  setCheckedItems: () => { },
-  selectedCategories: [],
-  setSelectedCategories: () => { },
-  setCheckedUiItems: () => { },
-  setUrlPath: () => { },
-  isAllChecked: false,
-  setIsAllChecked: () => { },
-  categoryCreate: false,
-  setCategoryCreate: () => { },
-  isPrivate: false,
-  setIsPrivate: () => { },
-  isPublished: false,
-  setIsPublished: () => { },
-  selectedTabId: "",
-  setSelectedTabId: () => { },
-})
+const CategoryListContext = createContext<CategoryContextData | undefined>(undefined);
 
 type Props = {
   children: React.ReactNode
@@ -122,7 +65,7 @@ export function CategoryListContextProvider({ children }: Props) {
   const [totalItems, setTotalItems] = useState(0)
   const [selectedStatus, setSelectedStatus] = useState("")
   const [items, setItems] = useState<Category[]>([])
-  const [editItem, setEditItem] = useState([])
+  const [editItem, setEditItem] = useState<Category[]>([]);
   const [isEdit, setIsEdit] = useState<boolean>(false)
   const [categoryIdsUrl, setCategoryIdsUrl] = useState<URL | null>(null);
 
@@ -130,37 +73,35 @@ export function CategoryListContextProvider({ children }: Props) {
   const [isPrivate, setIsPrivate] = useState(false);
   const [isPublished, setIsPublished] = useState(false);
 
-  const [selectedTabId, setSelectedTabId] = useState<string>(Category_list_info[0]?.id || "");
+  const [selectedTabId, setSelectedTabId] = useState<string>("");
 
-  const [pageNumber, setPageNumber] = useState(1)
   const [urlPath, setUrlPath] = useState<URL | null>(null)
-  const [categoryInfo, setCategoryInfo] = useState({})
-  const [pageMeta, setPageMeta] = useState({})
+  const [categoryInfo, setCategoryInfo] = useState<Partial<Category>>({})
 
   // Checkbox states
   const [isAllChecked, setIsAllChecked] = useState(false)
   const [checkedItems, setCheckedItems] = useState<string[]>([])
   const [checkedUiItems, setCheckedUiItems] = useState<string[]>([])
-  const [selectedCategories, setSelectedCategories] = useState<{ categoryName: string }[]>([])
+  const [selectedCategories, setSelectedCategories] = useState<Category[]>([])
 
   const { data: categories, isLoading, isError, mutate: refreshCategoryRows, meta } = useFetch(urlPath)
 
   useEffect(() => {
     if (categories && !isLoading) {
-      setTotalItems(categories.total)
-      setItems(categories.data)
-      setPageMeta(meta)
-      console.log(meta, "....pageMeta in category context");
+      setTotalItems(categories.length) // Backend returns array now
+      setItems(categories)
+      
+      // If no tab is selected or the current selected tab is not in the new items, select the first one
+      if (categories.length > 0 && (!selectedTabId || !categories.find((c: any) => c.id === selectedTabId))) {
+        setSelectedTabId(categories[0].id)
+      }
     }
-    else if (!categories){
-      setTotalItems(Category_list_info.length)
-      setItems(Category_list_info)
-      setPageMeta({current_page: 1,
-        last_page: 1,
-        per_page: 10,
-        total: Category_list_info.length})
+    else if (!categories && !isLoading && isError){
+      // Clear items on error
+      setTotalItems(0)
+      setItems([])
     }
-  }, [categories, isLoading, isError])
+  }, [categories, isLoading, isError, selectedTabId])
 
   useEffect(() => {
     if (!urlPath) return
@@ -179,9 +120,9 @@ export function CategoryListContextProvider({ children }: Props) {
   }
 
   useEffect(() => {
-    setUrlPath(new URL(window.location.origin + "/api/proxy/admin/categories/"))
-    // setUrlPath(new URL(window.location.origin + "/api/proxy/admin/categories/paginate"))
-    setCategoryIdsUrl(new URL(window.location.origin + "/api/proxy/admin/categories/categories-ids"));
+    setUrlPath(new URL(window.location.origin + "/api/proxy/categories/"))
+    // setUrlPath(new URL(window.location.origin + "/api/proxy/categories/paginate"))
+    setCategoryIdsUrl(new URL(window.location.origin + "/api/proxy/categories/categories-ids"));
   }, [])
 
   useEffect(() => {
@@ -195,40 +136,9 @@ export function CategoryListContextProvider({ children }: Props) {
     }
   }, [isSubmitClear])
 
-  const prevPage = useCallback(() => {
-    if (urlPath) {
-      const url = new URL(urlPath);
-      const curPage = pageNumber;
-      url.searchParams.set("page", (curPage - 1).toString());
-      setPageNumber(pageNumber - 1);
-      setUrlPath(url);
-    }
-  }, [pageNumber, urlPath])
 
-  const nextPage = useCallback(() => {
-    if (urlPath) {
-      const url = new URL(urlPath);
-      const curPage = pageNumber;
-      url.searchParams.set("page", (curPage + 1).toString());
-      setPageNumber(pageNumber + 1);
-      setUrlPath(url);
-    }
-  }, [pageNumber, urlPath])
-
-  const pagination = useCallback(
-    (newPageNumber: number) => {
-      if (urlPath) {
-        const url = new URL(urlPath)
-        url.searchParams.set("page", newPageNumber.toString())
-        setPageNumber(newPageNumber)
-        setUrlPath(url)
-      }
-    },
-    [urlPath],
-  )
 
   const handleSearch = useCallback(async () => {
-    setPageNumber(1) // Reset to first page
     let query = "?"
 
     if (keyword.trim().length) {
@@ -255,13 +165,13 @@ export function CategoryListContextProvider({ children }: Props) {
 
     isSubmitClear && ((query = ""), setisSubmitClear(false));
 
-    const url = new URL(window.location.origin + "/api/proxy/admin/categories/" + (query.length > 1 ? query : ""))
-    // const url = new URL(window.location.origin + "/api/proxy/admin/categories/paginate" + (query.length > 1 ? query : ""))
+    const url = new URL(window.location.origin + "/api/proxy/categories/" + (query.length > 1 ? query : ""))
+    // const url = new URL(window.location.origin + "/api/proxy/categories/paginate" + (query.length > 1 ? query : ""))
     console.log(url, "....urlurl")
 
     url.searchParams.set("sortBy", String(sortBy))
     url.searchParams.set("orderBy", String(orderBy))
-    url.searchParams.set("page", "1") // Always start from page 1 when searching
+
 
     // Set filter active state
     query.length > 1 ? setIsFilterActive(true) : setIsFilterActive(false)
@@ -273,7 +183,7 @@ export function CategoryListContextProvider({ children }: Props) {
 
   const getCategoryInfo = async (id: string) => {
     try {
-      const res = await fetcher("/api/proxy/admin/categories/" + id, {
+      const res = await fetcher("/api/proxy/categories/" + id, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -289,7 +199,7 @@ export function CategoryListContextProvider({ children }: Props) {
 
   const context: CategoryContextData = {
     listCount: totalItems,
-    items: items.length > 0 ? items : Category_list_info,
+    items,
     setItems,
     isEdit,
     setIsEdit,
@@ -300,17 +210,11 @@ export function CategoryListContextProvider({ children }: Props) {
     resetFilter,
     isFilterActive,
     handleSearch,
-    pageMeta,
-    pageNumber,
-    setPageNumber,
-    prevPage,
-    nextPage,
-    pagination,
     getCategoryInfo,
     categoryInfo,
     setCategoryInfo,
     refreshCategoryRows,
-    isLoading: items.length > 0 ? false : isLoading,
+    isLoading,
     isError,
     sortBy,
     setSortBy,
@@ -340,5 +244,13 @@ export function CategoryListContextProvider({ children }: Props) {
 
   return <CategoryListContext.Provider value={context}>{children}</CategoryListContext.Provider>
 }
+
+export const useCategoryList = () => {
+  const context = useContext(CategoryListContext);
+  if (context === undefined) {
+    throw new Error("useCategoryList must be used within a CategoryListContextProvider");
+  }
+  return context;
+};
 
 export default CategoryListContext

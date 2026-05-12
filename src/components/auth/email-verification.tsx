@@ -16,7 +16,7 @@ const EmailVerification = () => {
   const [messageType, setMessageType] = useState<"success" | "error" | "">("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     setIsLoading(true);
     e.preventDefault();
     setMessage("");

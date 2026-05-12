@@ -14,20 +14,16 @@ const CategoryPageIndex = () => {
       <Head>
         <title>カテゴリー編集 | Admin - 建工管理ブログ</title>
       </Head>
-      <CategoriesEntry />
+      <CategoryListContextProvider>
+        <CategoriesEntry />
+      </CategoryListContextProvider>
     </>
   );
 };
 
 CategoryPageIndex.getLayout = function getLayout(page: JSX.Element) {
   return (
-    <>
-      <CategoryListContextProvider>
-        <ListPageContextProvider>
-          <MainLayout title='カテゴリー編集'>{page}</MainLayout>
-        </ListPageContextProvider>
-      </CategoryListContextProvider>
-    </>
+    <MainLayout title='カテゴリー編集'>{page}</MainLayout>
   );
 };
 

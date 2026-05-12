@@ -1,6 +1,5 @@
 /** @format */
 
-'use client';
 import type React from 'react';
 import {
   createContext,
@@ -9,116 +8,64 @@ import {
   useEffect,
   useState,
   SetStateAction,
+  useContext,
 } from 'react';
 import { fetcher } from '@/utils/fetcher';
 import { useFetch } from '@/lib/hooks/common-hooks';
-import { ArticlesInfoType } from '@/utils/types';
+import { ArticlesInfoType, PageMeta } from '@/utils/types';
 
 type ArticleContextData = {
   listCount: number;
   items: ArticlesInfoType[];
-  setItems: Dispatch<any>;
-  editItem: any;
-  setEditItem: Dispatch<any>;
+  setItems: Dispatch<SetStateAction<ArticlesInfoType[]>>;
+  editItem: ArticlesInfoType[];
+  setEditItem: Dispatch<SetStateAction<ArticlesInfoType[]>>;
   isEdit: boolean;
-  setIsEdit: Dispatch<any>;
+  setIsEdit: Dispatch<SetStateAction<boolean>>;
   keyword: string;
-  setKeyword: Dispatch<any>;
-  queryParams: any;
-  setQueryParams: Dispatch<any>;
+  setKeyword: Dispatch<SetStateAction<string>>;
+  queryParams: Record<string, string | string[]>;
+  setQueryParams: Dispatch<SetStateAction<Record<string, string | string[]>>>;
   handleSearch: () => void;
   resetFilter: () => void;
   isFilterActive: boolean;
-  pageMeta: {};
+  pageMeta: PageMeta | Record<string, never>;
   pageNumber: number;
-  setPageNumber: Dispatch<any>;
+  setPageNumber: Dispatch<SetStateAction<number>>;
   prevPage: () => void;
   nextPage: () => void;
   pagination: (value: number) => void;
-  getBlogInfo: (value: string) => void;
-  blogInfo: any;
-  setBlogInfo: Dispatch<any>;
+  getBlogInfo: (id: string) => Promise<ArticlesInfoType | Error>;
+  blogInfo: Partial<ArticlesInfoType>;
+  setBlogInfo: Dispatch<SetStateAction<Partial<ArticlesInfoType>>>;
   refreshBlogRows: () => void;
   isLoading: boolean;
   isError: boolean;
   sortBy: string;
-  setSortBy: Dispatch<any>;
+  setSortBy: Dispatch<SetStateAction<string>>;
   orderBy: string;
-  setOrderBy: Dispatch<any>;
+  setOrderBy: Dispatch<SetStateAction<string>>;
   selectedStatus: string;
-  setSelectedStatus: Dispatch<any>;
-  // openModal: boolean;
-  // setOpenModal: Dispatch<any>;
+  setSelectedStatus: Dispatch<SetStateAction<string>>;
   checkedItems: string[];
-  setCheckedItems: Dispatch<any>;
+  setCheckedItems: Dispatch<SetStateAction<string[]>>;
   selectedBlogs: { title: string }[];
-  setSelectedBlogs: Dispatch<any>;
-  setCheckedUiItems: Dispatch<any>;
-  setUrlPath: Dispatch<any>;
+  setSelectedBlogs: Dispatch<SetStateAction<{ title: string }[]>>;
+  setCheckedUiItems: Dispatch<SetStateAction<string[]>>;
+  setUrlPath: Dispatch<SetStateAction<URL | null>>;
   isAllChecked: boolean;
   setIsAllChecked: Dispatch<SetStateAction<boolean>>;
   blogCreate: boolean;
-  setBlogCreate: Dispatch<any>;
+  setBlogCreate: Dispatch<SetStateAction<boolean>>;
   isPrivate: boolean;
-  setIsPrivate: Dispatch<any>;
+  setIsPrivate: Dispatch<SetStateAction<boolean>>;
   isDraft: boolean;
-  setIsDraft: Dispatch<any>;
+  setIsDraft: Dispatch<SetStateAction<boolean>>;
   isPublished: boolean;
-  setIsPublished: Dispatch<any>;
+  setIsPublished: Dispatch<SetStateAction<boolean>>;
 };
 
-const BlogContext = createContext<ArticleContextData>({
-  listCount: 0,
-  items: [],
-  setItems: () => { },
-  editItem: [],
-  setEditItem: () => { },
-  isEdit: false,
-  setIsEdit: () => { },
-  keyword: '',
-  setKeyword: () => { },
-  queryParams: {},
-  setQueryParams: () => { },
-  handleSearch: () => { },
-  resetFilter: () => { },
-  isFilterActive: false,
-  pageMeta: {},
-  pageNumber: 1,
-  setPageNumber: () => { },
-  prevPage: () => { },
-  nextPage: () => { },
-  pagination: () => { },
-  getBlogInfo: () => { },
-  blogInfo: {},
-  setBlogInfo: () => { },
-  refreshBlogRows: () => { },
-  isLoading: true,
-  isError: false,
-  sortBy: '',
-  setSortBy: () => { },
-  orderBy: '',
-  setOrderBy: () => { },
-  selectedStatus: '',
-  setSelectedStatus: () => { },
-  // openModal: false,
-  // setOpenModal: () => { },
-  checkedItems: [],
-  setCheckedItems: () => { },
-  selectedBlogs: [],
-  setSelectedBlogs: () => { },
-  isAllChecked: false,
-  setIsAllChecked: () => { },
-  blogCreate: false,
-  setBlogCreate: () => { },
-  setCheckedUiItems: () => { },
-  setUrlPath: () => { },
-  isPrivate: false,
-  setIsPrivate: () => { },
-  isDraft: false,
-  setIsDraft: () => { },
-  isPublished: false,
-  setIsPublished: () => { },
-});
+const BlogContext = createContext<ArticleContextData | undefined>(undefined);
 
 type Props = {
   children: React.ReactNode;
@@ -134,14 +81,14 @@ export function BlogContextProvider({ children }: Props) {
   const [totalItems, setTotalItems] = useState(0);
   const [selectedStatus, setSelectedStatus] = useState('');
   const [items, setItems] = useState<ArticlesInfoType[]>([]);
-  const [editItem, setEditItem] = useState([]);
+  const [editItem, setEditItem] = useState<ArticlesInfoType[]>([]);
   const [isEdit, setIsEdit] = useState<boolean>(false);
   const [blogIdsUrl, setBlogIdsUrl] = useState<URL | null>(null)
 
   const [pageNumber, setPageNumber] = useState(1);
   const [urlPath, setUrlPath] = useState<URL | null>(null);
-  const [blogInfo, setBlogInfo] = useState({});
-  const [pageMeta, setPageMeta] = useState({});
+  const [blogInfo, setBlogInfo] = useState<Partial<ArticlesInfoType>>({});
+  const [pageMeta, setPageMeta] = useState<PageMeta | Record<string, never>>({});
   const [isPrivate, setIsPrivate] = useState(false);
   const [isDraft, setIsDraft] = useState(false);
   const [isPublished, setIsPublished] = useState(false);
@@ -351,5 +298,13 @@ export function BlogContextProvider({ children }: Props) {
     </BlogContext.Provider>
   );
 }
+
+export const useBlog = () => {
+  const context = useContext(BlogContext);
+  if (context === undefined) {
+    throw new Error('useBlog must be used within a BlogContextProvider');
+  }
+  return context;
+};
 
 export default BlogContext;

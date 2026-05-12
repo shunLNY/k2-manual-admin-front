@@ -28,7 +28,9 @@ SignInPage.getLayout = function getLayout(page: ReactElement) {
   );
 };
 
-export async function getServerSideProps(context: any): Promise<any> {
+import { type GetServerSidePropsContext } from 'next';
+
+export async function getServerSideProps(context: GetServerSidePropsContext) {
   const session = await getSession(context);
 
   if (session) {
@@ -37,7 +39,7 @@ export async function getServerSideProps(context: any): Promise<any> {
         destination: '/dashboard',
         permanent: false,
       },
-    };
+    } as const;
   }
 
   return {

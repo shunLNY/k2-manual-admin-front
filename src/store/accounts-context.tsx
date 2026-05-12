@@ -1,138 +1,89 @@
-/** @format */
-
-import React, { Dispatch, createContext, useCallback, useEffect, useState } from 'react';
-import { Account } from '@/utils/types';
+import React, { Dispatch, createContext, useCallback, useEffect, useState, type SetStateAction, useContext } from 'react';
+import type { Account, PageMeta } from '@/utils/types';
 import { useFetch } from '@/lib/hooks/common-hooks';
 import { fetcher } from '@/utils/fetcher';
-import { AccountListInfo } from '@/utils/constants';
 
 type AccountContextData = {
   listCount: number;
-  items: any[];
-  setItems: Dispatch<any>;
-  editItem: any;
-  setEditItem: Dispatch<any>;
+  items: Account[];
+  setItems: Dispatch<SetStateAction<Account[]>>;
+  editItem: Account[];
+  setEditItem: Dispatch<SetStateAction<Account[]>>;
   isEdit: boolean;
-  setIsEdit: Dispatch<any>;
+  setIsEdit: Dispatch<SetStateAction<boolean>>;
   keyword: string;
-  setKeyword: Dispatch<any>;
-  queryParams: any;
-  setQueryParams: Dispatch<any>;
+  setKeyword: Dispatch<SetStateAction<string>>;
+  queryParams: Record<string, string | string[]>;
+  setQueryParams: Dispatch<SetStateAction<Record<string, string | string[]>>>;
   handleSearch: () => void;
   resetFilter: () => void;
   isFilterActive: boolean;
-  pageMeta: {};
+  pageMeta: PageMeta | Record<string, never>;
   pageNumber: number;
-  setPageNumber: Dispatch<any>;
+  setPageNumber: Dispatch<SetStateAction<number>>;
   prevPage: () => void;
   nextPage: () => void;
   pagination: (value: number) => void;
-  getAccountInfo: (value: string) => void;
-  accountInfo: any;
-  setAccountInfo: Dispatch<any>;
+  getAccountInfo: (id: string) => Promise<Account | Error>;
+  accountInfo: Partial<Account>;
+  setAccountInfo: Dispatch<SetStateAction<Partial<Account>>>;
   refreshAccountRows: () => void;
   isLoading: boolean;
   isError: boolean;
   sortBy: string;
-  setSortBy: Dispatch<any>;
+  setSortBy: Dispatch<SetStateAction<string>>;
   orderBy: string;
-  setOrderBy: Dispatch<any>;
+  setOrderBy: Dispatch<SetStateAction<string>>;
   selectedStatus: string;
-  setSelectedStatus: Dispatch<any>;
+  setSelectedStatus: Dispatch<SetStateAction<string>>;
   accountCreate: boolean;
-  setAccountCreate: Dispatch<any>;
+  setAccountCreate: Dispatch<SetStateAction<boolean>>;
   isActive: string;
-  setIsActive: Dispatch<any>;
+  setIsActive: Dispatch<SetStateAction<string>>;
   isAdmin: boolean;
-  setIsAdmin :Dispatch<any>;
+  setIsAdmin: Dispatch<SetStateAction<boolean>>;
   isEditor: boolean;
-  setIsEditor :Dispatch<any>;
+  setIsEditor: Dispatch<SetStateAction<boolean>>;
 };
 
-const AccountContext = createContext<AccountContextData>({
-  listCount: 0,
-  items: [],
-  setItems: () => { },
-  editItem: [],
-  setEditItem: () => { },
-  isEdit: false,
-  setIsEdit: () => { },
-  keyword: "",
-  setKeyword: () => { },
-  queryParams: {},
-  setQueryParams: () => { },
-  handleSearch: () => { },
-  resetFilter: () => { },
-  isFilterActive: false,
-  pageMeta: {},
-  pageNumber: 1,
-  setPageNumber: () => { },
-  prevPage: () => { },
-  nextPage: () => { },
-  pagination: () => { },
-  getAccountInfo: () => { },
-  accountInfo: {},
-  setAccountInfo: () => { },
-  refreshAccountRows: () => { },
-  isLoading: true,
-  isError: false,
-  sortBy: "",
-  setSortBy: () => { },
-  orderBy: "",
-  setOrderBy: () => { },
-  selectedStatus: "",
-  setSelectedStatus: () => { },
-  accountCreate: false,
-  setAccountCreate: () => { },
-  isActive: '',
-  setIsActive: () => { },
-  isAdmin : false,
-  setIsAdmin : ()=>{},
-  isEditor : false,
-  setIsEditor : ()=>{}
-});
+const AccountContext = createContext<AccountContextData | undefined>(undefined);
 
 type Props = {
   children: React.ReactNode;
 };
 
-
 export function AccountContextProvider({ children }: Props) {
   const [accountCreate, setAccountCreate] = useState(false);
   const [pageLoaded, setPageLoaded] = useState(false);
   const [keyword, setKeyword] = useState("");
-  const [queryParams, setQueryParams] = useState<{ [key: string]: any }>({});
+  const [queryParams, setQueryParams] = useState<Record<string, string | string[]>>({});
   const [sortBy, setSortBy] = useState("");
   const [orderBy, setOrderBy] = useState("");
   const [totalItems, setTotalItems] = useState(0);
   const [selectedStatus, setSelectedStatus] = useState("");
-  const [items, setItems] = useState([]);
-  const [editItem, setEditItem] = useState([]);
+  const [items, setItems] = useState<Account[]>([]);
+  const [editItem, setEditItem] = useState<Account[]>([]);
   const [isEdit, setIsEdit] = useState<boolean>(false);
   const [accountIdsUrl, setAccountIdsUrl] = useState<URL | null>(null);
   const [isActive, setIsActive] = useState('private');
-  
 
-  //checkbox
-  const [ isAdmin , setIsAdmin ] = useState(false);
-  const [ isEditor , setIsEditor ] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isEditor, setIsEditor] = useState(false);
 
   const [pageNumber, setPageNumber] = useState(1);
   const [urlPath, setUrlPath] = useState<URL | null>(null);
-  const [accountInfo, setAccountInfo] = useState({});
-  const [pageMeta, setPageMeta] = useState({});
+  const [accountInfo, setAccountInfo] = useState<Partial<Account>>({});
+  const [pageMeta, setPageMeta] = useState<PageMeta | Record<string, never>>({});
 
   const { data: accounts, isLoading, isError, mutate: refreshAccountRows, meta } = useFetch(urlPath);
-  
 
   useEffect(() => {
     if (accounts && !isLoading) {
       setTotalItems(meta && meta.totalItems);
       setItems(accounts);
       setPageMeta(meta);
-      console.log(pageMeta, "....pageMeta in account context");
     }
-  }, [accounts, isLoading]);
+  }, [accounts, isLoading, meta]);
 
   useEffect(() => {
     if (!urlPath) return;
@@ -142,7 +93,6 @@ export function AccountContextProvider({ children }: Props) {
     setUrlPath(newUrl);
   }, [sortBy, orderBy]);
 
-  // clear query params
   const [isSubmitClear, setisSubmitClear] = useState(false);
   const [isFilterActive, setIsFilterActive] = useState(false);
 
@@ -179,7 +129,7 @@ export function AccountContextProvider({ children }: Props) {
         setUrlPath(url);
       }
     },
-    [pageNumber, urlPath]
+    [urlPath]
   );
 
   const handleSearch = useCallback(async () => {
@@ -196,7 +146,7 @@ export function AccountContextProvider({ children }: Props) {
       for (queryKey in queryParams) {
         if (queryParams.hasOwnProperty(queryKey)) {
           let key = queryKey;
-          let value = queryParams[queryKey] as object;
+          let value = queryParams[queryKey];
           if (Array.isArray(value)) {
             for (var i in value) {
               query += key + "[]" + "=" + value[i] + "&";
@@ -210,24 +160,19 @@ export function AccountContextProvider({ children }: Props) {
 
     isSubmitClear && ((query = ""), setisSubmitClear(false));
     let url = new URL(window.location.origin + "/api/proxy/admin/accounts/paginate" + (query.length > 1 ? query : ""));
-    console.log(url, "....urlurl");
 
-    url.searchParams.set("sortBy", String(sortBy)); // Add sortBy parameter
+    url.searchParams.set("sortBy", String(sortBy));
     url.searchParams.set("orderBy", String(orderBy));
-    // set is filter active
     query.length > 1 ? setIsFilterActive(true) : setIsFilterActive(false);
 
-    // refresh if same query
     setUrlPath(url);
-
     !pageLoaded && setPageLoaded(true);
     return;
-  }, [keyword, queryParams, urlPath, isSubmitClear, pageLoaded]);
-
+  }, [keyword, queryParams, sortBy, orderBy, isSubmitClear, pageLoaded]);
 
   const getAccountInfo = async (id: string) => {
     try {
-      const res = await fetcher("/api/proxy/admin/accounts/" + id, {
+      const res = await fetcher<any>("/api/proxy/admin/accounts/" + id, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -236,13 +181,12 @@ export function AccountContextProvider({ children }: Props) {
         setAccountInfo(res.data);
       }
       return res.data;
-    } catch (error) {
+    } catch (error: any) {
       return error;
     }
   };
 
   useEffect(() => {
-    // getEstimateInfo();
     setUrlPath(new URL(window.location.origin + "/api/proxy/admin/accounts/paginate"));
     setAccountIdsUrl(new URL(window.location.origin + "/api/proxy/admin/accounts/account-ids"));
   }, []);
@@ -257,7 +201,7 @@ export function AccountContextProvider({ children }: Props) {
       setIsEditor(false)
       setisSubmitClear(false);
     }
-  }, [isSubmitClear]);
+  }, [isSubmitClear, handleSearch]);
 
   const context: AccountContextData = {
     listCount: totalItems,
@@ -305,4 +249,12 @@ export function AccountContextProvider({ children }: Props) {
   return <AccountContext.Provider value={context}>{children}</AccountContext.Provider>;
 }
 
-export default AccountContext
+export const useAccount = () => {
+  const context = useContext(AccountContext);
+  if (context === undefined) {
+    throw new Error('useAccount must be used within an AccountContextProvider');
+  }
+  return context;
+};
+
+export default AccountContext;

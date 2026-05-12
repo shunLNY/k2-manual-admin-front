@@ -4,7 +4,7 @@ import type React from "react"
 
 import { IconArrowDown, IconArrowRight, IconArrowUp, IconYellowAlert, IconPlus } from "@/components/icons/icons"
 import { useRouter } from "next/router"
-import { useSortable } from "@dnd-kit/sortable"
+import { SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import { GrDrag } from "react-icons/gr"
 import type { Category } from "@/utils/types"
@@ -12,23 +12,21 @@ import styles from "../../../styles/_list.module.scss"
 import categoryListStyles from "./category-list.module.scss"
 import { Checkbox } from "@/components/commons/inputs/checkbox"
 import { useContext } from "react"
-import CategoryListContext from "@/store/categories-context"
+import { useCategoryList } from "@/store/categories-context"
 import dayjs from "dayjs"
 import { useState } from "react"
 
 type Props = {
   item: Category
   index: number
-  currentPage: number
-  pageSize: number
   limit?: number
   level: number
 }
 
 const ListItem = (props: Props) => {
   const router = useRouter()
-  const listCtx = useContext(CategoryListContext)
-  const { item, currentPage, pageSize, index, level } = props
+  const listCtx = useCategoryList()
+  const { item, index, level } = props
   const { checkedItems, setCheckedItems, selectedCategories, setSelectedCategories } = listCtx
 
   const [isOpen, setIsOpen] = useState(level > 1)
@@ -128,7 +126,7 @@ const ListItem = (props: Props) => {
         <div>{item?.blog_categories?.length ?? 0}</div>
         {level < 3 && (
           <div onClick={(e) => e.stopPropagation()}>
-            <button className={categoryListStyles.btn_add_child} onClick={() => router.push(`/categories/entry?parentId=${item.id}`)}>
+            <button className={categoryListStyles.btn_add_child} onClick={() => router.push(`/categories/new?parentId=${item.id}`)}>
               +サブカテゴリー
             </button>
           </div>
@@ -145,18 +143,18 @@ const ListItem = (props: Props) => {
         </div>
       </div>
       {(canExpand || level > 1) && hasChildren && isOpen && (
-        <ul className={categoryListStyles.sortable_list}>
-          {item.child_categories.map((child: any, childIndex: number) => (
-            <ListItem
-              key={child.id}
-              item={child}
-              index={childIndex}
-              currentPage={currentPage}
-              pageSize={pageSize}
-              level={level + 1}
-            />
-          ))}
-        </ul>
+        <SortableContext items={item.child_categories.map((i: any) => i.id)} strategy={verticalListSortingStrategy}>
+          <ul className={categoryListStyles.sortable_list}>
+            {item.child_categories.map((child: any, childIndex: number) => (
+              <ListItem
+                key={child.id}
+                item={child}
+                index={childIndex}
+                level={level + 1}
+              />
+            ))}
+          </ul>
+        </SortableContext>
       )}
     </li>
   )

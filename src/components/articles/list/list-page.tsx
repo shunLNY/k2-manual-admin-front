@@ -1,15 +1,15 @@
 /** @format */
 
 'use client';
-import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useDebounce } from '../../../utils/helpers';
 import search from '@/components/commons/lists/list-filter-pc.module.scss';
 import ListPageLayout from '@/components/commons/lists/list-page-layout';
 import ButtonFilterClear from '@/components/commons/buttons/btn-filter-clear';
 import BlogList from './article-list';
-import ListPageContext from '@/store/list-page-context';
-import ArticleContext from '@/store/articles-context';
+import { useListPage } from '@/store/list-page-context';
+import { useBlog } from '@/store/articles-context';
 import { useForm, Controller } from 'react-hook-form';
 import { ArticlesInfoType } from '@/utils/types';
 import { SelectInstance } from 'react-select';
@@ -31,7 +31,7 @@ import useSWR from 'swr';
 import styles from '../entry/articles.entry.module.scss';
 import DateInput from '@/components/commons/inputs/date-input';
 import ReactDatepicker from '@/components/commons/datepicker/react-datepicker';
-import CategoryListContext from '@/store/categories-context';
+import { useCategoryList } from '@/store/categories-context';
 
 const ListFilterPc = dynamic(
   () => import('../../commons/lists/list-filter-pc'),
@@ -60,9 +60,9 @@ type FilterFormData = {
 
 const ListPage = () => {
   const router = useRouter();
-  const pageCtx = useContext(ListPageContext);
-  const listCtx = useContext(ArticleContext);
-  const categoryListCtx = useContext(CategoryListContext);
+  const pageCtx = useListPage();
+  const listCtx = useBlog();
+  const categoryListCtx = useCategoryList();
   const { items } = categoryListCtx;
 
   const {

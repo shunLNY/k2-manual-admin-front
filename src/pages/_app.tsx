@@ -14,36 +14,42 @@ type AppPropsWithLayout = AppProps & {
   Component: NextPageWithLayout;
 };
 
-export default function MyApp({ Component, pageProps }: AppPropsWithLayout) {
+import { SessionProvider } from "next-auth/react";
+
+import { AuthContextProvider } from "@/store/auth-context";
+
+export default function MyApp({ Component, pageProps: { session, ...pageProps } }: AppPropsWithLayout) {
   const getLayout = Component.getLayout ?? ((page) => page);
   return (
-        <>
-          <ToastContainer
-            theme='light'
-            autoClose={3000}
-            position='top-right'
-            hideProgressBar={false}
-            newestOnTop={false}
-            pauseOnFocusLoss
-            rtl={false}
-            draggable
-            pauseOnHover
-            closeButton={true}
-            closeOnClick={true} />
-          {getLayout(
-            <>
-              <Head>
-                <meta name="robots" content="noindex, nofollow" />
-                <meta
-                  name='viewport'
-                  content='width=device-width,user-scalable=no,initial-scale=1,minimum-scale=1,maximum-scale=1'
-                />
-              </Head>
+    <SessionProvider session={session}>
+      <AuthContextProvider>
+        <ToastContainer
+          theme='light'
+          autoClose={3000}
+          position='top-right'
+          hideProgressBar={false}
+          newestOnTop={false}
+          pauseOnFocusLoss
+          rtl={false}
+          draggable
+          pauseOnHover
+          closeButton={true}
+          closeOnClick={true} />
+        {getLayout(
+          <>
+            <Head>
+              <meta name="robots" content="noindex, nofollow" />
+              <meta
+                name='viewport'
+                content='width=device-width,user-scalable=no,initial-scale=1,minimum-scale=1,maximum-scale=1'
+              />
+            </Head>
 
-              <Component {...pageProps} />
+            <Component {...pageProps} />
 
-            </>
-          )}
           </>
+        )}
+      </AuthContextProvider>
+    </SessionProvider>
   )
 }
