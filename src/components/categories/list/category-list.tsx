@@ -140,7 +140,7 @@ const CategoryList = (props: Props) => {
         }
 
         const ids = newList.map((i: any) => i.id)
-        fetch("/api/proxy/categories/reorder", {
+        fetch("/api/proxy/admin/categories/reorder", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ ids }),

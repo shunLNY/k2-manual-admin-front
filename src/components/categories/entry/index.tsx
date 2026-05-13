@@ -139,7 +139,7 @@ const CategoriesEntry = () => {
     let submitMsg = ""
 
     if (pageCtx.entryMode === "new") {
-      url = "/api/proxy/categories/"
+      url = "/api/proxy/admin/categories/"
       const submitData: any = {
         category_name: data.category_name,
         category_slug: data.category_slug,
@@ -188,7 +188,7 @@ const CategoriesEntry = () => {
         },
         body: JSON.stringify(submitData),
       }
-      url = new URL(window.location.origin + "/api/proxy/categories/" + categoryInfo.id)
+      url = new URL(window.location.origin + "/api/proxy/admin/categories/" + categoryInfo.id)
       submitMsg = updateSuccessfulMessage
     }
 
@@ -220,7 +220,7 @@ const CategoriesEntry = () => {
     setShowModal(false)
     setIsBtnDisable(true)
     try {
-      await fetcher(`/api/proxy/categories/${categoryInfo.id}`, { method: "DELETE" })
+      await fetcher(`/api/proxy/admin/categories/${categoryInfo.id}`, { method: "DELETE" })
       toast.success("カテゴリーを削除しました")
       router.push("/categories")
       refreshCategoryRows()

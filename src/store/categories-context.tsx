@@ -120,9 +120,9 @@ export function CategoryListContextProvider({ children }: Props) {
   }
 
   useEffect(() => {
-    setUrlPath(new URL(window.location.origin + "/api/proxy/categories/"))
+    setUrlPath(new URL(window.location.origin + "/api/proxy/admin/categories/"))
     // setUrlPath(new URL(window.location.origin + "/api/proxy/categories/paginate"))
-    setCategoryIdsUrl(new URL(window.location.origin + "/api/proxy/categories/categories-ids"));
+    setCategoryIdsUrl(new URL(window.location.origin + "/api/proxy/admin/categories/categories-ids"));
   }, [])
 
   useEffect(() => {
@@ -165,7 +165,7 @@ export function CategoryListContextProvider({ children }: Props) {
 
     isSubmitClear && ((query = ""), setisSubmitClear(false));
 
-    const url = new URL(window.location.origin + "/api/proxy/categories/" + (query.length > 1 ? query : ""))
+    const url = new URL(window.location.origin + "/api/proxy/admin/categories/" + (query.length > 1 ? query : ""))
     // const url = new URL(window.location.origin + "/api/proxy/categories/paginate" + (query.length > 1 ? query : ""))
     console.log(url, "....urlurl")
 
@@ -183,7 +183,7 @@ export function CategoryListContextProvider({ children }: Props) {
 
   const getCategoryInfo = async (id: string) => {
     try {
-      const res = await fetcher("/api/proxy/categories/" + id, {
+      const res = await fetcher("/api/proxy/admin/categories/" + id, {
         headers: {
           "Content-Type": "application/json",
         },
