@@ -56,10 +56,10 @@ const ListPage = () => {
 		setQueryParams,
 		resetFilter,
 		handleSearch,
-		isPrivate,
-		setIsPrivate,
-		isPublished,
-		setIsPublished,
+		is_private,
+		setIs_Private,
+		is_published,
+		setIs_Published,
 		isFilterActive,
 		setUrlPath,
 		setCategoryCreate
@@ -118,11 +118,11 @@ const ListPage = () => {
 		}
 	}, [pageCtx.listFilter]);
 
-	const handleCheckbox = (e: React.ChangeEvent<HTMLInputElement>) => {
+
+  	const handleCheckbox = (e: React.ChangeEvent<HTMLInputElement>) => {
 		let paramName = e.target.getAttribute("name") as string;
-		paramName === "isPrivate" && setIsPrivate(!isPrivate);
-		paramName === "isPublished" && setIsPublished(!isPublished);
-		console.log(paramName)
+		paramName === "is_private" && setIs_Private(!is_private);
+		paramName === "is_published" && setIs_Published(!is_published);
 
 
 		setQueryParams((prevState: any) => {
@@ -248,9 +248,9 @@ const ListPage = () => {
 															<div className={search.list_search_check}  >
 																<label className={"d-flex items-center"}  >
 																	<Checkbox
-																		name="isPrivate"
+																		name="is_private"
 																		onChange={handleCheckbox}
-																		checked={isPrivate}
+																		checked={is_private}
 																		className={search.checkbox_status}
 																	/>
 																	<SearchCheckboxStatusPC
@@ -262,9 +262,9 @@ const ListPage = () => {
 															<div className={search.list_search_check}  >
 																<label className={"d-flex items-center"}  >
 																	<Checkbox
-																		name="isPublished"
+																		name="is_published"
 																		onChange={handleCheckbox}
-																		checked={isPublished}
+																		checked={is_published}
 																		className={search.checkbox_status}
 																	/>
 																	<SearchCheckboxStatusPC

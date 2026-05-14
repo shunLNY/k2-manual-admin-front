@@ -14,11 +14,13 @@ type Props = {
 };
 
 import { ListPageContextProvider } from '@/store/list-page-context';
+import { AccountContextProvider } from '@/store/accounts-context';
 
 export default function MainLayout({ children, title = 'HOME' }: Props) {
 	const pathname = usePathname();
 	return (
 		<ListPageContextProvider>
+      <AccountContextProvider>
 			<div className='main_container'>
 				<Header title={title} className={'relative'}>
 				</Header>
@@ -27,6 +29,7 @@ export default function MainLayout({ children, title = 'HOME' }: Props) {
 					<div className={styles.content}>{children}</div>
 				</div>
 			</div>
+      </AccountContextProvider>
 		</ListPageContextProvider>
 	);
 }

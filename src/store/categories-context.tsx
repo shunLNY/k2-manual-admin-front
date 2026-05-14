@@ -41,10 +41,10 @@ type CategoryContextData = {
   setIsAllChecked: Dispatch<SetStateAction<boolean>>
   categoryCreate: boolean
   setCategoryCreate: Dispatch<SetStateAction<boolean>>
-  isPrivate: boolean;
-  setIsPrivate: Dispatch<SetStateAction<boolean>>;
-  isPublished: boolean;
-  setIsPublished: Dispatch<SetStateAction<boolean>>;
+  is_private: boolean;
+  setIs_Private: Dispatch<SetStateAction<boolean>>;
+  is_published: boolean;
+  setIs_Published: Dispatch<SetStateAction<boolean>>;
   selectedTabId: string;
   setSelectedTabId: Dispatch<SetStateAction<string>>;
 }
@@ -70,8 +70,8 @@ export function CategoryListContextProvider({ children }: Props) {
   const [categoryIdsUrl, setCategoryIdsUrl] = useState<URL | null>(null);
 
   //search checkbox
-  const [isPrivate, setIsPrivate] = useState(false);
-  const [isPublished, setIsPublished] = useState(false);
+  const [ is_private, setIs_Private] = useState(false);
+  const [ is_published, setIs_Published] = useState(false);
 
   const [selectedTabId, setSelectedTabId] = useState<string>("");
 
@@ -88,7 +88,7 @@ export function CategoryListContextProvider({ children }: Props) {
 
   useEffect(() => {
     if (categories && !isLoading) {
-      setTotalItems(categories.length) // Backend returns array now
+      setTotalItems(categories.length)
       setItems(categories)
       
       // If no tab is selected or the current selected tab is not in the new items, select the first one
@@ -117,6 +117,8 @@ export function CategoryListContextProvider({ children }: Props) {
 
   const resetFilter = () => {
     setisSubmitClear(true)
+    setIs_Private(false)
+    setIs_Published(false)
   }
 
   useEffect(() => {
@@ -234,10 +236,10 @@ export function CategoryListContextProvider({ children }: Props) {
     setIsAllChecked,
     categoryCreate,
     setCategoryCreate,
-    isPrivate,
-    setIsPrivate,
-    isPublished,
-    setIsPublished,
+    is_private,
+    setIs_Private,
+    is_published,
+    setIs_Published,
     selectedTabId,
     setSelectedTabId
   }

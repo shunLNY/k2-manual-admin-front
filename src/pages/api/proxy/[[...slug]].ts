@@ -1,60 +1,78 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { API_URL } from '@/utils/constants';
+import type { ServerResponse } from 'http';
+import { getToken } from 'next-auth/jwt';
+import httpProxy from 'http-proxy';
+import { API_URL } from '../../../utils/constants';
+
+const secret = process.env.NEXTAUTH_SECRET;
+
+const proxy = httpProxy.createProxyServer({
+  target: API_URL,
+  autoRewrite: false,
+  xfwd: true,
+  secure: process.env.ENVIRONMENT === 'production',
+  changeOrigin: true,
+});
+
+const nextProxy = async (
+  req: NextApiRequest,
+  res: NextApiResponse,
+): Promise<void> => {
+  const token = await getToken({ req, secret });
+
+  return new Promise<void>((resolve, reject) => {
+    // Remove /api/proxy prefix
+    req.url = req.url?.replace('/api/proxy', '') || '';
+
+    // Remove host header
+    delete req.headers.host;
+
+    // Do not forward cookies
+    req.headers.cookie = '';
+
+    // Custom header
+    req.headers['x-device-type'] = 'pc';
+
+    // Add Authorization header if token exists
+    if (token && token.accessToken) {
+      req.headers.authorization = `Bearer ${token.accessToken}`;
+    }
+
+    // Handle proxy errors
+    proxy.once('error', (err, _req, proxyRes) => {
+      if ('writeHead' in proxyRes) {
+        const serverRes = proxyRes as ServerResponse;
+
+        serverRes.writeHead(503, {
+          'Content-Type': 'application/json',
+        });
+
+        serverRes.end(
+          JSON.stringify({
+            status: 503,
+            message: 'Error in connection to API Service',
+          }),
+        );
+      }
+
+      reject(err);
+    });
+
+    // Resolve when proxy response finishes
+    proxy.once('proxyRes', () => {
+      resolve();
+    });
+
+    // Forward request
+    proxy.web(req, res);
+  });
+};
+
+export default nextProxy;
 
 export const config = {
   api: {
-    bodyParser: false, // Handle multipart/form-data and other bodies manually
+    bodyParser: false,
+    responseLimit: false,
   },
 };
-
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { slug } = req.query;
-  const path = Array.isArray(slug) ? slug.join('/') : slug;
-  
-  // Construct the target URL
-  const queryPart = req.url?.includes('?') ? '?' + req.url.split('?')[1] : '';
-  const url = `${API_URL}/${path}${queryPart}`;
-
-  console.log(`[Proxy] ${req.method} ${req.url} -> ${url}`);
-
-  try {
-    // Forward the request to the backend
-    const response = await fetch(url, {
-      method: req.method,
-      headers: {
-        ...req.headers as any,
-        host: new URL(API_URL).host,
-      },
-      // Pass the request body stream directly for POST/PUT/PATCH
-      body: req.method !== 'GET' && req.method !== 'HEAD' ? (req as any) : undefined,
-      // @ts-ignore - Duplex is required when body is a stream in some environments
-      duplex: 'half',
-    });
-
-    // Copy response headers
-    response.headers.forEach((value, key) => {
-      // Skip some headers that shouldn't be forwarded
-      if (!['content-encoding', 'transfer-encoding'].includes(key.toLowerCase())) {
-        res.setHeader(key, value);
-      }
-    });
-
-    res.status(response.status);
-
-    // Stream the response body back
-    if (response.body) {
-      const reader = response.body.getReader();
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        res.write(value);
-      }
-    }
-    res.end();
-  } catch (error) {
-    console.error('[Proxy Error]', error);
-    if (!res.headersSent) {
-      res.status(500).json({ message: 'Internal Server Error' });
-    }
-  }
-}

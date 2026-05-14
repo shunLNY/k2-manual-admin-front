@@ -24,6 +24,10 @@ import { NEXT_PUBLIC_APP_URL } from '@/utils/constants';
 // import AuthContext from '@/store/auth-context';
 // import AccountContext from '@/store/accounts-context';
 import { useAccountInfo } from '@/lib/hooks/common-hooks';
+import AuthContext from '@/store/auth-context';
+import CategoryListContext from '@/store/categories-context';
+import AccountContext from '@/store/accounts-context';
+import { signOut } from 'next-auth/react';
 
 type Props = {
   title?: string;
@@ -37,7 +41,7 @@ export default function Header(props: LayoutProps) {
   
   const searchParams = useSearchParams();
   const filterParams = searchParams.get("filter") ?? "";
-  // const authContext = useContext(AuthContext);
+  const authContext = useContext(AuthContext);
 
   const isEntryPage = pathname?.includes("/new"); // Check If PathName include  "/new"
   const isEditEntryPage = pathname?.includes("/edit"); // Check If PathName include  "/edit"
@@ -46,10 +50,14 @@ export default function Header(props: LayoutProps) {
 
   const articleListCtx = useContext(ArticleContext)
   const pageCtx = useListPage();
-  // const categoryCtx = useContext(CategoryListContext)
-  // const accountCtx = useContext(AccountContext);
-  // const { getAccountInfo, accountInfo } = accountCtx;
-  // const { data: accountData, mutate: refreshData } = useAccountInfo(authContext.user.uid)
+  const categoryCtx = useContext(CategoryListContext)
+  const accountCtx = useContext(AccountContext);
+  console.log(accountCtx,"......accountCtx")
+  if (!accountCtx) {
+  return null; // Or a loading skeleton
+}
+  const { getAccountInfo, accountInfo } = accountCtx;
+  const { data: accountData, mutate: refreshData } = useAccountInfo(authContext?.user?.uid || "")
 
 
 
@@ -57,15 +65,6 @@ export default function Header(props: LayoutProps) {
   const isDashboard = pathname === '/dashboard' || pathname === '/';
   let classes = [styles.header, className].join(" ");
   const [isShowSetting, setIsShowSetting] = useState<boolean>(false);
-
-  // const session =await getSession();
-
-  // console.log(session , "...........session in header menu");
-
-  // useEffect(() => {
-  //   refreshData();
-  // }, [isShowSetting])
-
 
 
   // Navigate to the Previous page
@@ -204,8 +203,8 @@ export default function Header(props: LayoutProps) {
           <div onClick={() => { setIsShowSetting(!isShowSetting) }} className={styles.overlay}>
             <div onClick={(e) => e.stopPropagation()} className={styles.setting_container}>
               <div className={styles.user_account_container}>
-                {/* <p className={styles.user_name}> {accountData.account_name} </p> */}
-                {/* <p className={styles.user_email}> {accountData.email} </p> */}
+                <p className={styles.user_name}> {accountData?.account_name} </p>
+                <p className={styles.user_email}> {accountData?.email} </p>
                 <ButtonSave onClick={() => { handleUserProfile() }} type='button' text='アカウント管理' className={styles.logout_btn} />
               </div>
               <div className={styles.theme_container}>
@@ -232,10 +231,10 @@ export default function Header(props: LayoutProps) {
                   <label htmlFor="theme-dark-radio">ダークモード</label>
                 </div>
               </div>
-              <div 
-              // onClick={() =>
-                // signOut({ callbackUrl: NEXT_PUBLIC_APP_URL + '/auth/signin' })
-              // }
+              <div
+              onClick={() =>
+                signOut({ callbackUrl: NEXT_PUBLIC_APP_URL + '/auth/signin' })
+              }
                 className={styles.logout_container}>
                 <div className={styles.logout_btn}>
                   <IconLogout />
