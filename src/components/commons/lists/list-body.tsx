@@ -1,12 +1,11 @@
 /** @format */
-import { useContext, useState } from 'react';
+import { useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import classNames from 'classnames';
 import styles from './list-body.module.scss';
-import ListPageContext from '@/store/list-page-context';
-import CategoryListContext from '@/store/categories-context';
+import { useListPage } from '@/store/list-page-context';
 import { fetcher } from '@/utils/fetcher';
 import { deleteSuccessfulMessage } from '@/utils/constants';
 import { toast } from 'react-toastify';
@@ -31,8 +30,7 @@ type ListBodyProps = {
 
 export default function ListBody(props: ListBodyProps) {
   const pathname = usePathname();
-  const CategoryCtx = useContext(CategoryListContext)
-  const pageCtx = useContext(ListPageContext);
+  const pageCtx = useListPage();
   const {
     countIcon,
     count,

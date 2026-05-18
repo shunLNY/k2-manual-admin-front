@@ -1,11 +1,11 @@
 "@use client"
 import { usePathname } from "next/navigation"
-import { useCallback, useContext, useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 
-import ListPageContext from "@/store/list-page-context"
+import { useListPage } from "@/store/list-page-context"
 
 import AccountList from "./account-list"
-import AccountContext from "@/store/accounts-context"
+import { useAccount } from "@/store/accounts-context"
 import { useRouter } from "next/router"
 import { useForm } from "react-hook-form"
 import ListPageLayout from "@/components/commons/lists/list-page-layout"
@@ -41,8 +41,8 @@ interface InputData {
 
 const ListPage = () => {
   const router = useRouter()
-  const pageCtx = useContext(ListPageContext)
-  const listCtx = useContext(AccountContext)
+  const pageCtx = useListPage()
+  const listCtx = useAccount()
 
   const {
     listCount,
@@ -265,14 +265,14 @@ const ListPage = () => {
 
                     <li className={search.list_search_box}  >
                       <FormControl
-                        label="担当者"
+                        label="アカウントID"
                         layout="row"
                         classNames={search.custom_label}
                       >
                         <TextField
                           name="account_id"
                           register={register}
-                          placeholder="建工 太郎"
+                          placeholder="Otech_01"
                           onChange={handleInputChange}
                         />
                       </FormControl>

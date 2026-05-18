@@ -17,8 +17,7 @@ import styles from '../../../styles/_list.module.scss';
 import blogListStyles from './article-list.module.scss';
 import { IconOrder } from '@/components/icons/icons';
 import { BlogsListInfo } from '@/utils/constants';
-import ArticleContext from '@/store/articles-context';
-import ListPageContext from '@/store/list-page-context';
+import { useBlog } from '@/store/articles-context';
 import { Checkbox } from '@/components/commons/inputs/checkbox';
 
 type Props = {
@@ -31,8 +30,7 @@ type Props = {
 
 const ArticleList = (props: Props) => {
 
-  const listCtx = useContext(ArticleContext)
-  const pageCtx = useContext(ListPageContext)
+  const listCtx = useBlog();
 
   const {
     items,

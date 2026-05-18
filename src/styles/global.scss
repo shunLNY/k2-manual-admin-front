@@ -56,7 +56,7 @@
   // --list-background: #f2f3f7;
   --list-foreground: #4b5563;
 
-  --filter-background: var(--secondary);
+  --filter-background: var(--background);
   --filter-foreground: var(--foreground);
 
   --auth-background: #f2f3f7;
@@ -150,7 +150,7 @@
   --list-background: #555B76;
   --list-foreground: #BABCD0;
 
-  --filter-background: #222234;
+  --filter-background: var(--background);
   --filter-foreground: #333333;
 
   --auth-background: #f2f3f7;

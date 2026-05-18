@@ -24,6 +24,25 @@ import { useRouter } from "next/router"
 import { useAuth } from "@/store/auth-context"
 import ReactSelect from "@/components/commons/inputs/_select"
 
+const findRootCategoryId = (categories: any[], targetId: string): string | null => {
+  for (const cat of categories) {
+    if (cat.id === targetId) {
+      return cat.id;
+    }
+    const hasChild = (item: any): boolean => {
+      if (item.id === targetId) return true;
+      if (item.child_categories && item.child_categories.length > 0) {
+        return item.child_categories.some((child: any) => hasChild(child));
+      }
+      return false;
+    };
+    if (cat.child_categories && cat.child_categories.some((child: any) => hasChild(child))) {
+      return cat.id;
+    }
+  }
+  return null;
+};
+
 const CategoriesEntry = () => {
   const router = useRouter()
   const params = useParams()
@@ -145,8 +164,8 @@ const CategoriesEntry = () => {
         category_slug: data.category_slug,
         status: data.status,
         sort_order: data.sort_order,
-        creator_id: authCtx.user.id,
-        editor_id: authCtx.user.id,
+        creator_id: authCtx.user.uid,
+        editor_id: authCtx.user.uid,
       }
       if (data.has_parent === "yes" && data.parent_id) {
         submitData.parent_category_id = data.parent_id
@@ -165,7 +184,7 @@ const CategoriesEntry = () => {
       const submitData = {
         ...data,
         id: categoryInfo.id,
-        editor_id: authCtx.user.id,
+        editor_id: authCtx.user.uid,
       }
       if (data.has_parent === "yes" && data.parent_id) {
         (submitData as any).parent_category_id = data.parent_id
@@ -197,12 +216,31 @@ const CategoriesEntry = () => {
         toast.success(submitMsg)
         setIsBtnDisable(false)
         refreshCategoryRows()
+        
+        let redirectTabId = "";
         if (pageCtx.entryMode === "new") {
-          router.push("/categories")
+          if (data.has_parent === "yes" && data.parent_id) {
+            const rootId = findRootCategoryId(listCtx.items, data.parent_id);
+            if (rootId) redirectTabId = rootId;
+          } else if (res?.data?.id) {
+            redirectTabId = res.data.id;
+          }
         } else {
           listCtx.setCategoryInfo(res.data)
-          router.push("/categories")
+          if (data.has_parent === "yes" && data.parent_id) {
+            const rootId = findRootCategoryId(listCtx.items, data.parent_id);
+            if (rootId) redirectTabId = rootId;
+          } else if (categoryInfo.id) {
+            const isRoot = listCtx.items.some((c: any) => c.id === categoryInfo.id);
+            if (isRoot) redirectTabId = categoryInfo.id;
+            else {
+              const rootId = findRootCategoryId(listCtx.items, categoryInfo.id);
+              if (rootId) redirectTabId = rootId;
+            }
+          }
         }
+        
+        router.push(redirectTabId ? `/categories?tabId=${redirectTabId}` : "/categories")
       })
       .catch((error) => {
         toast.error(failMessage)
@@ -222,7 +260,9 @@ const CategoriesEntry = () => {
     try {
       await fetcher(`/api/proxy/admin/categories/${categoryInfo.id}`, { method: "DELETE" })
       toast.success("カテゴリーを削除しました")
-      router.push("/categories")
+      
+      const currentTabId = listCtx.selectedTabId;
+      router.push(currentTabId ? `/categories?tabId=${currentTabId}` : "/categories")
       refreshCategoryRows()
     } catch (err) {
       console.error(err)

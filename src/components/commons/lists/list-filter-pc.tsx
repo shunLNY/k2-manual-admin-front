@@ -2,10 +2,10 @@
 
 'use client';
 
-import { JSX, useContext } from 'react';
+import { JSX } from 'react';
 import classNames from 'classnames';
 
-import ListPageContext from '@/store/list-page-context';
+import { useListPage } from '@/store/list-page-context';
 
 import styles from './list-filter-pc.module.scss';
 import KeywordInput from '../inputs/keyword-input';
@@ -21,7 +21,7 @@ type Props = {
 
 export default function ListFilterPc({ children, ...props }: Props) {
   const { keyword, onKeywordChange, onSearch } = props;
-  const pageCtx = useContext(ListPageContext);
+  const pageCtx = useListPage();
 
   return (
     <>

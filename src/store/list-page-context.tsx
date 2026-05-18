@@ -17,6 +17,8 @@ type MultipleCopy = {
   isEstimateCopy?: boolean;
   isBusinessPartnerCopy?: boolean;
   isCustomerCopy?: boolean;
+  isBlogCopy?: boolean;
+  isCategoryCopy?: boolean;
 };
 
 type NewCreate = {
@@ -25,6 +27,8 @@ type NewCreate = {
   isUnitPriceCreate?: boolean;
   isCustomerCreate?: boolean;
   isBusinessPartnerCreate?: boolean;
+  isBlogCreate?: boolean;
+  isCategoryCreate?: boolean;
 };
 
 interface BreadCrumbTitle {
@@ -138,6 +142,8 @@ export function ListPageContextProvider({ children }: Props) {
     isEstimateCopy: true,
     isBusinessPartnerCopy: true,
     isCustomerCopy: true,
+    isBlogCopy: true,
+    isCategoryCopy: true,
   });
   const [isNewCreate, setIsNewCreate] = useState<NewCreate>({
     isTermCreate: true,
@@ -145,6 +151,8 @@ export function ListPageContextProvider({ children }: Props) {
     isUnitPriceCreate: true,
     isBusinessPartnerCreate: true,
     isCustomerCreate: true,
+    isBlogCreate: true,
+    isCategoryCreate: true,
   });
   const [openTermEntryModal, setOpenTermEntryModal] = useState(false);
   const [openConstructionTypeEntryModal, setOpenConstructionTypeEntryModal] =

@@ -251,8 +251,8 @@ const CategoryList = (props: Props) => {
               ) : null}
             </DragOverlay>
           </DndContext>
-          {list.length === 0 && <p className="p-8 text-center text-gray-500">子カテゴリーがありません</p>}
-          {items.length === 0 && <div className="p-8 text-center text-gray-500">カテゴリーが見つかりません</div>}
+          {list.length === 0 && <p className="p-8 text-center text-gray-500">子カテゴリーが見つかりません</p>}
+          {/* {items.length === 0 && <div className="p-8 text-center text-gray-500">カテゴリーが見つかりません</div>} */}
         </div>
       </div>
 

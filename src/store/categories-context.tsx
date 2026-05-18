@@ -122,6 +122,11 @@ export function CategoryListContextProvider({ children }: Props) {
   }
 
   useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const tabId = searchParams.get('tabId');
+    if (tabId) {
+      setSelectedTabId(tabId);
+    }
     setUrlPath(new URL(window.location.origin + "/api/proxy/admin/categories/"))
     // setUrlPath(new URL(window.location.origin + "/api/proxy/categories/paginate"))
     setCategoryIdsUrl(new URL(window.location.origin + "/api/proxy/admin/categories/categories-ids"));

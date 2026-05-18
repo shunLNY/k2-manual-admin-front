@@ -1,9 +1,9 @@
 /** @format */
 
-import { useContext, Dispatch, JSX } from 'react';
+import { Dispatch, JSX } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 
-import ListPageContext from '@/store/list-page-context';
+import { useListPage } from '@/store/list-page-context';
 
 import styles from './list-page-layout.module.scss';
 import { fetcher } from '@/utils/fetcher';
@@ -57,7 +57,7 @@ function ListPageLayout(props: SearchProps) {
     setCheckCombineSelected,
   } = props;
 
-  const pageCtx = useContext(ListPageContext);
+  const pageCtx = useListPage();
 
   const handleModal = () => {
     pageCtx.toggleSpFilter();

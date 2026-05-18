@@ -33,5 +33,6 @@ export const fetcher = async <T = any>(input: RequestInfo | URL, init?: RequestI
     throw error;
   }
 
-  return res.json() as Promise<T>;
+  const text = await res.text();
+  return (text ? JSON.parse(text) : {}) as T;
 };

@@ -21,19 +21,18 @@ const NewPassword = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [token, setToken] = useState<string | null>(null);
 
-  //comment off remporarily to see reset-password page
-  // useEffect(() => {
-  //   if (router.isReady) {
-  //     const t = router.query.token;
+  useEffect(() => {
+    if (router.isReady) {
+      const t = router.query.token;
 
-  //     if (!t) router.replace("/auth/signin");
+      if (!t) router.replace("/auth/signin");
 
-  //     if (typeof t === 'string') {
-  //       setToken(t);
-  //       console.log('Token from query:', t);
-  //     }
-  //   }
-  // }, [router.isReady, router.query.token]);
+      if (typeof t === 'string') {
+        setToken(t);
+        console.log('Token from query:', t);
+      }
+    }
+  }, [router.isReady, router.query.token]);
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword)
@@ -52,13 +51,13 @@ const NewPassword = () => {
 
   const onSubmit = async (data: any) => {
     setIsLoading(true);
-    let newPassword: string;
+    let new_password: string;
     console.log(data, "in new password form");
     if (data.password !== data.confirmPassword) {
       setError('パスワードが一致しません。');
       return;
     } else {
-      newPassword = data.password;
+      new_password = data.password;
     }
 
 
@@ -77,7 +76,7 @@ const NewPassword = () => {
       const response = await fetcher(`${NEXT_PUBLIC_APP_URL}/api/proxy/auth/reset-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token, newPassword }),
+        body: JSON.stringify({ token, new_password }),
       });
 
 

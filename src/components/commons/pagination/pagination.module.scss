@@ -13,10 +13,11 @@
   margin: 0 4px;
   padding: 8px 12px;
   cursor: pointer;
-  border: 1px solid var(--foreground);
-  color: var(--foreground);
+  border: 1px solid var(--sidebar-primary-background);
+  color: var(--sidebar-primary-background);
   border-radius: 3px;
   background: var(--background);
+      // background-color: var(--sidebar-primary-background);
   min-width: 32px;
   text-align: center;
   user-select: none;
@@ -27,13 +28,13 @@
   }
 
   &.active {
-    background: var(--foreground);
+    background: var(--sidebar-primary-background);
     color: var(--background);
-    border-color: var(--foreground);
+    border-color: var(--sidebar-primary-background);
     cursor: default;
 
     &:hover {
-      background: var(--foreground);
+      background: var(--sidebar-primary-background);
     }
   }
 
