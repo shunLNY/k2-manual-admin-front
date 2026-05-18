@@ -5,7 +5,7 @@ import { fetcher } from '@/utils/fetcher';
 import useSWRImmutable from 'swr/immutable';
 
 export function useFetch(query: string | URL | null) {
-  const { data, error, mutate } = useSWR(query, fetcher);
+  const { data, error, mutate } = useSWR<any>(query, fetcher);
   return {
     data: data ? data.data : undefined,
     meta: data ? data.meta : undefined,
@@ -16,7 +16,7 @@ export function useFetch(query: string | URL | null) {
 }
 
 export function useAccountInfo(id : string) {
-  const { data, error, mutate } = useSWR(id ? '/api/proxy/admin/accounts/' + id : null, fetcher);
+  const { data, error, mutate } = useSWR<any>(id ? '/api/proxy/admin/accounts/' + id : null, fetcher);
   return {
     data: data ? data.data : undefined,
     meta: data ? data.meta : undefined,
@@ -27,7 +27,7 @@ export function useAccountInfo(id : string) {
 }
 
 export function useImmutableFetch(query: string | URL | null) {
-  const { data, error, isLoading, mutate } = useSWRImmutable(query, fetcher);
+  const { data, error, isLoading, mutate } = useSWRImmutable<any>(query, fetcher);
   return {
     data: data ? data.data : undefined,
     meta: data ? data.meta : undefined,

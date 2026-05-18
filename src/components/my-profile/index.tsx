@@ -8,21 +8,21 @@ import FormFooter from "../commons/inputs/form-footer";
 import ButtonCancel from "../commons/buttons/btn-cancel";
 import ButtonSave from "../commons/buttons/btn-save";
 import { IconDelete } from "../icons/icons";
-import AuthContext from "@/store/auth-context";
+import AuthContext, { useAuth } from "@/store/auth-context";
 import { fetcher } from "@/utils/fetcher";
 import { toast } from "react-toastify";
 import { failMessage, updateSuccessfulMessage } from "@/utils/constants";
-import AccountContext from "@/store/accounts-context";
+import AccountContext, { useAccount } from "@/store/accounts-context";
 import { signOut } from 'next-auth/react';
 import { NEXT_PUBLIC_APP_URL } from '@/utils/constants';
 import { useRouter } from "next/router";
 
 const ProfileEntry = () => {
-  const authCtx = useContext(AuthContext);
+  const authCtx = useAuth();
   const router = useRouter();
   const [isBtnDisable, setIsBtnDisable] = useState(false)
   const [selectedStatus, setSelectedStatus] = useState("admin");
-  const { getAccountInfo, accountInfo } = useContext(AccountContext);
+  const { getAccountInfo, accountInfo } = useAccount();
   const [isEmailEdited, setIsEmailEdited] = useState(false);
 
   const statusOptions = [
@@ -36,8 +36,10 @@ const ProfileEntry = () => {
   };
 
   useEffect(() => {
-    getAccountInfo(authCtx.user.uid);
-  }, [authCtx.user.uid])
+    if (authCtx.user?.uid) {
+      getAccountInfo(authCtx.user.uid);
+    }
+  }, [authCtx.user?.uid])
 
   useEffect(() => {
     if (accountInfo) {

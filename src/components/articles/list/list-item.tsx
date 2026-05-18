@@ -20,7 +20,7 @@ import { API_URL, BlogsListInfo } from '@/utils/constants';
 import { Checkbox } from '@/components/commons/inputs/checkbox';
 import Image from 'next/image';
 import { ArticlesInfoType } from '@/utils/types';
-import ArticleContext from '@/store/articles-context';
+import { useBlog } from '@/store/articles-context';
 
 type Props = {
   item: ArticlesInfoType,
@@ -32,7 +32,7 @@ type Props = {
 
 const ListItem = (props: Props) => {
   const router = useRouter();
-  const listCtx = useContext(ArticleContext)
+  const listCtx = useBlog()
   const { item, index, currentPage, pageSize } = props;
   console.log(item);
   const { checkedItems, setCheckedItems, selectedBlogs, setSelectedBlogs } = listCtx

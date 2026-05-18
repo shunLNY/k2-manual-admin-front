@@ -1,7 +1,7 @@
 "use client"
 import { useContext, useEffect, useState } from "react";
 import ListItem from "./list-item"
-import AccountContext from "@/store/accounts-context";
+import AccountContext, { useAccount } from "@/store/accounts-context";
 import ListPageContext from "@/store/list-page-context";
 
 import ListBody from "@/components/commons/lists/list-body";
@@ -36,7 +36,7 @@ type Props = {
 
 const AccountList = (props: Props) => {
 
-  const listCtx = useContext(AccountContext)
+  const listCtx = useAccount()
   const { items, refreshAccountRows } = listCtx
 
   const { count, currentPage, pageSize } = props;
