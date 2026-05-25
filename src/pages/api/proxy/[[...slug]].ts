@@ -33,10 +33,12 @@ const nextProxy = async (
     // Custom header
     req.headers['x-device-type'] = 'pc';
 
-    // Add Authorization header if token exists
-    if (token && token.accessToken) {
-      req.headers.authorization = `Bearer ${token.accessToken}`;
+    // Block unauthenticated requests and forward Bearer token
+    if (!token || !token.accessToken) {
+      res.status(401).json({ message: 'Unauthorized' });
+      return;
     }
+    req.headers.authorization = `Bearer ${token.accessToken}`;
 
     // Handle proxy errors
     proxy.once('error', (err, _req, proxyRes) => {

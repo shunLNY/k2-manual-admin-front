@@ -33,7 +33,7 @@ import { type GetServerSidePropsContext } from 'next';
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const session = await getSession(context);
 
-  if (session) {
+  if (session && !(session as { error?: string }).error) {
     return {
       redirect: {
         destination: '/dashboard',

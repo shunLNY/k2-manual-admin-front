@@ -21,6 +21,7 @@ import { Checkbox } from '@/components/commons/inputs/checkbox';
 import Image from 'next/image';
 import { ArticlesInfoType } from '@/utils/types';
 import { useBlog } from '@/store/articles-context';
+import dayjs from 'dayjs';
 
 type Props = {
   item: ArticlesInfoType,
@@ -36,6 +37,20 @@ const ListItem = (props: Props) => {
   const { item, index, currentPage, pageSize } = props;
   console.log(item);
   const { checkedItems, setCheckedItems, selectedBlogs, setSelectedBlogs } = listCtx
+
+  const itemAny = item as ArticlesInfoType & {
+    published_start_at?: string | null;
+    published_end_at?: string | null;
+  };
+  const publishStartAt =
+    itemAny.published_start_at ?? item.publish_start_at ?? null;
+  const publishEndAt =
+    itemAny.published_end_at ?? item.publish_end_at ?? null;
+
+  const formatListDate = (date: string | null | undefined) => {
+    if (!date) return '';
+    return dayjs(date).format('YYYY/MM/DD');
+  };
 
   const blogStatus = {
     0: {
@@ -62,7 +77,7 @@ const ListItem = (props: Props) => {
   const navigateToEditEntry = (param: string) => {
     console.log(param);
     // Push the new route with the construction title
-    router.push(`/blogs/edit/${param}`);
+    router.push(`/articles/edit/${param}`);
   };
 
   const handleCheckboxChange = (blog: ArticlesInfoType, itemId: string, e: React.ChangeEvent<HTMLInputElement>) => {
@@ -115,7 +130,7 @@ const ListItem = (props: Props) => {
             </span>
           )}
           {item.status === 'published' && (
-            item?.publish_start_at && new Date(item?.publish_start_at + 'T00:00:00') > new Date() ? (
+            publishStartAt && new Date(publishStartAt + 'T00:00:00') > new Date() ? (
               <span className={`${styles[`border_${blogStatus[3].color}`]}`}>
                 {blogStatus[3]?.text}
               </span>
@@ -128,15 +143,15 @@ const ListItem = (props: Props) => {
         </div>
         <div>
           <span className={styles.client_name}>
-            {item?.publish_start_at}  〜
+            {formatListDate(publishStartAt) || '-'} 〜
           </span>
-          <br></br>
+          <br />
           <span className={styles.client_name}>
-            {item?.publish_end_at}
+            {formatListDate(publishEndAt) || '現在'}
           </span>
         </div>
         <div>
-          {item.categories.map((category, i) => (
+          {(item.categories ?? []).map((category, i) => (
             <>
               {i > 0 ? <br /> : null}
               <span key={i} className={styles.client_name}>
@@ -153,7 +168,9 @@ const ListItem = (props: Props) => {
             : '-'}
         </div>
         <div>
-          {item.excerpt
+          {item.description
+            ? item.description
+            : item.excerpt
             ? item.excerpt
             : item.content
               ? item.content.length > 120

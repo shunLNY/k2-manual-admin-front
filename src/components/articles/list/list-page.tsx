@@ -196,7 +196,7 @@ const ListPage = () => {
     }
 
     try {
-      const result = await fetcher('/api/proxy/admin/blogs/duplicate', {
+      const result = await fetcher('/api/proxy/admin/articles/duplicate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ids: selectedIds }),
@@ -214,11 +214,29 @@ const ListPage = () => {
     }
   };
 
-  const categoryOptions: any[] =
-    items?.map((cat) => ({
-      value: cat.id,
-      label: cat.category_name,
-    })) || [];
+  const categoryOptions: any[] = useMemo(() => {
+    const getAllCategoriesFormatted = (categories: any[], depth = 1): any[] => {
+      let result: any[] = [];
+      if (!categories) return result;
+      for (const category of categories) {
+        let prefix = "";
+        if (depth === 1) {
+          prefix = "▣ ";
+        } else {
+          prefix = "　".repeat(depth - 1) + "↳ ";
+        }
+        result.push({
+          value: category.id,
+          label: prefix + category.category_name,
+        });
+        if (category.child_categories && category.child_categories.length > 0) {
+          result = result.concat(getAllCategoriesFormatted(category.child_categories, depth + 1));
+        }
+      }
+      return result;
+    };
+    return getAllCategoriesFormatted(items);
+  }, [items]);
 
   return (
     <>

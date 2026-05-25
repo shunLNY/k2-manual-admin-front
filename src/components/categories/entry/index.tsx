@@ -280,7 +280,7 @@ const CategoriesEntry = () => {
   const deleteMessage =
     blogCount > 0
       ? `${blogCount.toLocaleString()} 件の記事で使用されています。削除しますか？\n (※ このカテゴリに関する投稿も削除されます。)`
-      : "このカテゴリーを削除しますか？"
+      : "このカテゴリーを削除しますか？(※ このカテゴリに関する子カテゴリも全て削除されます。)"
 
   if (isLoading) {
     return (
@@ -292,34 +292,47 @@ const CategoriesEntry = () => {
     )
   }
 
+  const getSubtreeHeight = (category: any): number => {
+    if (!category.child_categories || category.child_categories.length === 0) {
+      return 1;
+    }
+    let maxChildHeight = 0;
+    for (const child of category.child_categories) {
+      maxChildHeight = Math.max(maxChildHeight, getSubtreeHeight(child));
+    }
+    return 1 + maxChildHeight;
+  };
+
+  const editSubtreeHeight = categoryInfo ? getSubtreeHeight(categoryInfo) : 1;
+
   const getAvailableParents = (categories: any[], depth = 1): any[] => {
     let result: any[] = [];
-    for (const cat of categories) {
+    for (const category of categories) {
       // Cannot select itself (or its children)
-      if (categoryInfo && cat.id === categoryInfo.id) continue;
+      if (categoryInfo && category.id === categoryInfo.id) continue;
       
-      // Cannot select a category that is already at Level 4 
-      if (depth < 4) {
-      // Different icon for each level
-      let prefix = "";
+      // The parent's depth + our subtree height must not exceed 4 (max category depth limit)
+      if (depth + editSubtreeHeight <= 4) {
+        // Different icon for each level
+        let prefix = "";
 
-      if (depth === 1) {
-        // Parent category (top level)
-        prefix = "▣ ";
-      } else {
-        // Child categories
-        prefix = "　".repeat(depth - 1) + "↳ ";
+        if (depth === 1) {
+          // Parent category (top level)
+          prefix = "▣ ";
+        } else {
+          // Child categories
+          prefix = "　".repeat(depth - 1) + "↳ ";
+        }
+
+        result.push({
+          value: category.id,
+          label: prefix + category.category_name,
+        });
       }
-
-      result.push({
-        value: cat.id,
-        label: prefix + cat.category_name,
-      });
-    }
       
       // Recursively add children
-      if (cat.child_categories && cat.child_categories.length > 0) {
-        result = result.concat(getAvailableParents(cat.child_categories, depth + 1));
+      if (category.child_categories && category.child_categories.length > 0) {
+        result = result.concat(getAvailableParents(category.child_categories, depth + 1));
       }
     }
     return result;

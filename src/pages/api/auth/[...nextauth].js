@@ -89,56 +89,6 @@ export const authOptions = {
           type: 'role',
         },
       },
-      // async authorize(credentials, req) {
-      //   const payload = {
-      //     email: credentials.email,
-      //     password: credentials.password,
-      //     role: credentials.role || 'admin',
-      //   };
-
-      //   const headers = {
-      //     'user-agent': req.headers['user-agent'],
-      //     'Content-Type': 'application/json',
-      //     'x-device-type': 'pc',
-      //     'x-name': credentials.email, //  name is same as user id
-      //   };
-
-      //   const ip =
-      //     req.headers['x-real-ip'] ||
-      //     req.headers['x-forwarded-for'] ||
-      //     req.connection?.remoteAddress;
-
-      //   if (ip) headers['X-Forwarded-For'] = ip;
-
-      //   const res = await axios({
-      //     method: 'post',
-      //     url: process.env.NEXT_PUBLIC_API_ENDPOINT + '/auth/login',
-      //     data: payload,
-      //     headers: {
-      //       'user-agent': req.headers['user-agent'],
-      //       'Content-Type': 'application/json',
-      //       'x-device-type': 'pc',
-      //     },
-      //   });
-
-      //   const u = await res.data;
-      //   console.log(res, '............................aaa');
-      //   // If no error and we have user data, return it
-      //   if (res.status === 201 && u.token) {
-      //     const user = {
-      //       ...u.data,
-      //       accessToken: u.token.accessToken,
-      //       refreshToken: u.token.refreshToken,
-      //       accessTokenExpire: u.token.accessTokenExpire,
-      //       user: credentials.user,
-      //       userAgent: req.headers['user-agent'],
-      //     };
-      //     return user;
-      //   }
-      //   if (ip) user.ipAddress = ip;
-      //   // Return null if user data could not be retrieved
-      //   return null;
-      // },
 
       async authorize(credentials, req) {
   try {
@@ -158,7 +108,6 @@ export const authOptions = {
       }
     );
 
-    console.log("LOGIN RESPONSE:", res.data);
 
     const data = res.data;
 
@@ -185,18 +134,12 @@ export const authOptions = {
 
   callbacks: {
     async jwt({ token, user, account, trigger, session }) {
-      // token = updatedToken ? updatedToken : token;
-      // console.log(account, "......next auth account");
-      // console.log(user, "......next auth user");
-      // console.log(session, "......next auth session");
-      // console.log(trigger, "......next auth trigger");
       if (trigger === 'update') {
         token.account_name = session.account_name;
         return token;
       }
 
       if (user) {
-        console.log(user, '......if next user account');
         token.uid = user.id;
         token.accessToken = user.accessToken;
         token.refreshToken = user.refreshToken;
@@ -207,18 +150,11 @@ export const authOptions = {
         token.role = user.role;
         token.account_id = user.account_id;
       }
-      console.log(
-        dayjs(dayjs().format('YYYYMMDDHHmmss')).isSameOrAfter(
-          dayjs(token.accessTokenExpire)
-        ),
-        'res...'
-      );
       if (
         dayjs(dayjs().format('YYYYMMDDHHmmss')).isSameOrAfter(
           dayjs(token.accessTokenExpire)
         )
       ) {
-        console.log('getting refresh token.........................');
 
         const headers = {
           'Content-Type': 'application/json',
@@ -230,16 +166,14 @@ export const authOptions = {
         if (user?.ipAddress) headers['X-Forwarded-For'] = user?.ipAddress;
 
         const res = await fetch(
-          process.env.PROXY_API_ENDPOINT + '/auth/token/new',
+          process.env.NEXT_PUBLIC_API_ENDPOINT + '/auth/token/new',
           {
             method: 'POST',
             headers,
           }
         );
         const data = await res.json();
-        console.log(data, '................generate new token');
         if (res.status === 201 && data.token) {
-          console.log('res.status 201.................', res.status);
           token.accessToken = data.token.accessToken
             ? data.token.accessToken
             : token.accessToken;
@@ -253,15 +187,12 @@ export const authOptions = {
           delete token.error;
         }
         if (res.status === 401) {
-          console.log('res.status 401....', res.status);
           token.error = 'RefreshAccessTokenError';
         }
-        // console.log(token, "..............return token");
 
         return token;
       }
 
-      console.log(token, '....................final token');
       return token;
     },
     async session({ session, token, user }) {
@@ -279,7 +210,6 @@ export const authOptions = {
       session.error = token.error;
       session.accessToken = token.accessToken;
       session.ipAddress = token?.ipAddress;
-      console.log(session, '..................session');
       return session;
     },
   },

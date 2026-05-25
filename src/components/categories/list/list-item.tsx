@@ -60,18 +60,17 @@ const ListItem = (props: Props) => {
   }
 
   const dynamicOpacity = (level - 1) * 0.05;
-
   return (
     <li
       key={index}
       ref={setNodeRef}
       style={style}
-      onClick={() => navigateToEditEntry(item.id)}
       className={isDragging ? "category_list_item dragging" : "category_list_item"}
     >
       <div 
         className={`${styles.item_wrapper} ${categoryListStyles.item_wrapper}`}
         style={{ paddingLeft: `${(level - 1) * 20}px`, backgroundColor: `rgba(0, 0, 0, ${dynamicOpacity})` }}
+        onClick={() => navigateToEditEntry(item.id)}
       >
         <div
           {...attributes}

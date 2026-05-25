@@ -13,7 +13,6 @@ import { useListPage } from '@/store/list-page-context';
 import formStyles from '../../commons/inputs/form-element.module.scss';
 
 import { IconClose, IconDelete } from '@/components/icons/icons';
-import { useParams } from 'next/navigation';
 import { fetcher } from '@/utils/fetcher';
 import {
   API_URL,
@@ -40,10 +39,16 @@ import { ArticlesInfoType } from '@/utils/types';
 import { useCategoryList } from '@/store/categories-context';
 import ConfirmModal from './confirm-model';
 import MultiSelect from '@/components/commons/inputs/multi-select-box';
+import ReactSelect from '@/components/commons/inputs/_select';
 import dynamic from 'next/dynamic';
 import inputStyles from '../../commons/inputs/form-element.module.scss'
 import Image from 'next/image';
 import { resizeMainImage } from '@/utils/helpers';
+import { stripHtml } from '@/utils/strip-html';
+import {
+  normalizeContentImageUrls,
+  resolveContentImageUrls,
+} from '@/utils/article-content';
 import { useAuth } from '@/store/auth-context';
 
 
@@ -56,35 +61,55 @@ const SummernoteEditor = dynamic(() => import('../../commons/text-editor/summern
 
 const ArticleEntry = () => {
   const router = useRouter();
-  const params = useParams();
   const pathname = router.pathname;
-  const showInfo = pathname !== "/articles/new"
-  const _id: string = params?.id as string;
+  const _id =
+    typeof router.query.id === 'string' ? router.query.id : '';
+  const showInfo = pathname !== '/articles/new' && !!_id;
 
   const listCtx = useBlog();
   const categoryListCtx = useCategoryList();
   const pageCtx = useListPage();
   const { blogInfo, refreshBlogRows, getBlogInfo } = listCtx;
+  const articleId = blogInfo?.id || _id;
   const { items } = categoryListCtx;
   const AuthCtx = useAuth();
 
-  const categoryOptions: any[] =
-    items?.map((cat) => ({
-      value: cat.id,
-      label: cat.category_name,
-    })) || []
+  const categoryOptions: any[] = useMemo(() => {
+    const getAllCategoriesFormatted = (categories: any[], depth = 1): any[] => {
+      let result: any[] = [];
+      if (!categories) return result;
+      for (const category of categories) {
+        let prefix = "";
+        if (depth === 1) {
+          prefix = "▣ ";
+        } else {
+          prefix = "　".repeat(depth - 1) + "↳ ";
+        }
+        result.push({
+          value: category.id,
+          label: prefix + category.category_name,
+        });
+        if (category.child_categories && category.child_categories.length > 0) {
+          result = result.concat(getAllCategoriesFormatted(category.child_categories, depth + 1));
+        }
+      }
+      return result;
+    };
+    return getAllCategoriesFormatted(items);
+  }, [items]);
 
   console.log(blogInfo)
 
   const [isLoading, setIsLoading] = useState(false)
   const [isBtnDisable, setIsBtnDisable] = useState(false)
-  const [selectedStatus, setSelectedStatus] = useState<"published" | "private" | "draft">("draft")
+  const [selectedStatus, setSelectedStatus] = useState<"published" | "private">("private")
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [showSaveModal, setShowSaveModal] = useState(false)
   const [formDataToSubmit, setFormDataToSubmit] = useState<ArticlesInfoType | null>(null);
   const [confirmationMessage, setConfirmationMessage] = useState("");
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [content, setContent] = useState('');
+  const [isGeneratingExcerpt, setIsGeneratingExcerpt] = useState(false);
 
 
 
@@ -108,13 +133,15 @@ const ArticleEntry = () => {
         publish_end_at: "",
         content: "",
         thumbnail_path: "",
-        blog_categories: [],
-        categoryIds: []
+        category_id: "",
+        description: "",
       }
     }
   );
 
   useEffect(() => {
+    if (!router.isReady) return;
+
     async function fetchData() {
       if (_id) {
         setIsLoading(true)
@@ -130,75 +157,89 @@ const ArticleEntry = () => {
       } else {
         pageCtx.setEntryMode("new")
         reset()
-        setSelectedStatus("draft")
+        setSelectedStatus("private")
       }
     }
     fetchData()
-  }, [_id])
+  }, [_id, router.isReady])
 
-  let mappedCategories: [];
-  // useEffect(() => {
-  //   if (blogInfo && _id) {
+  const formatDateForInput = (date: string | null | undefined) => {
+    if (!date) return '';
+    return dayjs(date).format('YYYY-MM-DD');
+  };
 
-  //     setImage(blogInfo.thumbnail_path);
-  //     mappedCategories =
-  //       blogInfo.blog_categories?.map((cat: any) => ({
-  //         value: cat.category?.id,
-  //         label: cat.category?.category_name,
-  //       })) || [];
+  useEffect(() => {
+    if (blogInfo?.id && _id && blogInfo.id === _id) {
+      setImage(blogInfo.thumbnail_path || null);
 
-  //     setSelectedCategories(mappedCategories)
-  //     console.log(mappedCategories);
+      const info = blogInfo as any;
+      const catId =
+        info.categoryId ||
+        info.category_id ||
+        (info.category ? info.category.id : '');
 
-  //     if (blogInfo.content) {
+      setContent(resolveContentImageUrls(info.content ?? ''));
 
-  //       setContent(blogInfo.content)
-  //     }
+      reset({
+        title: info.title ?? '',
+        status: info.status ?? 'private',
+        publish_start_at: formatDateForInput(
+          info.published_start_at || info.publish_start_at
+        ),
+        publish_end_at: formatDateForInput(
+          info.published_end_at || info.publish_end_at
+        ),
+        content: info.content ?? '',
+        thumbnail_path: info.thumbnail_path ?? '',
+        category_id: catId,
+        description: info.description ?? info.excerpt ?? '',
+      });
 
-  //     reset({
-  //       title: blogInfo.title ?? "",
-  //       status: blogInfo.status ?? "draft",
-  //       publish_start_at: blogInfo.publish_start_at ?? null,
-  //       publish_end_at: blogInfo.publish_end_at ?? null,
-  //       content: blogInfo.content ?? "",
-  //       thumbnail_path: blogInfo.thumbnail_path ?? "",
-  //       blog_categories: mappedCategories,
-  //     });
-
-
-  //     setSelectedStatus(blogInfo.status as "published" | "private" | "draft");
-
-  //   } else if (!_id) {
-  //     setSelectedCategories([]);
-  //     reset();
-  //     setSelectedStatus("draft");
-  //   }
-  // }, [blogInfo, _id, reset]);
+      setSelectedStatus(
+        (info.status === 'published' ? 'published' : 'private') as
+          | 'published'
+          | 'private'
+      );
+    } else if (!_id) {
+      reset({
+        title: "",
+        status: "private",
+        publish_start_at: "",
+        publish_end_at: "",
+        content: "",
+        thumbnail_path: "",
+        category_id: "",
+        description: "",
+      });
+      setSelectedStatus("private");
+      setContent("");
+      setImage(null);
+    }
+  }, [blogInfo, _id, reset]);
 
   console.log(selectedCategories, ".....")
 
   const statusOptions = [
-    { label: '下書き', value: 'draft', style: styles.draft },
     { label: '公開', value: 'published', style: styles.public },
     { label: '非公開', value: 'private', style: styles.private },
   ];
 
   const handleStatusClick = (value: string, label: string) => {
-    setSelectedStatus(value as "published" | "private" | "draft")
+    setSelectedStatus(value as "published" | "private")
     setValue("status", value)
   }
 
   const handleSaveClick = (data: any) => {
     setFormDataToSubmit(data);
-    let message = "この内容でブログを保存しますか？";
+    let message = "この内容で記事を保存しますか？";
     const startDate = data.publish_start_at;
     const endDate = data.publish_end_at;
     const formattedStartDate = startDate ? dayjs(startDate).format('YYYY/MM/DD') : null;
     const formattedEndDate = endDate ? dayjs(endDate).format('YYYY/MM/DD') : null;
     console.log(formattedEndDate)
 
-    //For Content
-    data.content = content;
+    //For Content — store /storage paths, not display URLs
+    data.content = normalizeContentImageUrls(content);
 
 
     if (formattedStartDate && formattedEndDate) {
@@ -220,46 +261,74 @@ const ArticleEntry = () => {
     setValue('content', content);
   };
 
+  const handleGenerateDescription = async () => {
+    const plainText = stripHtml(content);
+    if (!plainText) {
+      toast.error('本文を入力してください。');
+      return;
+    }
+
+    setIsGeneratingExcerpt(true);
+    try {
+      const res = await fetcher<{ description: string }>('/api/articles/generate-excerpt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          content,
+          title: getValues('title'),
+        }),
+      });
+      setValue('description', res.description, { shouldValidate: true });
+      toast.success('概要を生成しました。');
+    } catch (error: any) {
+      console.error(error);
+      const apiMessage =
+        error?.info?.message && typeof error.info.message === 'string'
+          ? error.info.message
+          : null;
+      toast.error(apiMessage || '概要の生成に失敗しました。');
+    } finally {
+      setIsGeneratingExcerpt(false);
+    }
+  };
+
   const handleConfirmSubmit = () => {
     if (!formDataToSubmit) return;
     setShowSaveModal(false);
     setIsBtnDisable(true);
-    const categoryIds = formDataToSubmit.blog_categories?.map((cat: any) => cat.value) || [];
 
-    // let transformedData = {
-    //   ...formDataToSubmit,
-    //   categoryIds,
-    // };
+    const rawForm = formDataToSubmit as any;
     let transformedData = {
-      title: formDataToSubmit.title,
-      status: formDataToSubmit.status,
-      content: formDataToSubmit.content,
-      thumbnail_path: formDataToSubmit.thumbnail_path,
-      publish_start_at: formDataToSubmit.publish_start_at,
-      publish_end_at: formDataToSubmit.publish_end_at,
-      categoryIds: categoryIds,
-      id: blogInfo?.id,
+      title: rawForm.title,
+      status: rawForm.status,
+      content: rawForm.content,
+      description: rawForm.description,
+      thumbnail_path: rawForm.thumbnail_path,
+      published_start_at: rawForm.publish_start_at || null,
+      published_end_at: rawForm.publish_end_at || null,
+      category_id: rawForm.category_id,
+      id: articleId,
     }
 
-    const hasStartDate = !!transformedData.publish_start_at;
-    const hasEndDate = !!transformedData.publish_end_at;
+    const hasStartDate = !!transformedData.published_start_at;
+    const hasEndDate = !!transformedData.published_end_at;
 
     if (!hasStartDate && !hasEndDate) {
       // Both empty: publish_start_at = today, publish_end_at = ""
-      transformedData.publish_start_at = dayjs().format('YYYY-MM-DD');
-      transformedData.publish_end_at = null;
+      transformedData.published_start_at = dayjs().format('YYYY-MM-DD');
+      transformedData.published_end_at = null;
     } else if (hasStartDate && !hasEndDate) {
       // Only start date: Use the input value and leave end date empty
-      transformedData.publish_start_at = transformedData.publish_start_at;
-      transformedData.publish_end_at = null;
+      transformedData.published_start_at = transformedData.published_start_at;
+      transformedData.published_end_at = null;
     } else if (!hasStartDate && hasEndDate) {
       // Only end date: publish_start_at = today, publish_end_at = input
-      transformedData.publish_start_at = dayjs().format('YYYY-MM-DD');
-      transformedData.publish_end_at = transformedData.publish_end_at;
+      transformedData.published_start_at = dayjs().format('YYYY-MM-DD');
+      transformedData.published_end_at = transformedData.published_end_at;
     } else {
       // Both filled: Use the provided values
-      transformedData.publish_start_at = transformedData.publish_start_at;
-      transformedData.publish_end_at = transformedData.publish_end_at;
+      transformedData.published_start_at = transformedData.published_start_at;
+      transformedData.published_end_at = transformedData.published_end_at;
     }
 
     console.log("Transformed Data:", transformedData);
@@ -269,8 +338,8 @@ const ArticleEntry = () => {
     let url = null;
     let submitMsg = "";
 
-    if (pageCtx.entryMode === "new") {
-      url = "/api/proxy/admin/blogs/";
+    if (!_id) {
+      url = "/api/proxy/admin/articles/";
       fetchConfig = {
         method: "POST",
         headers: {
@@ -280,18 +349,23 @@ const ArticleEntry = () => {
       };
       submitMsg = createSuccessfulMessage;
     } else {
+      if (!articleId) {
+        toast.error(failMessage);
+        setIsBtnDisable(false);
+        return;
+      }
       const updatedData = {
         ...transformedData,
-        id: blogInfo.id,
+        id: articleId,
       };
       fetchConfig = {
-        method: "PUT",
+        method: "PATCH",
         headers: {
           "content-type": "application/json",
         },
         body: JSON.stringify(updatedData),
       };
-      url = new URL(window.location.origin + "/api/proxy/admin/blogs/" + blogInfo.id);
+      url = new URL(window.location.origin + "/api/proxy/admin/articles/" + articleId);
       submitMsg = updateSuccessfulMessage;
     }
 
@@ -300,12 +374,7 @@ const ArticleEntry = () => {
         toast.success(submitMsg);
         setIsBtnDisable(false);
         refreshBlogRows();
-        if (pageCtx.entryMode === "new") {
-          router.push("/blogs");
-        } else {
-          listCtx.setBlogInfo(res.data);
-          router.push("/blogs");
-        }
+        router.push("/articles");
       })
       .catch((error) => {
         toast.error(failMessage);
@@ -316,21 +385,29 @@ const ArticleEntry = () => {
 
 
   const handleDelete = async () => {
-    if (!blogInfo?.id) return
+    if (!articleId) {
+      toast.error('記事IDが取得できません。');
+      return;
+    }
     setShowDeleteModal(true)
   }
 
   const confirmDelete = async () => {
+    if (!articleId) return;
     setShowDeleteModal(false)
     setIsBtnDisable(true)
     try {
-      await fetcher(`/api/proxy/admin/blogs/${blogInfo.id}`, { method: "DELETE" })
-      toast.success("ブログを削除しました")
-      router.push("/blogs")
+      await fetcher(`/api/proxy/admin/articles/${articleId}`, { method: "DELETE" })
+      toast.success("記事を削除しました")
+      router.push("/articles")
       refreshBlogRows()
-    } catch (err) {
+    } catch (err: any) {
       console.error(err)
-      toast.error(failMessage)
+      const apiMessage =
+        err?.info?.message && typeof err.info.message === 'string'
+          ? err.info.message
+          : null
+      toast.error(apiMessage || failMessage)
       setIsBtnDisable(false)
     }
   }
@@ -341,7 +418,7 @@ const ArticleEntry = () => {
   const [isOpenDatePicker, setIsOpenDatePicker] = useState(false);
   const [inputDateName, setInputDateName] = useState("");
 
-  const [image, setImage] = useState(null);
+  const [image, setImage] = useState<string | null>(null);
   const handleFileChange = (event: any) => {
     const id = toast.loading('Please wait...');
     const file = event.target.files[0];
@@ -566,40 +643,24 @@ const ArticleEntry = () => {
 
               </div>
             </FormControl>
-
-            <FormControl label='概要' required>
-              <TextField
-                register={register}
-                name='description'
-                placeholder='行（グループ）機能をリリースしました。'
-                // onKeyDown={handleKeyDown}
-                validation={{
-                  maxLength: {
-                    value: 500,
-                    message: '500文字まで入力できます。',
-                  },
-                }}
-                maxLength={500}
-              />
-            </FormControl>
             
             <FormControl label="カテゴリー設定" required>
               <Controller
                 control={control}
-                name="blog_categories"
+                name="category_id"
                 rules={{ required: "カテゴリーを選択してください" }}
                 render={({ field, fieldState }) => (
                   <>
-                    <MultiSelect
+                    <ReactSelect
+                      {...field}
                       options={categoryOptions}
-                      value={selectedCategories}
-                      onChange={(selectedOptions: any) => {
-                        setSelectedCategories(selectedOptions);
-                        field.onChange(selectedOptions)
+                      value={categoryOptions.find((opt: any) => opt.value === field.value) || null}
+                      onChange={(selectedOption: any) => {
+                        field.onChange(selectedOption ? selectedOption.value : "");
                       }}
                       placeholder="カテゴリーを選択してください"
                       isClearable={true}
-                    // closeMenuOnSelect={false}
+                      hasError={!!fieldState.error}
                     />
                     {fieldState.error && (
                       <div style={{ color: "red", fontSize: "14px", marginTop: "4px" }}>{fieldState.error.message}</div>
@@ -607,6 +668,32 @@ const ArticleEntry = () => {
                   </>
                 )}
               />
+            </FormControl>
+
+            <FormControl label='概要' required>
+              <div className={styles.excerpt_container}>
+                <textarea
+                  className={styles.textareaInput}
+                  rows={4}
+                  placeholder='記事の概要を入力してください。'
+                  {...register('description', {
+                    required: '概要を入力してください。',
+                    maxLength: {
+                      value: 500,
+                      message: '500文字まで入力できます。',
+                    },
+                  })}
+                  maxLength={500}
+                />
+                <button
+                  type="button"
+                  className={styles.generate_btn}
+                  onClick={handleGenerateDescription}
+                  disabled={isGeneratingExcerpt}
+                >
+                  {isGeneratingExcerpt ? '生成中...' : '+ 概要生成'}
+                </button>
+              </div>
             </FormControl>
           </div>
         </div>
@@ -622,10 +709,15 @@ const ArticleEntry = () => {
             className={styles.submitBtn}
             disabled={isBtnDisable}></ButtonSave>
 
-          {showInfo && AuthCtx.user.role === 'admin' && (
-            <span className={styles.iconDelete} onClick={handleDelete} role='button' style={{ cursor: "pointer" }}>
+          {showInfo && AuthCtx.hasOwnerPermission && (
+            <button
+              type="button"
+              className={styles.iconDelete}
+              onClick={handleDelete}
+              aria-label="記事を削除"
+            >
               <IconDelete />
-            </span>
+            </button>
           )}
         </FormFooter>
       </form>

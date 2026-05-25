@@ -132,8 +132,8 @@ export function BlogContextProvider({ children }: Props) {
   };
 
   useEffect(() => {
-    setUrlPath(new URL(window.location.origin + '/api/proxy/admin/blogs/paginate'));
-    setBlogIdsUrl(new URL(window.location.origin + "/api/proxy/admin/blogs/blogs-ids"));
+    setUrlPath(new URL(window.location.origin + '/api/proxy/admin/articles/paginate'));
+    setBlogIdsUrl(new URL(window.location.origin + "/api/proxy/admin/articles/blogs-ids"));
   }, []);
 
   useEffect(() => {
@@ -201,7 +201,7 @@ export function BlogContextProvider({ children }: Props) {
 
     if (isSubmitClear) {
       setIsSubmitClear(false);
-      setUrlPath(new URL(window.location.origin + '/api/proxy/admin/blogs/paginate'));
+      setUrlPath(new URL(window.location.origin + '/api/proxy/admin/articles/paginate'));
       setIsFilterActive(false);
       !pageLoaded && setPageLoaded(true);
       return;
@@ -213,7 +213,7 @@ export function BlogContextProvider({ children }: Props) {
 
     setPageNumber(1);
 
-    const baseUrl = window.location.origin + '/api/proxy/admin/blogs/paginate';
+    const baseUrl = window.location.origin + '/api/proxy/admin/articles/paginate';
     const queryString = params.toString();
     const finalUrl = new URL(baseUrl + (queryString ? `?${queryString}` : ''));
 
@@ -226,17 +226,19 @@ export function BlogContextProvider({ children }: Props) {
 
   const getBlogInfo = async (id: string) => {
     try {
-      const res = await fetcher("/api/proxy/admin/blogs/" + id, {
+      const res = await fetcher("/api/proxy/admin/articles/" + id, {
         headers: {
           "Content-Type": "application/json",
         },
       })
-      if (res && res?.data) {
-        setBlogInfo(res.data)
+      // API may return { data: article } or the article object directly
+      const article = res?.data ?? (res?.id ? res : null);
+      if (article) {
+        setBlogInfo(article);
       }
-      return res.data
+      return article;
     } catch (error) {
-      return error
+      return error;
     }
   }
 

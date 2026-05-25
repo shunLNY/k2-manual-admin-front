@@ -3,7 +3,7 @@
 import { useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { fetcher } from '@/utils/fetcher';
-import { API_URL } from '@/utils/constants';
+import { buildFileUrl, resolveContentImageUrls } from '@/utils/article-content';
 
 // Summernote Lite is standalone and works best with Bootstrap 5
 import 'summernote/dist/summernote-lite.css';
@@ -77,8 +77,7 @@ const SummernoteEditor = ({ value, onChange, toolbar }: Props) => {
                   });
 
                   if (data?.path) {
-                    const url = `${API_URL.replace(/\/$/, '')}${data.path}`;
-                    $editor.summernote('insertImage', url);
+                    $editor.summernote('insertImage', buildFileUrl(data.path));
                   }
                 } catch (err) {
                   console.error("Upload error", err);
@@ -88,7 +87,7 @@ const SummernoteEditor = ({ value, onChange, toolbar }: Props) => {
           });
 
           if (value) {
-            $editor.summernote('code', value);
+            $editor.summernote('code', resolveContentImageUrls(value));
           }
           isInitialized.current = true;
         }
@@ -110,8 +109,9 @@ const SummernoteEditor = ({ value, onChange, toolbar }: Props) => {
     if (isInitialized.current && editorRef.current && window.$) {
       const $editor = window.$(editorRef.current);
       const currentCode = $editor.summernote('code');
-      if (currentCode !== value) {
-        $editor.summernote('code', value || '');
+      const resolved = resolveContentImageUrls(value || '');
+      if (currentCode !== resolved) {
+        $editor.summernote('code', resolved);
       }
     }
   }, [value]);

@@ -46,13 +46,13 @@ export default function ListBody(props: ListBodyProps) {
   const router = useRouter();
 
   const handleMultipleCopy = () => {
-    if (pathname === '/blogs') {
+    if (pathname === '/articles') {
       pageCtx.setIsMultipleCopy({ isBlogCopy: false });
     }
   };
 
   const handleMultipleDelete = () => {
-    if (pathname === '/blogs') {
+    if (pathname === '/articles') {
       pageCtx.setIsMultipleCopy({ isBlogCopy: false });
     }
     if (pathname === '/categories') {
@@ -60,7 +60,7 @@ export default function ListBody(props: ListBodyProps) {
     }
   };
 
-  const shouldShowDeleteButton = ['/blogs'].includes(pathname);
+  const shouldShowDeleteButton = ['/articles'].includes(pathname);
   const totalCategories = ['/categories'].includes(pathname);
 
   return (
