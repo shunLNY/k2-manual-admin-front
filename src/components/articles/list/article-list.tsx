@@ -16,7 +16,6 @@ import ListItem from './list-item';
 import styles from '../../../styles/_list.module.scss';
 import blogListStyles from './article-list.module.scss';
 import { IconOrder } from '@/components/icons/icons';
-import { BlogsListInfo } from '@/utils/constants';
 import { useBlog } from '@/store/articles-context';
 import { Checkbox } from '@/components/commons/inputs/checkbox';
 

@@ -16,7 +16,8 @@ import { IconArrowRight, IconMenuBuildingO } from '@/components/icons/icons';
 // Stylesheets imports
 import styles from '../../../styles/_list.module.scss';
 import blogListStyles from './article-list.module.scss';
-import { API_URL, BlogsListInfo } from '@/utils/constants';
+import { API_URL } from '@/utils/constants';
+
 import { Checkbox } from '@/components/commons/inputs/checkbox';
 import Image from 'next/image';
 import { ArticlesInfoType } from '@/utils/types';

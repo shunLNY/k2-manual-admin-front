@@ -7,7 +7,6 @@ import ListPageContext from "@/store/list-page-context";
 import ListBody from "@/components/commons/lists/list-body";
 
 import { IconOrder, IconQuotation } from "@/components/icons/icons";
-import { AccountListInfo } from '@/utils/constants'
 import { Checkbox } from "@/components/commons/inputs/checkbox";
 import {
   DndContext,
