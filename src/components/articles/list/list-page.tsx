@@ -1,22 +1,19 @@
 /** @format */
 
 'use client';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { type Dispatch, type SetStateAction, useCallback, useEffect, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { useDebounce } from '../../../utils/helpers';
 import search from '@/components/commons/lists/list-filter-pc.module.scss';
 import ListPageLayout from '@/components/commons/lists/list-page-layout';
 import ButtonFilterClear from '@/components/commons/buttons/btn-filter-clear';
-import BlogList from './article-list';
+import ArticleList from './article-list';
 import { useListPage } from '@/store/list-page-context';
-import { useBlog } from '@/store/articles-context';
-import { useForm, Controller } from 'react-hook-form';
-import { ArticlesInfoType } from '@/utils/types';
-import { SelectInstance } from 'react-select';
+import { useBlog as useArticle } from '@/store/articles-context';
+import { Controller, useForm, useWatch } from 'react-hook-form';
+import { Category } from '@/utils/types';
 import { toast } from 'react-toastify';
 import { fetcher } from '@/utils/fetcher';
 import { useRouter } from 'next/navigation';
-import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import Modal from '@/components/modals/modal';
 import { Checkbox } from '@/components/commons/inputs/checkbox';
@@ -27,7 +24,6 @@ import ButtonSearch from '@/components/commons/buttons/btn-search';
 import { IconXMark } from '@/components/icons/icons';
 import dayjs from 'dayjs';
 import MultiSelect from '@/components/commons/inputs/multi-select-box';
-import useSWR from 'swr';
 import styles from '../entry/articles.entry.module.scss';
 import DateInput from '@/components/commons/inputs/date-input';
 import ReactDatepicker from '@/components/commons/datepicker/react-datepicker';
@@ -58,10 +54,30 @@ type FilterFormData = {
   category_ids: string[];
 };
 
+type ArticleQueryValue = string | string[] | boolean;
+type ArticleQueryParams = Record<string, ArticleQueryValue>;
+type CategoryOption = {
+  value: string;
+  label: string;
+};
+type CategoryWithChildren = Category & {
+  child_categories?: CategoryWithChildren[];
+};
+type DuplicateArticlesResponse = {
+  duplicatedArticles?: unknown[];
+  duplicatedBlogs?: unknown[];
+  data?: {
+    duplicatedArticles?: unknown[];
+    duplicatedBlogs?: unknown[];
+    failedIds?: string[];
+  };
+  failedIds?: string[];
+};
+
 const ListPage = () => {
   const router = useRouter();
   const pageCtx = useListPage();
-  const listCtx = useBlog();
+  const articleCtx = useArticle();
   const categoryListCtx = useCategoryList();
   const { items } = categoryListCtx;
 
@@ -73,19 +89,16 @@ const ListPage = () => {
     resetFilter,
     handleSearch,
     isFilterActive,
-    setBlogCreate,
+    setBlogCreate: setArticleCreate,
     pagination,
-  } = listCtx;
+    refreshBlogRows: refreshArticleRows,
+  } = articleCtx;
+  const setArticleQueryParams = setQueryParams as Dispatch<SetStateAction<ArticleQueryParams>>;
 
   const [isOpenDatePicker, setIsOpenDatePicker] = useState(false);
   const [inputDateName, setInputDateName] = useState("");
   const {
-    register,
     control,
-    handleSubmit,
-    reset,
-    watch,
-    getValues,
     setValue,
   } = useForm<FilterFormData>({
     defaultValues: {
@@ -101,12 +114,12 @@ const ListPage = () => {
     },
   });
 
-  const watchPublishStartAt = watch('publish_start_at');
-  const watchPublishEndAt = watch('publish_end_at');
+  const watchPublishStartAt = useWatch({ control, name: 'publish_start_at' });
+  const watchPublishEndAt = useWatch({ control, name: 'publish_end_at' });
 
   useEffect(() => {
     // 公開開始日が変更されたら、queryParamsを更新
-    setQueryParams((prev: any) => {
+    setArticleQueryParams((prev) => {
       const newParams = { ...prev };
       if (watchPublishStartAt) {
         newParams.publish_start_at = dayjs(watchPublishStartAt).format('YYYY-MM-DD');
@@ -115,10 +128,10 @@ const ListPage = () => {
       }
       return newParams;
     });
-  }, [watchPublishStartAt, setQueryParams]);
+  }, [watchPublishStartAt, setArticleQueryParams]);
 
   useEffect(() => {
-    setQueryParams((prev: any) => {
+    setArticleQueryParams((prev) => {
       const newParams = { ...prev };
       if (watchPublishEndAt) {
         newParams.publish_end_at = dayjs(watchPublishEndAt).format('YYYY-MM-DD');
@@ -127,16 +140,16 @@ const ListPage = () => {
       }
       return newParams;
     });
-  }, [watchPublishEndAt, setQueryParams]);
+  }, [watchPublishEndAt, setArticleQueryParams]);
 
   const [currentPage, setCurrentPage] = useState<number>(1);
   const PageSize: number = 10;
 
   useEffect(() => {
     if (window.location.hash.startsWith("#")) {
-      setBlogCreate(true);
+      setArticleCreate(true);
     }
-  }, [setBlogCreate]);
+  }, [setArticleCreate]);
 
   const handleKeywordChange = useCallback((value: string) => {
     setKeyword(value.trimStart());
@@ -146,11 +159,11 @@ const ListPage = () => {
     pageCtx.setOpenFilterModal(false);
   };
 
-  const { queryParams } = listCtx;
+  const { queryParams } = articleCtx;
 
   const handleFilterCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, checked } = e.target;
-    setQueryParams((prev: any) => {
+    setArticleQueryParams((prev) => {
       const newParams = { ...prev };
       if (checked) {
         newParams[name] = true;
@@ -164,12 +177,12 @@ const ListPage = () => {
   const handleFilterTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     console.log(`入力中 => name: ${name}, value: ${value}`);
-    setQueryParams((prev: any) => ({ ...prev, [name]: value }));
+    setArticleQueryParams((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleCategoryChange = (selectedOptions: any) => {
-    const categoryIds = selectedOptions ? selectedOptions.map((opt: any) => opt.value) : [];
-    setQueryParams((prev: any) => ({ ...prev, category_ids: categoryIds }));
+  const handleCategoryChange = (selectedOptions: CategoryOption[] | null) => {
+    const categoryIds = selectedOptions ? selectedOptions.map((opt) => opt.value) : [];
+    setArticleQueryParams((prev) => ({ ...prev, category_ids: categoryIds }));
   };
 
   const handleSearchAndClose = () => {
@@ -182,41 +195,44 @@ const ListPage = () => {
     onCloseModal();
   };
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-    pagination(page);
-
-  };
-
-  const handleDuplicateBlogs = async () => {
-    const selectedIds = listCtx.checkedItems;
+  const handleDuplicateArticles = async () => {
+    const selectedIds = articleCtx.checkedItems;
     if (!selectedIds || selectedIds.length === 0) {
-      toast.warn('複製するブログを選択してください。');
+      toast.warn('複製する記事を選択してください。');
       return;
     }
 
     try {
-      const result = await fetcher('/api/proxy/admin/articles/duplicate', {
+      const result = await fetcher<DuplicateArticlesResponse>('/api/proxy/admin/articles/duplicate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ids: selectedIds }),
       });
 
-      toast.success(`${result.duplicatedBlogs.length}件のブログを複製しました。`);
-      if (result.failedIds && result.failedIds.length > 0) {
-        toast.error(`${result.failedIds.length}件の複製に失敗しました。`);
+      const duplicatedItems =
+        result.duplicatedArticles ??
+        result.duplicatedBlogs ??
+        result.data?.duplicatedArticles ??
+        result.data?.duplicatedBlogs;
+      const failedIds = result.failedIds ?? result.data?.failedIds ?? [];
+      const duplicatedCount = duplicatedItems?.length ?? selectedIds.length - failedIds.length;
+
+      toast.success(`${duplicatedCount}件の記事を複製しました。`);
+      if (failedIds.length > 0) {
+        toast.error(`${failedIds.length}件の複製に失敗しました。`);
       }
-      listCtx.setCheckedItems([]);
+      articleCtx.setCheckedItems([]);
+      refreshArticleRows();
       router.refresh();
     } catch (error) {
-      console.error('ブログの複製に失敗しました:', error);
-      toast.error('ブログの複製中にエラーが発生しました。');
+      console.error('記事の複製に失敗しました:', error);
+      toast.error('記事の複製中にエラーが発生しました。');
     }
   };
 
-  const categoryOptions: any[] = useMemo(() => {
-    const getAllCategoriesFormatted = (categories: any[], depth = 1): any[] => {
-      let result: any[] = [];
+  const categoryOptions: CategoryOption[] = useMemo(() => {
+    const getAllCategoriesFormatted = (categories: CategoryWithChildren[], depth = 1): CategoryOption[] => {
+      let result: CategoryOption[] = [];
       if (!categories) return result;
       for (const category of categories) {
         let prefix = "";
@@ -258,14 +274,17 @@ const ListPage = () => {
           totalCount: listCount,
           pageSize: PageSize,
           // onPageChange: handlePageChange,
-          onPageChange: (page: number) => { setCurrentPage(page), listCtx.pagination(page) }
+          onPageChange: (page: number) => {
+            setCurrentPage(page);
+            pagination(page);
+          }
         }}>
         <>
-          <BlogList
+          <ArticleList
             count={listCount}
             currentPage={currentPage}
             pageSize={PageSize}
-            onDuplicate={handleDuplicateBlogs}
+            onDuplicate={handleDuplicateArticles}
           />
 
           <Modal
@@ -282,24 +301,12 @@ const ListPage = () => {
               >
                 <>
                   <ul className={search.construction_flex}>
-                    {/* ステータスフィルター */}
                     <li className={search.list_search_box}>
                       <div className={search.list_search_detail_label}>
                         <p className={search.list_search_label}>ステータス</p>
                       </div>
                       <div className={search.list_search_detail}>
                         <div className={search.list_search_flex}>
-                          <div className={search.list_search_check}>
-                            <label className={"d-flex items-center"}>
-                              <Checkbox
-                                name="isDraft"
-                                onChange={handleFilterCheckboxChange}
-                                checked={!!queryParams?.isDraft}
-                              />
-                              <SearchCheckboxStatusPC label="下書き" color="darkGray" />
-                            </label>
-                          </div>
-
                           <div className={search.list_search_check}>
                             <label className={"d-flex items-center"}>
                               <Checkbox
@@ -321,17 +328,6 @@ const ListPage = () => {
                               <SearchCheckboxStatusPC label="非公開" color="gray" />
                             </label>
                           </div>
-
-                          <div className={search.list_search_check}>
-                            <label className={"d-flex items-center"}>
-                              <Checkbox
-                                name="isScheduled"
-                                onChange={handleFilterCheckboxChange}
-                                checked={!!queryParams?.isScheduled}
-                              />
-                              <SearchCheckboxStatusPC label="予約" color="green" />
-                            </label>
-                          </div>
                         </div>
                       </div>
                     </li>
@@ -340,7 +336,7 @@ const ListPage = () => {
                       <FormControl label="カテゴリー" layout="row" classNames={search.custom_label}>
                         <MultiSelect
                           options={categoryOptions}
-                          placeholder="カテゴリーを選択（複数可）"
+                          placeholder="カテゴリーを選択"
                           isClearable={true}
                           value={categoryOptions.filter(opt => queryParams?.category_ids?.includes(opt.value))}
                           onChange={handleCategoryChange}
@@ -381,7 +377,7 @@ const ListPage = () => {
                             <Controller
                               name='publish_start_at'
                               control={control}
-                              render={({ field, fieldState }) => (
+                              render={({ field }) => (
                                 <>
                                   <DateInput
                                     {...field}
