@@ -6,11 +6,11 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import Cookies from "universal-cookie";
 // import { isIpAddress } from "@/utils/helpers";
 import axios from "axios";
+import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
 
-var isSameOrAfter = require("dayjs/plugin/isSameOrAfter");
 dayjs.extend(isSameOrAfter);
-var utc = require("dayjs/plugin/utc");
-var timezone = require("dayjs/plugin/timezone"); // dependent on utc plugin
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
@@ -35,11 +35,17 @@ const getDomainWithoutSubdomain = (url) => {
   }
 };
 
-const useSecureCookies = process.env.NEXTAUTH_URL.startsWith("https://");
+const nextAuthUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
+const useSecureCookies = nextAuthUrl.startsWith("https://");
 const cookiePrefix = useSecureCookies ? "__Secure-" : "";
-const hostName = getDomainWithoutSubdomain(process.env.NEXTAUTH_URL);
+const hostName = getDomainWithoutSubdomain(nextAuthUrl);
+const isLocalAuthHost =
+  process.env.APP_ENV === "local" ||
+  process.env.APP_ENV === "development" ||
+  hostName === "localhost" ||
+  isIpAddress(hostName);
 const sessionTokenDomain =
-  process.env.APP_ENV === "local" || isIpAddress(hostName)
+  isLocalAuthHost
     ? hostName
     : "." + hostName;
 
@@ -163,7 +169,7 @@ export const authOptions = {
   ],
 
   callbacks: {
-    async jwt({ token, user, account, trigger, session }) {
+    async jwt({ token, user, trigger, session }) {
       if (trigger === "update") {
         token.account_name = session.account_name;
         return token;
@@ -225,7 +231,7 @@ export const authOptions = {
 
       return token;
     },
-    async session({ session, token, user }) {
+    async session({ session, token }) {
       session.name = token.name;
       session.user = {
         ...session.user,
@@ -251,7 +257,7 @@ export const authOptions = {
     },
   },
   events: {
-    async signOut(message) {
+    async signOut() {
       const cookie = new Cookies();
       cookie.remove(`${cookiePrefix}next-auth.session-token`);
     },

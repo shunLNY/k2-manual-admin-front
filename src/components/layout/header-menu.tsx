@@ -10,24 +10,21 @@ import Image from 'next/image';
 
 //Icons , modals and buttons
 import { LayoutProps } from '@/utils/types';
-
-//CSS
-import styles from './header-menu.module.scss';
 import { IconArrowLeft, IconFilter, IconFilterDown, IconKenkoukanri, IconLogout, IconUserMenu } from '../icons/icons';
 import { useContext, useEffect, useState } from 'react';
 import ButtonSave from '@/components/commons/buttons/btn-save';
 import ArticleContext from '@/store/articles-context';
 import { useListPage } from '@/store/list-page-context';
-// import CategoryListContext from '@/store/categories-context';
-// import { signOut } from 'next-auth/react';
 import { NEXT_PUBLIC_APP_URL } from '@/utils/constants';
-// import AuthContext from '@/store/auth-context';
-// import AccountContext from '@/store/accounts-context';
 import { useAccountInfo } from '@/lib/hooks/common-hooks';
 import AuthContext from '@/store/auth-context';
 import CategoryListContext from '@/store/categories-context';
 import AccountContext from '@/store/accounts-context';
 import { signOut } from 'next-auth/react';
+
+//CSS
+import styles from './header-menu.module.scss';
+
 
 type Props = {
   title?: string;
@@ -177,7 +174,7 @@ export default function Header(props: LayoutProps) {
               !isEntryPage && !isEditEntryPage && pathname !== "/dashboard" && pathname !== "/my-profile" && pathname !== "/" && (
                 <div className={`${styles.filter_container} ${pageCtx.openFilterModal ? styles.active : ""}`} onClick={() => pageCtx.setOpenFilterModal(!pageCtx.openFilterModal)}>
                   <IconFilter />
-                  絞り込む
+                  <span className={styles.filter_text}>絞り込む</span>
                   <IconFilterDown />
                 </div>
               )
