@@ -1,14 +1,22 @@
 /** @format */
 
 @use '../../../styles/variables.scss' as *;
+@use '../../../styles/mixins' as mixin;
 
 %gridColumn {
-  grid-auto-columns: 25px 100px 100px 80px 0.5fr 0.8fr 1fr 100px 25px;
-  gap: 30px;
+  grid-auto-columns: 25px 100px 100px 80px 1fr 1fr 2fr 100px 25px;
+  gap: 10px;
+
+  @include mixin.md{
+    grid-auto-columns: 25px 150px 100px 150px 100px 100px 200px 100px 30px; 
+  }
 }
 
 .list_header {
   @extend %gridColumn;
+  @include mixin.sm{
+        padding: 10px 20px;
+  }
 }
 
 .item_wrapper {

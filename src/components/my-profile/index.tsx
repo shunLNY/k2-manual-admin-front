@@ -223,7 +223,7 @@ const ProfileEntry = () => {
 
         {/* <div className={styles.row_two}></div> */}
 
-        <FormFooter>
+        <FormFooter threeButtonsCenterOnTop={true}>
 
           <ButtonCancel
             disabled={isBtnDisable}

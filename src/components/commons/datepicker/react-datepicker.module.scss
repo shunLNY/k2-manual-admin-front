@@ -7,7 +7,7 @@
 	position: absolute;
 	left: 0;
 	right: 0;
-	top: 200;
+	top: 200px;
 	margin: auto;
 	width: 330px;
 	border-radius: 10px;
@@ -74,14 +74,17 @@
 		position: absolute;
 		left: 0;
 		right: 0;
-		top: 0;
-		margin-top: fn.get-vw(50px);
-		width: 100%;
-		border-radius: 0;
+		top: 100px;
+		// margin-top: fn.get-vw(50px);
+        // margin: fn.get-vw(50px) auto 0 auto;
+		width: fit-content;
+		border-radius: 10px;
 		overflow: hidden;
+        box-sizing: border-box;
 
 		>div {
-			padding: fn.get-vw(30px) 0 fn.get-vw(20px) 0;
+			// padding: fn.get-vw(30px) 0 fn.get-vw(20px) 0;
+            padding: fn.get-vw(20px) 0 fn.get-vw(15px) 0;
 		}
 
 		&.multi {
@@ -101,6 +104,11 @@
 			}
 		}
 	}
+
+    @include mixin.xs{
+        width: 100%;
+        padding: auto;
+    }
 }
 
 .navButton {
@@ -289,8 +297,13 @@
 	}
 
 	@include mixin.sm {
-		height: fn.get-vw(55px);
-		font-size: fn.get-vw(14px);
+		// height: fn.get-vw(55px);
+		// font-size: fn.get-vw(14px);
+        @include mixin.sm {
+        height: auto;
+        padding: fn.get-vw(10px) 0;
+        font-size: fn.get-vw(13px);
+    }
 	}
 }
 
@@ -317,7 +330,10 @@
 		text-align: center;
 
 		@include mixin.sm {
-			height: fn.get-vw(50px);
+			// height: fn.get-vw(50px);
+            height: auto;
+            aspect-ratio: 1 / 1; 
+            padding: fn.get-vw(2px);
 		}
 
 		&:nth-of-type(6n) {
@@ -345,9 +361,14 @@
 			span {}
 
 			@include mixin.sm {
-				width: fn.get-vw(40px);
-				height: fn.get-vw(40px);
-				font-size: fn.get-vw(14px);
+				// width: fn.get-vw(40px);
+				// height: fn.get-vw(40px);
+				// font-size: fn.get-vw(14px);
+                width: 85%; 
+                height: auto;
+                aspect-ratio: 1 / 1; 
+                font-size: fn.get-vw(13px);
+                line-height: 1;
 			}
 
 			&:hover {

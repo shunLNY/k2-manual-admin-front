@@ -108,7 +108,9 @@ export function BlogContextProvider({ children }: Props) {
   } = useFetch(urlPath);
 
   useEffect(() => {
+    console.log("SWR raw response logic: blogs =", blogs, "isLoading =", isLoading, "meta =", meta);
     if (blogs && !isLoading) {
+      console.log("Setting items from blogs:", blogs);
       setTotalItems(meta && meta.totalItems);
       setItems(blogs);
       setPageMeta(meta);
@@ -190,10 +192,20 @@ export function BlogContextProvider({ children }: Props) {
       for (const key in queryParams) {
         if (queryParams.hasOwnProperty(key)) {
           const value = queryParams[key as keyof typeof queryParams];
+          
+          let backendKey = key;
+          if (key === 'category_ids') {
+            backendKey = 'category_id';
+          } else if (key === 'publish_start_at') {
+            backendKey = 'published_start_at';
+          } else if (key === 'publish_end_at') {
+            backendKey = 'published_end_at';
+          }
+
           if (Array.isArray(value)) {
-            value.forEach(item => params.append(key, String(item)));
+            value.forEach(item => params.append(backendKey, String(item)));
           } else if (value) {
-            params.append(key, String(value));
+            params.append(backendKey, String(value));
           }
         }
       }
@@ -216,6 +228,8 @@ export function BlogContextProvider({ children }: Props) {
     const baseUrl = window.location.origin + '/api/proxy/admin/articles/paginate';
     const queryString = params.toString();
     const finalUrl = new URL(baseUrl + (queryString ? `?${queryString}` : ''));
+
+    console.log("handleSearch: keyword =", keyword, "queryParams =", queryParams, "finalUrl =", finalUrl.toString());
 
     setIsFilterActive(queryString.length > 0);
 

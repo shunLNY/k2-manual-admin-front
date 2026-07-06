@@ -120,6 +120,17 @@
   position: absolute;
   right: 20px;
 
+  @include mixin.lg{
+    position: static;
+    right: auto;
+  }
+
+  @include mixin.sm {
+    flex: 0 0 auto !important;
+    max-width: none !important;
+    width: auto !important;
+  }
+
   svg {
     font-size: 25px;
     color: var(--destructive);

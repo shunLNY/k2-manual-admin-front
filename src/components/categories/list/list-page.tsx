@@ -1,38 +1,38 @@
-"@use client"
-import { useCallback, useContext, useEffect, useRef, useState } from "react"
+"@use client";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 
-import { useListPage } from "@/store/list-page-context"
-import search from "../../commons/lists/list-filter-pc.module.scss"
-import CategoryList from "./category-list"
-import { useCategoryList } from "@/store/categories-context"
-import { Controller, useForm } from "react-hook-form"
-import ListPageLayout from "@/components/commons/lists/list-page-layout"
-import ButtonFilterClear from "@/components/commons/buttons/btn-filter-clear"
-import { SelectInstance } from "react-select"
-import dayjs from "dayjs"
-import dynamic from "next/dynamic"
-import { Category } from "@/utils/types"
-import { useDebounce } from "@/utils/helpers"
-import Modal from "@/components/modals/modal"
-import { Checkbox } from "@/components/commons/inputs/checkbox"
-import { IconXMark } from "@/components/icons/icons"
-import ButtonSearch from "@/components/commons/buttons/btn-search"
-import SearchCheckboxStatusPC from "@/components/commons/inputs/search-checkbox-status-pc"
-import classNames from "classnames"
-import FormControl from "@/components/commons/inputs/form-control"
-import TextField from "@/components/commons/inputs/text-field"
-import styles from "./category-list.module.scss"
-import DateInput from "@/components/commons/inputs/date-input"
-import ReactDatepicker from "@/components/commons/datepicker/react-datepicker"
+import { useListPage } from "@/store/list-page-context";
+import search from "../../commons/lists/list-filter-pc.module.scss";
+import CategoryList from "./category-list";
+import { useCategoryList } from "@/store/categories-context";
+import { Controller, useForm } from "react-hook-form";
+import ListPageLayout from "@/components/commons/lists/list-page-layout";
+import ButtonFilterClear from "@/components/commons/buttons/btn-filter-clear";
+import { SelectInstance } from "react-select";
+import dayjs from "dayjs";
+import dynamic from "next/dynamic";
+import { Category } from "@/utils/types";
+import { useDebounce } from "@/utils/helpers";
+import Modal from "@/components/modals/modal";
+import { Checkbox } from "@/components/commons/inputs/checkbox";
+import { IconXMark } from "@/components/icons/icons";
+import ButtonSearch from "@/components/commons/buttons/btn-search";
+import SearchCheckboxStatusPC from "@/components/commons/inputs/search-checkbox-status-pc";
+import classNames from "classnames";
+import FormControl from "@/components/commons/inputs/form-control";
+import TextField from "@/components/commons/inputs/text-field";
+import styles from "./category-list.module.scss";
+import DateInput from "@/components/commons/inputs/date-input";
+import ReactDatepicker from "@/components/commons/datepicker/react-datepicker";
 
 const ListFilterPc = dynamic(
-	() => import('../../commons/lists/list-filter-pc'),
+	() => import("../../commons/lists/list-filter-pc"),
 	{
 		ssr: false,
-	}
+	},
 );
 interface FormData {
-	categoryIds: string[]
+	categoryIds: string[];
 }
 
 interface InputData {
@@ -44,8 +44,8 @@ interface InputData {
 }
 
 const ListPage = () => {
-	const pageCtx = useListPage()
-	const listCtx = useCategoryList()
+	const pageCtx = useListPage();
+	const listCtx = useCategoryList();
 
 	const {
 		listCount,
@@ -61,11 +61,13 @@ const ListPage = () => {
 		setIs_Published,
 		isFilterActive,
 		setUrlPath,
-		setCategoryCreate
+		setCategoryCreate,
 	} = listCtx;
 
 	const [isOpenDatePicker, setIsOpenDatePicker] = useState(false);
-	const [inputDateName, setInputDateName] = useState<keyof InputData | "">("");
+	const [inputDateName, setInputDateName] = useState<keyof InputData | "">(
+		"",
+	);
 
 	const {
 		register,
@@ -73,7 +75,7 @@ const ListPage = () => {
 		clearErrors,
 		reset,
 		control,
-		formState: { errors }
+		formState: { errors },
 	} = useForm<InputData>({
 		defaultValues: {
 			category_id: "",
@@ -81,8 +83,8 @@ const ListPage = () => {
 			editor_name: "",
 			start_date: "",
 			end_date: "",
-		}
-	})
+		},
+	});
 
 	const handleKeywordChange = useCallback((value: string) => {
 		setKeyword(value.trimStart());
@@ -103,7 +105,8 @@ const ListPage = () => {
 		onClose();
 	}, [handleSearch, onClose]);
 
-	const [showSubmissionStatusFilter, setShowSubmissionStatusFilter] = useState<boolean>(false);
+	const [showSubmissionStatusFilter, setShowSubmissionStatusFilter] =
+		useState<boolean>(false);
 	useEffect(() => {
 		const hasCategoryCreate =
 			typeof window !== "undefined" &&
@@ -117,12 +120,10 @@ const ListPage = () => {
 		}
 	}, [pageCtx.listFilter]);
 
-
-  	const handleCheckbox = (e: React.ChangeEvent<HTMLInputElement>) => {
+	const handleCheckbox = (e: React.ChangeEvent<HTMLInputElement>) => {
 		let paramName = e.target.getAttribute("name") as string;
 		paramName === "is_private" && setIs_Private(!is_private);
 		paramName === "is_published" && setIs_Published(!is_published);
-
 
 		setQueryParams((prevState: any) => {
 			if (e.target.checked) {
@@ -153,12 +154,12 @@ const ListPage = () => {
 				});
 			}
 		},
-		[setValue, clearErrors, setQueryParams]
+		[setValue, clearErrors, setQueryParams],
 	);
 
 	useEffect(() => {
-		listCtx.setCategoryInfo({})
-	}, [])
+		listCtx.setCategoryInfo({});
+	}, []);
 
 	const clearFilterData = useCallback(() => {
 		reset({
@@ -192,39 +193,18 @@ const ListPage = () => {
 				isActive={pageCtx.showSpFilter}
 				count={listCount}
 				isPagination={false}
-			// onSubmit={
-			// pageCtx.listFilter === "invoice"
-			// 	? handleInvoiceCreate
-			// 	: handleConstructionCreate
-			// }
-			// isDisable={listCtx.items.length <= 0}
-			// setQueryParams={setQueryParams}
 			>
-				
 				<>
-					{/* <div className={styles.tabs_container}>
-						{Category_list_info.map((category) => (
-							<button
-								key={category.id}
-								className={classNames(styles.tab, {
-									[styles.active]: listCtx.selectedTabId === category.id,
-								})}
-								onClick={() => listCtx.setSelectedTabId(category.id)}
-							>
-								{category.category_name}
-							</button>
-						))}
-					</div> */}
-					<CategoryList
-						count={listCount}
-					/>
+					<CategoryList count={listCount} />
 					<Modal
 						isOpen={pageCtx.openFilterModal}
 						shouldCloseOnOverlayClick={true}
-						onRequestClose={() => { pageCtx.setOpenFilterModal(false) }}
+						onRequestClose={() => {
+							pageCtx.setOpenFilterModal(false);
+						}}
 						contentClassName={search.modal_bg}
 					>
-						<div className={search.account_modal}>
+						<div className={search.categories_modal}>
 							<ListFilterPc
 								keyword={keyword}
 								onKeywordChange={handleKeywordChange}
@@ -233,164 +213,274 @@ const ListPage = () => {
 								<>
 									<ul className={search.construction_flex}>
 										{showSubmissionStatusFilter && (
-											<div>
-												<li className={classNames(search.list_search_box, styles.list_search_box)}>
-													<div className={search.list_search_detail_label}>
-														<div className={search.list_search_label}>
-															<p>
-																ステータス
-															</p>
-														</div>
-													</div>
-													<div className={search.list_search_detail}>
-														<div className={search.list_search_flex}>
-															<div className={search.list_search_check}  >
-																<label className={"d-flex items-center"}  >
-																	<Checkbox
-																		name="is_private"
-																		onChange={handleCheckbox}
-																		checked={is_private}
-																		className={search.checkbox_status}
-																	/>
-																	<SearchCheckboxStatusPC
-																		label="未公開"
-																		color="gray"
-																	/>
-																</label>
-															</div>
-															<div className={search.list_search_check}  >
-																<label className={"d-flex items-center"}  >
-																	<Checkbox
-																		name="is_published"
-																		onChange={handleCheckbox}
-																		checked={is_published}
-																		className={search.checkbox_status}
-																	/>
-																	<SearchCheckboxStatusPC
-																		label="公開"
-																		color="blue"
-																	/>
-																</label>
-															</div>
-														</div>
-													</div>
-												</li>
-											</div>
-										)}
-
-										<div>
-											<li className={classNames(search.list_search_box, styles.list_search)}>
-												<p>公開期間</p>
-												{/* <FormControl
-													label=''
-												> */}
-												<div className={styles.publish_date_container}>
-													<div className={styles.date_input}>
-														<Controller
-															name='start_date'
-															control={control}
-															render={({ field }) => (
-																<DateInput
-																	{...field}
-																	onClick={() => {
-																		setIsOpenDatePicker(true);
-																		setInputDateName('start_date');
-																	}}
-																	onClear={() => {
-																		setValue('start_date', "");
-																		setQueryParams((prevState: any) => {
-																			delete prevState.start_date;
-																			return { ...prevState };
-																		});
-																	}}
-																	value={
-																		queryParams.start_date
-																			? dayjs(new Date(queryParams.start_date as string)).format('YYYY/MM/DD')
-																			: ''
-																	}
-																	placeholder={'2026/01/01'}
-																	
-																/>
-															)}
-														/>
-														<div>~</div>
-														<Controller
-															name='end_date'
-															control={control}
-															render={({ field }) => (
-																<DateInput
-																	{...field}
-																	onClick={() => {
-																		setIsOpenDatePicker(true);
-																		setInputDateName('end_date');
-																	}}
-																	onClear={() => {
-																		setValue('end_date', "");
-																		setQueryParams((prevState: any) => {
-																			delete prevState.end_date;
-																			return { ...prevState };
-																		});
-																	}}
-																	value={
-																		queryParams.end_date
-																			? dayjs(new Date(queryParams.end_date as string)).format('YYYY/MM/DD')
-																			: ''
-																	}
-																	placeholder={'2026/01/01'}
-																/>
-															)}
-														/>
+											<li
+												className={classNames(
+													search.list_search_box,
+													styles.list_search_box,
+												)}
+											>
+												<div
+													className={
+														search.list_search_detail_label
+													}
+												>
+													<div
+														className={
+															search.list_search_label
+														}
+													>
+														<p>ステータス</p>
 													</div>
 												</div>
-												{/* </FormControl> */}
-											</li>
-
-										</div>
-
-										<div>
-											<li className={classNames(search.list_search_box, styles.list_search)}>
-												<FormControl
-													label="作成者名"
-													layout="row"
-													classNames={search.custom_label}
+												<div
+													className={
+														search.list_search_detail
+													}
 												>
-													<TextField
-														name="creator_name"
-														register={register}
-														placeholder="作成者名を検査"
-														onChange={handleInputChange}
-													/>
-												</FormControl>
+													<div
+														className={
+															search.list_search_flex
+														}
+													>
+														<div
+															className={
+																search.list_search_check
+															}
+														>
+															<label
+																className={
+																	"d-flex items-center"
+																}
+															>
+																<Checkbox
+																	name="is_private"
+																	onChange={
+																		handleCheckbox
+																	}
+																	checked={
+																		is_private
+																	}
+																	className={
+																		search.checkbox_status
+																	}
+																/>
+																<SearchCheckboxStatusPC
+																	label="未公開"
+																	color="gray"
+																/>
+															</label>
+														</div>
+														<div
+															className={
+																search.list_search_check
+															}
+														>
+															<label
+																className={
+																	"d-flex items-center"
+																}
+															>
+																<Checkbox
+																	name="is_published"
+																	onChange={
+																		handleCheckbox
+																	}
+																	checked={
+																		is_published
+																	}
+																	className={
+																		search.checkbox_status
+																	}
+																/>
+																<SearchCheckboxStatusPC
+																	label="公開"
+																	color="blue"
+																/>
+															</label>
+														</div>
+													</div>
+												</div>
 											</li>
-										</div>
+										)}
 
-										<div>
-											<li className={classNames(search.list_search_box, styles.list_search)}>
-												<FormControl
-													label="編集者名"
-													layout="row"
-													classNames={search.custom_label}
+										<li
+											className={classNames(
+												search.list_search_box,
+												styles.list_search,
+											)}
+										>
+											<p>公開期間</p>
+											{/* <FormControl
+													label=''
+												> */}
+											<div
+												className={
+													styles.publish_date_container
+												}
+											>
+												<div
+													className={
+														styles.date_input
+													}
 												>
-													<TextField
-														name="editor_name"
-														register={register}
-														placeholder="編集者名を検査"
-														onChange={handleInputChange}
+													<Controller
+														name="start_date"
+														control={control}
+														render={({ field }) => (
+															<DateInput
+																{...field}
+																onClick={() => {
+																	setIsOpenDatePicker(
+																		true,
+																	);
+																	setInputDateName(
+																		"start_date",
+																	);
+																}}
+																onClear={() => {
+																	setValue(
+																		"start_date",
+																		"",
+																	);
+																	setQueryParams(
+																		(
+																			prevState: any,
+																		) => {
+																			delete prevState.start_date;
+																			return {
+																				...prevState,
+																			};
+																		},
+																	);
+																}}
+																value={
+																	queryParams.start_date
+																		? dayjs(
+																				new Date(
+																					queryParams.start_date as string,
+																				),
+																			).format(
+																				"YYYY/MM/DD",
+																			)
+																		: ""
+																}
+																placeholder={
+																	"2026/01/01"
+																}
+															/>
+														)}
 													/>
-												</FormControl>
-											</li>
-										</div>
+													<div>~</div>
+													<Controller
+														name="end_date"
+														control={control}
+														render={({ field }) => (
+															<DateInput
+																{...field}
+																onClick={() => {
+																	setIsOpenDatePicker(
+																		true,
+																	);
+																	setInputDateName(
+																		"end_date",
+																	);
+																}}
+																onClear={() => {
+																	setValue(
+																		"end_date",
+																		"",
+																	);
+																	setQueryParams(
+																		(
+																			prevState: any,
+																		) => {
+																			delete prevState.end_date;
+																			return {
+																				...prevState,
+																			};
+																		},
+																	);
+																}}
+																value={
+																	queryParams.end_date
+																		? dayjs(
+																				new Date(
+																					queryParams.end_date as string,
+																				),
+																			).format(
+																				"YYYY/MM/DD",
+																			)
+																		: ""
+																}
+																placeholder={
+																	"2026/01/01"
+																}
+															/>
+														)}
+													/>
+												</div>
+											</div>
+										</li>
+
+										<li
+											className={classNames(
+												search.list_search_box,
+												styles.list_search,
+											)}
+										>
+											<FormControl
+												label="作成者名"
+												layout="row"
+												classNames={search.custom_label}
+											>
+												<TextField
+													name="creator_name"
+													register={register}
+													placeholder="作成者名を検査"
+													onChange={handleInputChange}
+												/>
+											</FormControl>
+										</li>
+
+										<li
+											className={classNames(
+												search.list_search_box,
+												styles.list_search,
+											)}
+										>
+											<FormControl
+												label="編集者名"
+												layout="row"
+												classNames={search.custom_label}
+											>
+												<TextField
+													name="editor_name"
+													register={register}
+													placeholder="編集者名を検査"
+													onChange={handleInputChange}
+												/>
+											</FormControl>
+										</li>
 									</ul>
-									<div className="d-flex">
+									<div
+										className={`d-flex ${search.modal_action_buttons}`}
+									>
 										<div className={search.btn_flex}>
 											<ButtonFilterClear
 												text="条件クリア"
 												onClick={clearFilterData}
 												active={true}
+												className={
+													search.filter_buttons
+												}
 											/>
 											<ButtonSearch
 												text="検索"
-												className={search.submitBtn + " ml-10"}
+												className={
+													search.submitBtn +
+													" ml-10 " +
+													search.filter_buttons
+												}
 												onClick={handleSearchAndClose}
 											></ButtonSearch>
 										</div>
@@ -408,11 +498,19 @@ const ListPage = () => {
 						</div>
 					</Modal>
 					{isOpenDatePicker && (
-						<Modal isOpen={isOpenDatePicker} shouldCloseOnOverlayClick={true} onRequestClose={() => setIsOpenDatePicker(false)}>
+						<Modal
+							isOpen={isOpenDatePicker}
+							shouldCloseOnOverlayClick={true}
+							onRequestClose={() => setIsOpenDatePicker(false)}
+						>
 							<ReactDatepicker
 								onSelect={(e) => {
-									if (inputDateName === "start_date" || inputDateName === "end_date") {
-										const formattedDate = dayjs(e).format("YYYY-MM-DD");
+									if (
+										inputDateName === "start_date" ||
+										inputDateName === "end_date"
+									) {
+										const formattedDate =
+											dayjs(e).format("YYYY-MM-DD");
 										setValue(inputDateName, formattedDate, {
 											shouldValidate: true,
 										});
@@ -429,9 +527,8 @@ const ListPage = () => {
 						</Modal>
 					)}
 				</>
-			</ListPageLayout >
-
+			</ListPageLayout>
 		</>
-	)
-}
-export default ListPage
+	);
+};
+export default ListPage;

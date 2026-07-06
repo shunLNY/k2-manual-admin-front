@@ -20,6 +20,7 @@ import { Account } from "@/utils/types"
 import { useRouter } from "next/router"
 import { toast } from "react-toastify"
 import ConfirmModal from "@/components/categories/entry/confirm-model"
+import { useAuth } from "@/store/auth-context"
 
 
 
@@ -34,6 +35,7 @@ const AccountEntry = ({ mode }: { mode: 'new' | 'edit' }) => {
   const listCtx = useAccount();
   const { getAccountInfo, accountInfo, setAccountInfo, refreshAccountRows } = listCtx;
   const pageCtx = useListPage();
+  const authCtx = useAuth();
 
   // const [accountInfo, setAccountInfo] = useState<Account | null>(null)
   const [isLoading, setIsLoading] = useState(false)
@@ -179,6 +181,7 @@ const AccountEntry = ({ mode }: { mode: 'new' | 'edit' }) => {
   }
 
   const handleDelete = async () => {
+    if (!authCtx.hasOwnerPermission) return
     if (!accountInfo?.id) return
     setShowModal(true)
   }
@@ -190,6 +193,7 @@ const AccountEntry = ({ mode }: { mode: 'new' | 'edit' }) => {
   }
 
   const confirmDelete = async () => {
+    if (!authCtx.hasOwnerPermission) return;
     if (!accountInfo?.id) return;
 
     setIsBtnDisable(true)
@@ -366,7 +370,7 @@ const AccountEntry = ({ mode }: { mode: 'new' | 'edit' }) => {
 
         {/* <div className={styles.row_two}></div> */}
 
-        <FormFooter>
+        <FormFooter mobileThreeButtons={mode === "edit"}>
           <ButtonCancel onClick={() => router.back()} text="戻る" type="button" />
           {
             mode === "edit" && (
@@ -375,7 +379,7 @@ const AccountEntry = ({ mode }: { mode: 'new' | 'edit' }) => {
           }
           <ButtonSave type="submit" text="保存" className={styles.submitBtn} disabled={isBtnDisable} />
           {
-            mode === "edit" && (
+            mode === "edit" && authCtx.hasOwnerPermission && (
               <span onClick={handleDelete} role="button" className={styles.iconDelete}>
                 <IconDelete />
               </span>

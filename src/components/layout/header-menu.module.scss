@@ -377,16 +377,17 @@
 	height: 34px;
 	margin-left: 10px;
 	color: var(--muted-foreground);
-	border: 1px solid;
+	border: 1px solid var(--muted-foreground);
 	border-radius: 20px;
 	font-size: 16px;
 	cursor: pointer;
 
 	@include mixin.sm {
-		width: fn.get-vw(120px);
-		height: fn.get-vw(120px);
-		border: none;
-		// font-size: fn.get-vw(13px);
+        gap: 2px;
+		width: 30px;
+		height: 30px;
+		border-radius: 5px;
+        padding: 0 2px;
 		.filter_text {
 			display: none;
 		}

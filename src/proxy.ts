@@ -20,6 +20,7 @@ export const config = {
   matcher: [
     '/',
     '/dashboard',
+    '/dashboard/:path*',
     '/articles',
     '/categories',
     '/accounts',
@@ -29,3 +30,4 @@ export const config = {
     '/accounts/:path*',
   ],
 };
+

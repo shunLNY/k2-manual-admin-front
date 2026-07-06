@@ -1,429 +1,414 @@
-"use client"
+/** @format */
+
+'use client';
 
 /** @format */
-import styles from "./category-entry.module.scss"
-import { useState, useContext, useEffect } from "react"
-import { useForm } from "react-hook-form"
-import classNames from "classnames"
-import { useListPage } from "@/store/list-page-context"
-import { useParams } from "next/navigation"
-import { fetcher } from "@/utils/fetcher"
-import { createSuccessfulMessage, failMessage, updateSuccessfulMessage } from "@/utils/constants"
-import FormControl from "@/components/commons/inputs/form-control"
-import { useCategoryList } from "@/store/categories-context"
-import ButtonSave from "@/components/commons/buttons/btn-save"
-import ButtonCancel from "@/components/commons/buttons/btn-cancel"
-import FormFooter from "@/components/commons/inputs/form-footer"
-import TextField from "@/components/commons/inputs/text-field"
-import { IconDelete } from "@/components/icons/icons"
-import { usePathname } from "next/navigation"
-import { toast } from "react-toastify"
-import dayjs from "dayjs"
-import ConfirmModal from "./confirm-model"
-import { useRouter } from "next/router"
-import { useAuth } from "@/store/auth-context"
-import ReactSelect from "@/components/commons/inputs/_select"
+import styles from './category-entry.module.scss';
+import { useState, useContext, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import classNames from 'classnames';
+import { useListPage } from '@/store/list-page-context';
+import { useParams } from 'next/navigation';
+import { fetcher } from '@/utils/fetcher';
+import { createSuccessfulMessage, failMessage, updateSuccessfulMessage } from '@/utils/constants';
+import FormControl from '@/components/commons/inputs/form-control';
+import { useCategoryList } from '@/store/categories-context';
+import ButtonSave from '@/components/commons/buttons/btn-save';
+import ButtonCancel from '@/components/commons/buttons/btn-cancel';
+import FormFooter from '@/components/commons/inputs/form-footer';
+import TextField from '@/components/commons/inputs/text-field';
+import { IconDelete } from '@/components/icons/icons';
+import { usePathname } from 'next/navigation';
+import { toast } from 'react-toastify';
+import dayjs from 'dayjs';
+import ConfirmModal from './confirm-model';
+import { useRouter } from 'next/router';
+import { useAuth } from '@/store/auth-context';
+import ReactSelect from '@/components/commons/inputs/_select';
+
+const NO_PARENT_CATEGORY_VALUE = 'no_parent_category';
+
+type CategoryOption = {
+	value: string;
+	label: string;
+};
 
 const findRootCategoryId = (categories: any[], targetId: string): string | null => {
-  for (const cat of categories) {
-    if (cat.id === targetId) {
-      return cat.id;
-    }
-    const hasChild = (item: any): boolean => {
-      if (item.id === targetId) return true;
-      if (item.child_categories && item.child_categories.length > 0) {
-        return item.child_categories.some((child: any) => hasChild(child));
-      }
-      return false;
-    };
-    if (cat.child_categories && cat.child_categories.some((child: any) => hasChild(child))) {
-      return cat.id;
-    }
-  }
-  return null;
+	for (const cat of categories) {
+		if (cat.id === targetId) {
+			return cat.id;
+		}
+		const hasChild = (item: any): boolean => {
+			if (item.id === targetId) return true;
+			if (item.child_categories && item.child_categories.length > 0) {
+				return item.child_categories.some((child: any) => hasChild(child));
+			}
+			return false;
+		};
+		if (cat.child_categories && cat.child_categories.some((child: any) => hasChild(child))) {
+			return cat.id;
+		}
+	}
+	return null;
 };
 
 const CategoriesEntry = () => {
-  const router = useRouter()
-  const params = useParams()
-  // console.log(params)
-  const pathname = router.pathname;
-  const showInfo = pathname !== "/categories/new"
-  const _id: string = params?.id as string
+	const router = useRouter();
+	const params = useParams();
+	// console.log(params)
+	const pathname = router.pathname;
+	const showInfo = pathname !== '/categories/new';
+	const _id: string = params?.id as string;
 
-  const listCtx = useCategoryList()
-  const pageCtx = useListPage()
-  const { categoryInfo, refreshCategoryRows, getCategoryInfo } = listCtx;
-  const authCtx = useAuth();
+	const listCtx = useCategoryList();
+	const pageCtx = useListPage();
+	const { categoryInfo, refreshCategoryRows, getCategoryInfo } = listCtx;
+	const authCtx = useAuth();
 
-  const [isLoading, setIsLoading] = useState(false)
-  const [isBtnDisable, setIsBtnDisable] = useState(false)
-  const [selectedStatus, setSelectedStatus] = useState<"public" | "private">("public")
+	const [isLoading, setIsLoading] = useState(false);
+	const [isBtnDisable, setIsBtnDisable] = useState(false);
+	const [selectedStatus, setSelectedStatus] = useState<'public' | 'private'>('public');
 
-  const [showModal, setShowModal] = useState(false)
+	const [showModal, setShowModal] = useState(false);
 
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    setError,
-    clearErrors,
-    control,
-    formState: { errors },
-    watch,
-    reset,
-  } = useForm({
-    defaultValues: {
-      category_name: "",
-      category_slug: "",
-      status: "public",
-      sort_order: 0,
-      createdAt: "",
-      blog_categories: [],
-      has_parent: "no",
-      parent_id: "",
-    has_child: "no",
-    child_id: "",
-    },
-  })
+	const {
+		register,
+		handleSubmit,
+		setValue,
+		setError,
+		clearErrors,
+		control,
+		formState: { errors },
+		watch,
+		reset,
+	} = useForm({
+		defaultValues: {
+			category_name: '',
+			category_slug: '',
+			status: 'public',
+			sort_order: 0,
+			createdAt: '',
+			blog_categories: [],
+			parent_id: NO_PARENT_CATEGORY_VALUE,
+			has_child: 'no',
+			child_id: '',
+		},
+	});
 
-  const watchHasParent = watch("has_parent");
-  const watchHasChild = watch("has_child");
-  const watchParentId = watch("parent_id");
+	const watchParentId = watch('parent_id');
 
-  useEffect(() => {
-    async function fetchData() {
-      if (_id) {
-        setIsLoading(true)
-        try {
-          await getCategoryInfo(_id)
-          pageCtx.setEntryMode("edit")
-        } catch (error) {
-          console.error("Error fetching category:", error)
-          toast.error("カテゴリーの取得に失敗しました")
-        } finally {
-          setIsLoading(false)
-        }
-      } else {
-        pageCtx.setEntryMode("new")
-        reset()
-        setSelectedStatus("public")
+	useEffect(() => {
+		async function fetchData() {
+			if (_id) {
+				setIsLoading(true);
+				try {
+					await getCategoryInfo(_id);
+					pageCtx.setEntryMode('edit');
+				} catch (error) {
+					console.error('Error fetching category:', error);
+					toast.error('カテゴリーの取得に失敗しました');
+				} finally {
+					setIsLoading(false);
+				}
+			} else {
+				pageCtx.setEntryMode('new');
+				reset();
+				setSelectedStatus('public');
 
-        // Handle parentId from query params
-        if (router.query.parentId) {
-          setValue("has_parent", "yes");
-          setValue("parent_id", router.query.parentId as string);
-        }
-      }
-    }
-    fetchData()
-  }, [_id, router.query.parentId])
+				// Handle parentId from query params
+				if (router.query.parentId) {
+					setValue('parent_id', router.query.parentId as string);
+				}
+			}
+		}
+		fetchData();
+	}, [_id, router.query.parentId]);
 
-  useEffect(() => {
-    if (categoryInfo && _id) {
-      // Determine if there is a parent ID from either the relation object or the raw ID field
-      const parentId = (categoryInfo as any).parentCategory?.id || (categoryInfo as any).parent_category_id;
-      const hasParent = parentId ? "yes" : "no";
+	useEffect(() => {
+		if (categoryInfo && _id) {
+			// Determine if there is a parent ID from either the relation object or the raw ID field
+			const parentId = (categoryInfo as any).parentCategory?.id || (categoryInfo as any).parent_category_id;
 
-      const formData = {
-        category_name: categoryInfo.category_name ?? "",
-        category_slug: categoryInfo.category_slug ?? "",
-        status: categoryInfo.status ?? "public",
-        sort_order: categoryInfo.sort_order ?? 0,
-        createdAt: categoryInfo.createdAt ?? "",
-        has_parent: hasParent,
-        parent_id: parentId ?? "",
-      }
+			const formData = {
+				category_name: categoryInfo.category_name ?? '',
+				category_slug: categoryInfo.category_slug ?? '',
+				status: categoryInfo.status ?? 'public',
+				sort_order: categoryInfo.sort_order ?? 0,
+				createdAt: categoryInfo.createdAt ?? '',
+				parent_id: parentId ?? NO_PARENT_CATEGORY_VALUE,
+			};
 
-      reset(formData)
-      setSelectedStatus(categoryInfo.status as "public" | "private")
-    }
-  }, [categoryInfo, _id, reset])
+			reset(formData);
+			setSelectedStatus(categoryInfo.status as 'public' | 'private');
+		}
+	}, [categoryInfo, _id, reset]);
 
-  const statusOptions = [
-    { label: "公開", value: "public", style: styles.public },
-    { label: "非公開", value: "private", style: styles.private },
-  ]
+	const statusOptions = [
+		{ label: '公開', value: 'public', style: styles.public },
+		{ label: '非公開', value: 'private', style: styles.private },
+	];
 
-  const handleStatusClick = (value: string, label: string) => {
-    setSelectedStatus(value as "public" | "private")
-    setValue("status", value)
-  }
+	const handleStatusClick = (value: string, label: string) => {
+		setSelectedStatus(value as 'public' | 'private');
+		setValue('status', value);
+	};
 
-  const onSubmit = (data: any) => {
-    console.log(data)
-    setIsBtnDisable(true)
-    let fetchConfig = {}
-    let url = null
-    let submitMsg = ""
+	const onSubmit = (data: any) => {
+		console.log(data);
+		setIsBtnDisable(true);
+		let fetchConfig = {};
+		let url = null;
+		let submitMsg = '';
+		const parentCategoryId = data.parent_id === NO_PARENT_CATEGORY_VALUE ? null : data.parent_id;
 
-    if (pageCtx.entryMode === "new") {
-      url = "/api/proxy/admin/categories/"
-      const submitData: any = {
-        category_name: data.category_name,
-        category_slug: data.category_slug,
-        status: data.status,
-        sort_order: data.sort_order,
-        creator_id: authCtx.user.uid,
-        editor_id: authCtx.user.uid,
-      }
-      if (data.has_parent === "yes" && data.parent_id) {
-        submitData.parent_category_id = data.parent_id
-      }
-      console.log("Submitting new category:", submitData)
-      
-      fetchConfig = {
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-        },
-        body: JSON.stringify(submitData),
-      }
-      submitMsg = createSuccessfulMessage
-    } else {
-      const submitData = {
-        ...data,
-        id: categoryInfo.id,
-        editor_id: authCtx.user.uid,
-      }
-      if (data.has_parent === "yes" && data.parent_id) {
-        (submitData as any).parent_category_id = data.parent_id
-      } else {
-        (submitData as any).parent_category_id = null // Explicitly clear parent if changed to 'no'
-      }
+		if (pageCtx.entryMode === 'new') {
+			url = '/api/proxy/admin/categories/';
+			const submitData: any = {
+				category_name: data.category_name,
+				category_slug: data.category_slug,
+				status: data.status,
+				sort_order: data.sort_order,
+				creator_id: authCtx.user.uid,
+				editor_id: authCtx.user.uid,
+			};
+			if (parentCategoryId) {
+				submitData.parent_category_id = parentCategoryId;
+			}
+			console.log('Submitting new category:', submitData);
 
-      // Remove internal UI fields
-      delete (submitData as any).has_parent
-      delete (submitData as any).has_child
-      delete (submitData as any).parent_id
-      delete (submitData as any).child_id
+			fetchConfig = {
+				method: 'POST',
+				headers: {
+					'content-type': 'application/json',
+				},
+				body: JSON.stringify(submitData),
+			};
+			submitMsg = createSuccessfulMessage;
+		} else {
+			const submitData = {
+				...data,
+				id: categoryInfo.id,
+				editor_id: authCtx.user.uid,
+			};
+			if (parentCategoryId) {
+				(submitData as any).parent_category_id = parentCategoryId;
+			} else {
+				(submitData as any).parent_category_id = null;
+			}
 
-      console.log("Updating category:", submitData)
+			// Remove internal UI fields
+			delete (submitData as any).has_child;
+			delete (submitData as any).parent_id;
+			delete (submitData as any).child_id;
 
-      fetchConfig = {
-        method: "PUT",
-        headers: {
-          "content-type": "application/json",
-        },
-        body: JSON.stringify(submitData),
-      }
-      url = new URL(window.location.origin + "/api/proxy/admin/categories/" + categoryInfo.id)
-      submitMsg = updateSuccessfulMessage
-    }
+			console.log('Updating category:', submitData);
 
-    fetcher(url, { ...fetchConfig })
-      .then((res) => {
-        toast.success(submitMsg)
-        setIsBtnDisable(false)
-        refreshCategoryRows()
-        
-        let redirectTabId = "";
-        if (pageCtx.entryMode === "new") {
-          if (data.has_parent === "yes" && data.parent_id) {
-            const rootId = findRootCategoryId(listCtx.items, data.parent_id);
-            if (rootId) redirectTabId = rootId;
-          } else if (res?.data?.id) {
-            redirectTabId = res.data.id;
-          }
-        } else {
-          listCtx.setCategoryInfo(res.data)
-          if (data.has_parent === "yes" && data.parent_id) {
-            const rootId = findRootCategoryId(listCtx.items, data.parent_id);
-            if (rootId) redirectTabId = rootId;
-          } else if (categoryInfo.id) {
-            const isRoot = listCtx.items.some((c: any) => c.id === categoryInfo.id);
-            if (isRoot) redirectTabId = categoryInfo.id;
-            else {
-              const rootId = findRootCategoryId(listCtx.items, categoryInfo.id);
-              if (rootId) redirectTabId = rootId;
-            }
-          }
-        }
-        
-        router.push(redirectTabId ? `/categories?tabId=${redirectTabId}` : "/categories")
-      })
-      .catch((error) => {
-        toast.error(failMessage)
-        console.error("An error occurred:", error)
-        setIsBtnDisable(false)
-      })
-  }
+			fetchConfig = {
+				method: 'PUT',
+				headers: {
+					'content-type': 'application/json',
+				},
+				body: JSON.stringify(submitData),
+			};
+			url = new URL(window.location.origin + '/api/proxy/admin/categories/' + categoryInfo.id);
+			submitMsg = updateSuccessfulMessage;
+		}
 
-  const handleDelete = async () => {
-    if (!categoryInfo?.id) return
-    setShowModal(true)
-  }
+		fetcher(url, { ...fetchConfig })
+			.then((res) => {
+				toast.success(submitMsg);
+				setIsBtnDisable(false);
+				refreshCategoryRows();
 
-  const confirmDelete = async () => {
-    setShowModal(false)
-    setIsBtnDisable(true)
-    try {
-      await fetcher(`/api/proxy/admin/categories/${categoryInfo.id}`, { method: "DELETE" })
-      toast.success("カテゴリーを削除しました")
-      
-      const currentTabId = listCtx.selectedTabId;
-      router.push(currentTabId ? `/categories?tabId=${currentTabId}` : "/categories")
-      refreshCategoryRows()
-    } catch (err) {
-      console.error(err)
-      toast.error(failMessage)
-      setIsBtnDisable(false)
-    }
-  }
+				let redirectTabId = '';
+				if (pageCtx.entryMode === 'new') {
+					if (parentCategoryId) {
+						const rootId = findRootCategoryId(listCtx.items, parentCategoryId);
+						if (rootId) redirectTabId = rootId;
+					} else if (res?.data?.id) {
+						redirectTabId = res.data.id;
+					}
+				} else {
+					listCtx.setCategoryInfo(res.data);
+					if (parentCategoryId) {
+						const rootId = findRootCategoryId(listCtx.items, parentCategoryId);
+						if (rootId) redirectTabId = rootId;
+					} else if (categoryInfo.id) {
+						const isRoot = listCtx.items.some((c: any) => c.id === categoryInfo.id);
+						if (isRoot) redirectTabId = categoryInfo.id;
+						else {
+							const rootId = findRootCategoryId(listCtx.items, categoryInfo.id);
+							if (rootId) redirectTabId = rootId;
+						}
+					}
+				}
 
-  const cancelDelete = () => {
-    setShowModal(false)
-  }
+				router.push(redirectTabId ? `/categories?tabId=${redirectTabId}` : '/categories');
+			})
+			.catch((error) => {
+				toast.error(failMessage);
+				console.error('An error occurred:', error);
+				setIsBtnDisable(false);
+			});
+	};
 
-  // blog count
-  const blogCount = categoryInfo?.blog_categories?.length ?? 0
-  const deleteMessage =
-    blogCount > 0
-      ? `${blogCount.toLocaleString()} 件の記事で使用されています。削除しますか？\n (※ このカテゴリに関する投稿も削除されます。)`
-      : "このカテゴリーを削除しますか？(※ このカテゴリに関する子カテゴリも全て削除されます。)"
+	const handleDelete = async () => {
+		if (!categoryInfo?.id) return;
+		setShowModal(true);
+	};
 
-  if (isLoading) {
-    return (
-      <div className={styles.main_container}>
-        <div className={styles.row_one}>
-          <div className={styles.loading}>データを読み込み中...</div>
-        </div>
-      </div>
-    )
-  }
+	const confirmDelete = async () => {
+		setShowModal(false);
+		setIsBtnDisable(true);
+		try {
+			await fetcher(`/api/proxy/admin/categories/${categoryInfo.id}`, { method: 'DELETE' });
+			toast.success('カテゴリーを削除しました');
 
-  const getSubtreeHeight = (category: any): number => {
-    if (!category.child_categories || category.child_categories.length === 0) {
-      return 1;
-    }
-    let maxChildHeight = 0;
-    for (const child of category.child_categories) {
-      maxChildHeight = Math.max(maxChildHeight, getSubtreeHeight(child));
-    }
-    return 1 + maxChildHeight;
-  };
+			const currentTabId = listCtx.selectedTabId;
+			router.push(currentTabId ? `/categories?tabId=${currentTabId}` : '/categories');
+			refreshCategoryRows();
+		} catch (err) {
+			console.error(err);
+			toast.error(failMessage);
+			setIsBtnDisable(false);
+		}
+	};
 
-  const editSubtreeHeight = categoryInfo ? getSubtreeHeight(categoryInfo) : 1;
+	const cancelDelete = () => {
+		setShowModal(false);
+	};
 
-  const getAvailableParents = (categories: any[], depth = 1): any[] => {
-    let result: any[] = [];
-    for (const category of categories) {
-      // Cannot select itself (or its children)
-      if (categoryInfo && category.id === categoryInfo.id) continue;
-      
-      // The parent's depth + our subtree height must not exceed 4 (max category depth limit)
-      if (depth + editSubtreeHeight <= 4) {
-        // Different icon for each level
-        let prefix = "";
+	// blog count
+	const blogCount = categoryInfo?.blog_categories?.length ?? 0;
+	const deleteMessage =
+		blogCount > 0 ?
+			`${blogCount.toLocaleString()} 件の記事で使用されています。削除しますか？\n (※ このカテゴリに関する投稿も削除されます。)`
+		:	'このカテゴリーを削除しますか？(※ このカテゴリに関する子カテゴリも全て削除されます。)';
 
-        if (depth === 1) {
-          // Parent category (top level)
-          prefix = "▣ ";
-        } else {
-          // Child categories
-          prefix = "　".repeat(depth - 1) + "↳ ";
-        }
+	if (isLoading) {
+		return (
+			<div className={styles.main_container}>
+				<div className={styles.row_one}>
+					<div className={styles.loading}>データを読み込み中...</div>
+				</div>
+			</div>
+		);
+	}
 
-        result.push({
-          value: category.id,
-          label: prefix + category.category_name,
-        });
-      }
-      
-      // Recursively add children
-      if (category.child_categories && category.child_categories.length > 0) {
-        result = result.concat(getAvailableParents(category.child_categories, depth + 1));
-      }
-    }
-    return result;
-  };
+	const getSubtreeHeight = (category: any): number => {
+		if (!category.child_categories || category.child_categories.length === 0) {
+			return 1;
+		}
+		let maxChildHeight = 0;
+		for (const child of category.child_categories) {
+			maxChildHeight = Math.max(maxChildHeight, getSubtreeHeight(child));
+		}
+		return 1 + maxChildHeight;
+	};
 
-  const parentOptions = getAvailableParents(listCtx.items);
+	const editSubtreeHeight = categoryInfo ? getSubtreeHeight(categoryInfo) : 1;
 
-  return (
-    <>
-      <form className={styles.main_container} onSubmit={handleSubmit(onSubmit)} id="entryForm">
-        <div className={styles.row_one}>
-          <div className={styles.textboxContainer}>
-            <FormControl label="カテゴリー名" required>
-              <TextField
-                register={register}
-                name="category_name"
-                placeholder="カテゴリー"
-                validation={{
-                  required: "カテゴリー名は必須です",
-                  maxLength: {
-                    value: 50,
-                    message: "50文字まで入力できます。",
-                  },
-                }}
-                maxLength={50}
-              />
-              {errors.category_name && (
-                <p className={styles.error_message}>
-                  {errors.category_name.message}
-                </p>
-              )}
-            </FormControl>
-          </div>
+	const getAvailableParents = (categories: any[], depth = 1): any[] => {
+		let result: any[] = [];
+		for (const category of categories) {
+			// Cannot select itself (or its children)
+			if (categoryInfo && category.id === categoryInfo.id) continue;
 
-          <div className={styles.textboxContainer}>
-            <FormControl label="スラッグ" required>
-              <TextField
-                register={register}
-                name="category_slug"
-                placeholder="スラッグ"
-                validation={{
-                  required: "スラッグは必須です",
-                  maxLength: {
-                    value: 50,
-                    message: "50文字まで入力できます。",
-                  },
-                  // Add the pattern rule for validation
-                  pattern: {
-                    value: /^[a-z0-9-_]+$/,
-                    message: "小文字アルファベット、数字、ハイフンのみ使用可能です。",
-                  },
-                }}
-                maxLength={50}
-              />
-              {errors.category_slug && (
-                <p className={styles.error_message}>
-                  {errors.category_slug.message}
-                </p>
-              )}
-            </FormControl>
-          </div>
+			// The parent's depth + our subtree height must not exceed 4 (max category depth limit)
+			if (depth + editSubtreeHeight <= 4) {
+				// Different icon for each level
+				let prefix = '';
 
-          {/* --- Parent Category Section --- */}
-          <div className={styles.flexRow}>
-            <FormControl label="親カテゴリはありますか？" required>
-              <div className={styles.radio_group}>
-                <label>
-                  <input {...register("has_parent")} type="radio" value="yes" /> はい
-                </label>
-                <label>
-                  <input {...register("has_parent")} type="radio" value="no" /> いいえ
-                </label>
-              </div>
-            </FormControl>
-            {/* watchHasParent က "yes" ဖြစ်မှ Dropdown ပေါ်မည် */}
-            {watchHasParent === "yes" && (
-              <div className={styles.dropdown_side}>
-                <FormControl label="親カテゴリー名" required>
-                  <ReactSelect
-                    options={parentOptions}
-                    placeholder="---親カテゴリーを選択します---"
-                    value={parentOptions.find(opt => opt.value === watchParentId) || null}
-                    onChange={(opt: any) => setValue("parent_id", opt.value)}
-                  />
-                </FormControl>
-              </div>
-            )}
-        </div>
+				if (depth === 1) {
+					// Parent category (top level)
+					prefix = '▣ ';
+				} else {
+					// Child categories
+					prefix = '　'.repeat(depth - 1) + '↳ ';
+				}
 
-          {/* --- Child Category Section --- */}
-          {/* <div className={styles.flexRow}>
+				result.push({
+					value: category.id,
+					label: prefix + category.category_name,
+				});
+			}
+
+			// Recursively add children
+			if (category.child_categories && category.child_categories.length > 0) {
+				result = result.concat(getAvailableParents(category.child_categories, depth + 1));
+			}
+		}
+		return result;
+	};
+
+	const parentOptions: CategoryOption[] = [
+		{ value: NO_PARENT_CATEGORY_VALUE, label: '親カテゴリー無し' },
+		...getAvailableParents(listCtx.items),
+	];
+
+	return (
+		<>
+			<form className={styles.main_container} onSubmit={handleSubmit(onSubmit)} id='entryForm'>
+				<div className={styles.row_one}>
+					<div className={styles.textboxContainer}>
+						<FormControl label='カテゴリー名' required>
+							<TextField
+								register={register}
+								name='category_name'
+								placeholder='カテゴリー'
+								validation={{
+									required: 'カテゴリー名は必須です',
+									maxLength: {
+										value: 50,
+										message: '50文字まで入力できます。',
+									},
+								}}
+								maxLength={50}
+							/>
+							{errors.category_name && <p className={styles.error_message}>{errors.category_name.message}</p>}
+						</FormControl>
+					</div>
+
+					<div className={styles.textboxContainer}>
+						<FormControl label='スラッグ' required>
+							<TextField
+								register={register}
+								name='category_slug'
+								placeholder='スラッグ'
+								validation={{
+									required: 'スラッグは必須です',
+									maxLength: {
+										value: 50,
+										message: '50文字まで入力できます。',
+									},
+									// Add the pattern rule for validation
+									pattern: {
+										value: /^[a-z0-9-_]+$/,
+										message: '小文字アルファベット、数字、ハイフンのみ使用可能です。',
+									},
+								}}
+								maxLength={50}
+							/>
+							{errors.category_slug && <p className={styles.error_message}>{errors.category_slug.message}</p>}
+						</FormControl>
+					</div>
+
+					{/* --- Parent Category Section --- */}
+					<div className={styles.textboxContainer}>
+						<FormControl label='親カテゴリー名' required>
+							<ReactSelect
+								options={parentOptions}
+								placeholder='---親カテゴリーを選択します---'
+								value={parentOptions.find((opt) => opt.value === watchParentId) || parentOptions[0]}
+								onChange={(opt: CategoryOption | null) =>
+									setValue('parent_id', opt?.value ?? NO_PARENT_CATEGORY_VALUE)
+								}
+							/>
+						</FormControl>
+					</div>
+
+					{/* --- Child Category Section --- */}
+					{/* <div className={styles.flexRow}>
             <FormControl label="子カテゴリはありますか？" required>
               <div className={styles.radio_group}>
                 <label>
@@ -448,67 +433,68 @@ const CategoriesEntry = () => {
             )}
           </div> */}
 
-          <FormControl label="公開設定" required>
-            <div className={styles.status_container}>
-              {statusOptions.map(({ label, value, style }) => (
-                <div
-                  key={value}
-                  role="button"
-                  className={classNames(selectedStatus === value ? style : "")}
-                  onClick={() => handleStatusClick(value, label)}
-                >
-                  {label}
-                </div>
-              ))}
-            </div>
-          </FormControl>
+					<FormControl label='公開設定' required>
+						<div className={styles.status_container}>
+							{statusOptions.map(({ label, value, style }) => (
+								<div
+									key={value}
+									role='button'
+									className={classNames(selectedStatus === value ? style : '')}
+									onClick={() => handleStatusClick(value, label)}>
+									{label}
+								</div>
+							))}
+						</div>
+					</FormControl>
 
-          {showInfo && categoryInfo && (
-            <div className={styles.info_section}>
-              <div className={styles.info_item}>
-                <span className={styles.info_label}>並び順</span>
-                <span className={styles.info_value}>{categoryInfo.sort_order || "-"}</span>
-              </div>
-              <div className={styles.info_item}>
-                <span className={styles.info_label}>作成日</span>
-                <span className={styles.info_value}>
-                  {categoryInfo.createdAt ? dayjs(categoryInfo.createdAt).format("YYYY-MM-DD") : "-"}
-                </span>
-              </div>
-              <div className={styles.info_item}>
-                <span className={styles.info_label}>記事件数</span>
-                <span className={styles.info_value}>{blogCount > 0 ? `${blogCount.toLocaleString()} 件` : "0 件"}</span>
-                {/* <span className={styles.info_value}>{categoryInfo?.blogCategories?.length ?? 0}</span> */}
-              </div>
-            </div>
-          )}
-        </div>
+					{showInfo && categoryInfo && (
+						<div className={styles.info_section}>
+							<div className={styles.info_item}>
+								<span className={styles.info_label}>並び順</span>
+								<span className={styles.info_value}>{categoryInfo.sort_order || '-'}</span>
+							</div>
+							<div className={styles.info_item}>
+								<span className={styles.info_label}>作成日</span>
+								<span className={styles.info_value}>
+									{categoryInfo.createdAt ? dayjs(categoryInfo.createdAt).format('YYYY-MM-DD') : '-'}
+								</span>
+							</div>
+							<div className={styles.info_item}>
+								<span className={styles.info_label}>記事件数</span>
+								<span className={styles.info_value}>
+									{blogCount > 0 ? `${blogCount.toLocaleString()} 件` : '0 件'}
+								</span>
+								{/* <span className={styles.info_value}>{categoryInfo?.blogCategories?.length ?? 0}</span> */}
+							</div>
+						</div>
+					)}
+				</div>
 
-        <FormFooter>
-          <ButtonCancel onClick={() => router.back()} text="戻る" type="button" />
-          <ButtonSave type="submit" text="保存" className={styles.submitBtn} disabled={isBtnDisable} />
-          {/* {showInfo && authCtx.user.role === 'admin' && (
+				<FormFooter>
+					<ButtonCancel onClick={() => router.back()} text='戻る' type='button' />
+					<ButtonSave type='submit' text='保存' className={styles.submitBtn} disabled={isBtnDisable} />
+					{/* {showInfo && authCtx.user.role === 'admin' && (
             <span className={styles.iconDelete} onClick={handleDelete} role="button" style={{ cursor: "pointer" }}>
               <IconDelete />
             </span>
           )} */}
-          {showInfo && (
-            <span className={styles.iconDelete} onClick={handleDelete} role="button" style={{ cursor: "pointer" }}>
-              <IconDelete />
-            </span>
-          )}
-        </FormFooter>
-      </form>
+					{showInfo && (
+						<span className={styles.iconDelete} onClick={handleDelete} role='button' style={{ cursor: 'pointer' }}>
+							<IconDelete />
+						</span>
+					)}
+				</FormFooter>
+			</form>
 
-      <ConfirmModal
-        isOpen={showModal}
-        title="カテゴリー削除"
-        message={deleteMessage}
-        onConfirm={confirmDelete}
-        onCancel={cancelDelete}
-      />
-    </>
-  )
-}
+			<ConfirmModal
+				isOpen={showModal}
+				title='カテゴリー削除'
+				message={deleteMessage}
+				onConfirm={confirmDelete}
+				onCancel={cancelDelete}
+			/>
+		</>
+	);
+};
 
 export default CategoriesEntry;

@@ -127,6 +127,14 @@
   position: absolute;
   right: 20px;
 
+  @include mixin.sm {
+    position: static;
+    right: auto;
+    flex: 0 0 auto !important;
+    max-width: none !important;
+    width: auto !important;
+  }
+
   svg {
     font-size: 25px;
     color: var(--destructive);

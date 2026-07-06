@@ -5,7 +5,9 @@ import { fetcher } from '@/utils/fetcher';
 import useSWRImmutable from 'swr/immutable';
 
 export function useFetch(query: string | URL | null) {
+  console.log("useFetch query called with:", query?.toString());
   const { data, error, mutate } = useSWR<any>(query, fetcher);
+  if (error) console.error("useFetch error for query:", query?.toString(), error);
   return {
     data: data ? data.data : undefined,
     meta: data ? data.meta : undefined,

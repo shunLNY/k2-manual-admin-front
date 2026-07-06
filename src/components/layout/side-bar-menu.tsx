@@ -21,7 +21,7 @@ export default function SideBarMenu() {
             }`}
           href={'/dashboard'}>
           <IconMenuBlock />
-          <p className={styles.nav_text}>DASHBOARD</p>
+          <p className={styles.nav_text}>Dashboard</p>
         </Link>
         <Link
           className={`${styles.nav_item} ${pathname === '/articles' ? styles.active : ''

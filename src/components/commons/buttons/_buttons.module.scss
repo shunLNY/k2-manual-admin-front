@@ -19,8 +19,8 @@
   @include mixin.sm {
     width: fn.get-vw(100px);
     height: fn.get-vw(30px);
-    border-radius: fn.get-vw(5px);
-    font-size: fn.get-vw(60px);
+    // border-radius: fn.get-vw(5px);
+    // font-size: fn.get-vw(60px);
   }
 }
 
@@ -178,11 +178,11 @@
     background-color: color.mix($white, $blue, 15%);
   }
 
-  @include mixin.sm {
-    width: fn.get-vw(66px);
-    height: fn.get-vw(25px);
-    font-size: fn.get-vw(30px);
-  }
+//   @include mixin.sm {
+//     width: fn.get-vw(66px);
+//     height: fn.get-vw(25px);
+//     font-size: fn.get-vw(30px);
+//   }
 }
 
 .btn_close {
@@ -286,48 +286,9 @@
   font-weight: normal;
   font-size: 13px;
 
-  @include mixin.md {
-    // width: fn.get-vw(120px);
-    border-radius: fn.get-vw(20px);
-    // height: fn.get-vw(20px);
-  }
-
-  // @include mixin.sm{
-  //     width: fn.get-vw(100px);
-  //     height: fn.get-vw(30px);
-  // }
-
-  @include mixin.es {
-    width: fn.get-vw(100px);
-    border-radius: fn.get-vw(20px);
-    height: fn.get-vw(30px);
-  }
-
-  // @include mixin.md{
-  //     width: fn.get-vw(120px);
-  //     border-radius: fn.get-vw(20px);
-  //     height: fn.get-vw(20px);
-  // }
-  // @include mixin.sm{
-  //     width: fn.get-vw(120px);
-  //     border-radius: fn.get-vw(20px);
-  //     height: fn.get-vw(25px);
-  // }
-
-  @include mixin.es {
-    width: fn.get-vw(120px);
-    border-radius: fn.get-vw(20px);
-    height: fn.get-vw(30px);
-  }
-
   svg {
     font-size: 10px;
     padding-right: 10px;
-
-    @include mixin.es {
-      font-size: fn.get-vw(10px);
-      padding-right: fn.get-vw(5px);
-    }
   }
 
   &:hover {
@@ -350,11 +311,7 @@
     //     border-radius: fn.get-vw(20px);
     //     height: fn.get-vw(25px);
     // }
-    @include mixin.es {
-      width: fn.get-vw(100px);
-      border-radius: fn.get-vw(20px);
-      height: fn.get-vw(30px);
-    }
+
   }
 
   @include mixin.sm {

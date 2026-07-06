@@ -28,20 +28,19 @@
 		border-radius: 5px;
 		color: var(--foreground);
 
-		@include mixin.sm {
-			font-size: fn.get-vw(13px);
-			padding: fn.get-vw(4px);
-		}
+		// @include mixin.sm {
+		// 	height: 30px;
+		// }
 
 		&:focus-visible {
 			outline: none !important;
 		}
 	}
 
-	@include mixin.sm {
-		height: fn.get-vw(45px);
-		border-radius: fn.get-vw(5px);
-	}
+	// @include mixin.sm {
+	// 	height: fn.get-vw(45px);
+	// 	border-radius: fn.get-vw(5px);
+	// }
 
 	svg {
 		padding-left: 10px;
@@ -49,8 +48,8 @@
 		color: var(--muted-foreground);
 
 		@include mixin.sm {
-			padding-left: fn.get-vw(10px);
-			font-size: fn.get-vw(20px);
+			// padding-left: fn.get-vw(10px);
+			font-size: 12px;
 		}
 	}
 }
@@ -62,15 +61,11 @@
 	//   height: 35px;
 	border-radius: 5px;
 
-	@include mixin.xxl {
-		// width: 266px;
-	}
-
-	@include mixin.sm {
-		width: auto;
-		height: fn.get-vw(35px);
-		border-radius: fn.get-vw(5px);
-	}
+	// @include mixin.sm {
+	// 	width: auto;
+	// 	height: 30px;
+	// 	border-radius: fn.get-vw(5px);
+	// }
 }
 
 .search_withicon_bar {
@@ -95,7 +90,7 @@
 		margin-right: fn.get-vw(10px);
 
 		.col_xmark {
-			font-size: 10vw;
+			font-size: 12px;
 		}
 	}
 }

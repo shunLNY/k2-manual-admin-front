@@ -39,6 +39,7 @@ export type Category = {
   creatorId: string;
   editorId: string;
   blog_categories: any[];
+  article_count: number;
   createdAt: string;
   updatedAt: string;
   creator: Account,

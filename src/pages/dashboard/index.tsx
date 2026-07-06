@@ -3,13 +3,17 @@
 import DashBoard from '@/components/dashboard/dashboard';
 import MainLayout from '@/components/layout/main-layout';
 import Head from 'next/head';
-import { getSession } from 'next-auth/react';
 import type { GetServerSidePropsContext } from 'next';
+import type { ReactElement } from 'react';
+import { getToken } from 'next-auth/jwt';
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const session = await getSession(context);
+  const token = await getToken({
+    req: context.req,
+    secret: process.env.NEXTAUTH_SECRET,
+  });
 
-  if (!session || (session as { error?: string }).error) {
+  if (!token?.accessToken || token.error) {
     return {
       redirect: {
         destination: '/auth/signin',
@@ -32,7 +36,7 @@ const DashboardPage = () => {
 	);
 };
 
-DashboardPage.getLayout = function getLayout(page: any) {
+DashboardPage.getLayout = function getLayout(page: ReactElement) {
 	return (
 		<>
 			<MainLayout title='ダッシュボード'>{page}</MainLayout>

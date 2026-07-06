@@ -1,6 +1,8 @@
-@use "../../../styles/mixins" as mixin;
-@use "../../../styles/functions" as fn;
-@use "../../../styles/variables" as *;
+/** @format */
+
+@use '../../../styles/mixins' as mixin;
+@use '../../../styles/functions' as fn;
+@use '../../../styles/variables' as *;
 
 .container {
 	display: grid;
@@ -10,7 +12,7 @@
 	background: var(--list-background);
 	color: var(--list-foreground);
 
-	[data-theme="dark"] & {
+	[data-theme='dark'] & {
 		background: var(--list-background);
 		color: var(--list-foreground);
 	}
@@ -39,7 +41,7 @@
 	// z-index: 99999999999;
 
 	// width: 100%;
-	>button {
+	> button {
 		border-radius: 60px;
 	}
 }
@@ -57,14 +59,16 @@
 	// min-height: 50px;
 	// max-height: 110px;
 	padding: 10px 0;
-	background-color: rgba(var(--list-background), 0.8);
+	background-color: rgba(var(--list-background), 0.3);
+
 	// background-color:var(--subtle-foreground);
 	z-index: 1;
 
 	// background: transparent;
 	@include mixin.sm {
-		bottom: fn.get-vw(60px);
-		// min-height: fn.get-vw(30px);
-		// max-height: fn.get-vw(80px);
+		bottom: fn.get-vw(80px);
+	}
+	@include mixin.xs {
+		bottom: fn.get-vw(160px);
 	}
 }
