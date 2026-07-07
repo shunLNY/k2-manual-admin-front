@@ -12,7 +12,6 @@ import {
 import { usePathname } from "next/navigation";
 
 export default function SideBarMenu() {
-	// Safe fallback: if pathname is null, default to an empty string
 	const pathname = usePathname() || "";
 
 	return (

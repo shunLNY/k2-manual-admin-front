@@ -12,7 +12,7 @@ const CategoryPageIndex = () => {
   return (
     <>
       <Head>
-        <title>カテゴリー編集 | Admin - 建工管理ブログ</title>
+        <title>カテゴリー編集 | - K2 マニュアル</title>
       </Head>
       <CategoryListContextProvider>
         <CategoriesEntry />
