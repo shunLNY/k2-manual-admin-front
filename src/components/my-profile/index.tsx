@@ -13,240 +13,247 @@ import { fetcher } from "@/utils/fetcher";
 import { toast } from "react-toastify";
 import { failMessage, updateSuccessfulMessage } from "@/utils/constants";
 import AccountContext, { useAccount } from "@/store/accounts-context";
-import { signOut } from 'next-auth/react';
-import { NEXT_PUBLIC_APP_URL } from '@/utils/constants';
+import { signOut } from "next-auth/react";
+import { NEXT_PUBLIC_APP_URL } from "@/utils/constants";
 import { useRouter } from "next/router";
 
 const ProfileEntry = () => {
-  const authCtx = useAuth();
-  const router = useRouter();
-  const [isBtnDisable, setIsBtnDisable] = useState(false)
-  const [selectedStatus, setSelectedStatus] = useState("admin");
-  const { getAccountInfo, accountInfo } = useAccount();
-  const [isEmailEdited, setIsEmailEdited] = useState(false);
+	const authCtx = useAuth();
+	const router = useRouter();
+	const [isBtnDisable, setIsBtnDisable] = useState(false);
+	const [selectedStatus, setSelectedStatus] = useState("admin");
+	const { getAccountInfo, accountInfo } = useAccount();
+	const [isEmailEdited, setIsEmailEdited] = useState(false);
 
-  const statusOptions = [
-    { label: "編集者", value: "editor", style: styles.editor },
-    { label: "管理者", value: "admin", style: styles.admin },
-  ]
+	const statusOptions = [
+		{ label: "編集者", value: "editor", style: styles.editor },
+		{ label: "管理者", value: "admin", style: styles.admin },
+	];
 
-  const handleStatusClick = (value: string, label: string) => {
-    setSelectedStatus(value)
-    setValue("status", value)
-  };
+	const handleStatusClick = (value: string, label: string) => {
+		setSelectedStatus(value);
+		setValue("status", value);
+	};
 
-  useEffect(() => {
-    if (authCtx.user?.uid) {
-      getAccountInfo(authCtx.user.uid);
-    }
-  }, [authCtx.user?.uid])
+	useEffect(() => {
+		if (authCtx.user?.uid) {
+			getAccountInfo(authCtx.user.uid);
+		}
+	}, [authCtx.user?.uid]);
 
-  useEffect(() => {
-    if (accountInfo) {
-      const formData = {
-        account_name: accountInfo.account_name ?? "",
-        email: accountInfo.email ?? "",
-        role: accountInfo.role ?? "admin",
-        account_id: accountInfo.account_id ?? ""
+	useEffect(() => {
+		if (accountInfo) {
+			const formData = {
+				account_name: accountInfo.account_name ?? "",
+				email: accountInfo.email ?? "",
+				role: accountInfo.role ?? "admin",
+				account_id: accountInfo.account_id ?? "",
+			};
 
-      }
+			reset(formData);
+			setSelectedStatus(accountInfo.role as "admin" | "editor");
+		}
+	}, [accountInfo]);
 
-      reset(formData)
-      setSelectedStatus(accountInfo.role as "admin" | "editor")
-    }
-  }, [accountInfo])
+	const {
+		register,
+		handleSubmit,
+		setValue,
+		getValues,
+		setError,
+		clearErrors,
+		reset,
+		control,
+		formState: { errors },
+		watch,
+	} = useForm({
+		defaultValues: {
+			id: "",
+			name: "",
+			email: "",
+			status: "",
+		},
+	});
 
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    getValues,
-    setError,
-    clearErrors,
-    reset,
-    control,
-    formState: { errors },
-    watch,
-  } = useForm({
-    defaultValues: {
-      id: "",
-      name: "",
-      email: "",
-      status: ""
-    },
-  })
+	useEffect(() => {
+		const initialData = {
+			id: authCtx.user.account_id,
+			name: authCtx.user.account_name,
+			email: authCtx.user.email,
+			status: authCtx.user.role,
+		};
 
+		reset(initialData);
+	}, [authCtx.user]);
 
-  useEffect(() => {
-    const initialData = {
-      id: authCtx.user.account_id,
-      name: authCtx.user.account_name,
-      email: authCtx.user.email,
-      status: authCtx.user.role
-    }
+	//Password reset
+	const handleEmailValidation = async () => {
+		setIsBtnDisable(true);
 
-    reset(initialData)
-  }, [authCtx.user])
+		const email = await getValues("email");
 
-  //Password reset
-  const handleEmailValidation = async () => {
-    setIsBtnDisable(true)
+		try {
+			const response = await fetch(
+				` ${process.env.NEXT_PUBLIC_API_ENDPOINT}/auth/forget-password`,
+				{
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ email }),
+				},
+			);
 
-    const email = await getValues('email')
+			if (!response.ok) {
+				throw new Error("Something went wrong.");
+			}
+			toast.success("メールが送信されました");
+			setTimeout(
+				() =>
+					signOut({
+						callbackUrl: NEXT_PUBLIC_APP_URL + "/auth/signin",
+					}),
+				2000,
+			);
 
-    try {
-      const response = await fetch(
-        ` ${NEXT_PUBLIC_APP_URL}/api/proxy/auth/forget-password`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email }),
-        }
-      );
+			setIsBtnDisable(false);
+		} catch (error) {}
+	};
 
-      if (!response.ok) {
-        throw new Error("Something went wrong.");
-      }
-      toast.success('メールが送信されました');
-      setTimeout(() => signOut({ callbackUrl: NEXT_PUBLIC_APP_URL + '/auth/signin' }), 2000)
+	const onSubmit = (data: any) => {
+		setIsBtnDisable(true);
+		let fetchConfig = {};
+		let url = null;
+		data.isEmailEdited = isEmailEdited;
+		console.log(data);
 
+		data = {
+			...data,
+			id: authCtx.user.id,
+		};
+		fetchConfig = {
+			method: "PUT",
+			headers: {
+				"content-type": "application/json",
+			},
+			body: JSON.stringify(data),
+		};
+		url = new URL(
+			window.location.origin +
+				"/api/proxy/admin/accounts/my-profile/" +
+				authCtx.user.uid,
+		);
 
-      setIsBtnDisable(false)
-    } catch (error) {
+		fetcher(url, { ...fetchConfig })
+			.then((res) => {
+				toast.success(updateSuccessfulMessage);
+				setIsBtnDisable(false);
+				authCtx.refreshUser;
+				setIsEmailEdited(false);
 
-    }
-  };
+				if (res.data.message === "Email edited") {
+					signOut({
+						callbackUrl: NEXT_PUBLIC_APP_URL + "/auth/signin",
+					});
+				}
+			})
+			.catch((error) => {
+				toast.error(failMessage);
+				console.error("An error occurred:", error);
+				setIsBtnDisable(false);
+			});
+	};
 
+	return (
+		<>
+			<form
+				className={styles.main_container}
+				onSubmit={handleSubmit(onSubmit)}
+				id="entryForm"
+			>
+				<div className={styles.row_one}>
+					<div className={styles.title}>
+						<p>ID</p>
+						<p>{authCtx.user.account_id}</p>
+					</div>
+					<div className={styles.textboxContainer}>
+						<FormControl label="アカウント名" required>
+							<TextField
+								register={register}
+								name="account_name"
+								placeholder="田中太郎"
+								validation={{
+									required: "アカウント名は必須です",
+									maxLength: {
+										value: 50,
+										message: "50文字まで入力できます。",
+									},
+								}}
+								maxLength={50}
+							/>
+						</FormControl>
+					</div>
+					<FormControl label="権限" required>
+						<div className={styles.status_container}>
+							{statusOptions.map(({ label, value, style }) => (
+								<div
+									key={value}
+									role="button"
+									className={classNames(
+										selectedStatus === value ? style : "",
+									)}
+								>
+									{label}
+								</div>
+							))}
+						</div>
+					</FormControl>
+					<div className={styles.textboxContainer}>
+						<FormControl label="メールアドレス" required>
+							<TextField
+								register={register}
+								name="email"
+								placeholder="tanaka@sample.com"
+								validation={{
+									required: "メールアドレスは必須です",
+									maxLength: {
+										value: 50,
+										message: "50文字まで入力できます。",
+									},
+								}}
+								onChange={() => setIsEmailEdited(true)}
+								maxLength={50}
+							/>
+						</FormControl>
+					</div>
+				</div>
 
+				{/* <div className={styles.row_two}></div> */}
 
-  const onSubmit = (data: any) => {
-    setIsBtnDisable(true)
-    let fetchConfig = {};
-    let url = null;
-    data.isEmailEdited = isEmailEdited;
-    console.log(data);
+				<FormFooter threeButtonsCenterOnTop={true}>
+					<ButtonCancel
+						disabled={isBtnDisable}
+						onClick={() => {
+							reset();
+							router.back();
+						}}
+						text="戻る"
+						type="button"
+					></ButtonCancel>
+					<ButtonSave
+						onClick={handleEmailValidation}
+						disabled={isBtnDisable}
+						text="パスワード再設定"
+						type="button"
+					></ButtonSave>
+					<ButtonSave
+						type="submit"
+						text="保存"
+						className={styles.submitBtn}
+						disabled={isBtnDisable}
+					></ButtonSave>
+				</FormFooter>
+			</form>
+		</>
+	);
+};
 
-    data = {
-      ...data,
-      id: authCtx.user.id,
-    }
-    fetchConfig = {
-      method: "PUT",
-      headers: {
-        "content-type": "application/json",
-      },
-      body: JSON.stringify(data),
-    }
-    url = new URL(window.location.origin + "/api/proxy/admin/accounts/my-profile/" + authCtx.user.uid)
-
-
-
-    fetcher(url, { ...fetchConfig })
-      .then((res) => {
-        toast.success(updateSuccessfulMessage)
-        setIsBtnDisable(false)
-        authCtx.refreshUser;
-        setIsEmailEdited(false);
-
-        if (res.data.message === "Email edited") {
-          signOut({ callbackUrl: NEXT_PUBLIC_APP_URL + '/auth/signin' })
-        }
-      })
-      .catch((error) => {
-        toast.error(failMessage)
-        console.error("An error occurred:", error)
-        setIsBtnDisable(false)
-      })
-  }
-
-  return (
-    <>
-      <form className={styles.main_container} onSubmit={handleSubmit(onSubmit)} id="entryForm">
-        <div className={styles.row_one}>
-          <div className={styles.title}>
-            <p>ID</p>
-            <p>{authCtx.user.account_id}</p>
-          </div>
-          <div className={styles.textboxContainer}>
-            <FormControl label="アカウント名" required>
-              <TextField
-                register={register}
-                name="account_name"
-                placeholder="田中太郎"
-                validation={{
-                  required: "アカウント名は必須です",
-                  maxLength: {
-                    value: 50,
-                    message: "50文字まで入力できます。",
-                  },
-                }}
-                maxLength={50}
-              />
-            </FormControl>
-          </div>
-          <FormControl label="権限" required>
-            <div className={styles.status_container}>
-              {statusOptions.map(({ label, value, style }) => (
-                <div
-                  key={value}
-                  role="button"
-
-                  className={classNames(selectedStatus === value ? style : "",)}
-
-                >
-                  {label}
-                </div>
-              ))}
-            </div>
-          </FormControl>
-          <div className={styles.textboxContainer}>
-            <FormControl label="メールアドレス" required>
-              <TextField
-                register={register}
-                name="email"
-                placeholder="tanaka@sample.com"
-                validation={{
-                  required: "メールアドレスは必須です",
-                  maxLength: {
-                    value: 50,
-                    message: "50文字まで入力できます。",
-                  },
-                }}
-                onChange={() => setIsEmailEdited(true)}
-                maxLength={50}
-              />
-            </FormControl>
-          </div>
-
-
-        </div>
-
-        {/* <div className={styles.row_two}></div> */}
-
-        <FormFooter threeButtonsCenterOnTop={true}>
-
-          <ButtonCancel
-            disabled={isBtnDisable}
-            onClick={() => {
-              reset();
-              router.back();
-            }
-            }
-            text='戻る'
-            type='button'></ButtonCancel>
-          <ButtonSave onClick={handleEmailValidation} disabled={isBtnDisable} text='パスワード再設定' type='button'></ButtonSave>
-          <ButtonSave
-            type='submit'
-            text='保存'
-            className={styles.submitBtn}
-            disabled={isBtnDisable}></ButtonSave>
-
-
-        </FormFooter>
-      </form>
-
-    </>
-  )
-}
-
-export default ProfileEntry
+export default ProfileEntry;

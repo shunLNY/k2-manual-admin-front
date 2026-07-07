@@ -125,7 +125,7 @@ const ArticleList = (props: Props) => {
 					</ul>
 					{items.length === 0 && (
 						<div className="p-8 text-center text-gray-500">
-							ブログが見つかりません
+							記事が見つかりません
 						</div>
 					)}
 				</div>

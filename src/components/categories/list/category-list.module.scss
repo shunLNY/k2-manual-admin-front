@@ -8,6 +8,7 @@
 
 .list_header {
   @extend %gridColumn;
+  padding: 7px 0px !important;
 }
 
 .item_wrapper {

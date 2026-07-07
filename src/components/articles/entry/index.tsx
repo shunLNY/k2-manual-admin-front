@@ -182,7 +182,7 @@ const ArticleEntry = () => {
 					pageCtx.setEntryMode("edit");
 				} catch (error) {
 					console.error("Error fetching blog:", error);
-					toast.error("ブログの取得に失敗しました");
+					toast.error("記事の取得に失敗しました");
 				} finally {
 					setIsLoading(false);
 				}
@@ -284,11 +284,11 @@ const ArticleEntry = () => {
 		data.content = normalizeContentImageUrls(content);
 
 		if (formattedStartDate && formattedEndDate) {
-			message = `公開期間は ${dayjs(formattedStartDate).format("YYYY/MM/DD")} から ${dayjs(formattedEndDate).format("YYYY/MM/DD")} までです。\nブログを保存しますか？`;
+			message = `公開期間は ${dayjs(formattedStartDate).format("YYYY/MM/DD")} から ${dayjs(formattedEndDate).format("YYYY/MM/DD")} までです。\n記事を保存しますか？`;
 		} else if (formattedStartDate) {
-			message = `公開期間は ${dayjs(formattedStartDate).format("YYYY/MM/DD")} からです。\nブログを保存しますか？`;
+			message = `公開期間は ${dayjs(formattedStartDate).format("YYYY/MM/DD")} からです。\n記事を保存しますか？`;
 		} else if (formattedEndDate) {
-			message = `公開期間は今日から ${dayjs(formattedEndDate).format("YYYY/MM/DD")} までです。\nブログを保存しますか？`;
+			message = `公開期間は今日から ${dayjs(formattedEndDate).format("YYYY/MM/DD")} までです。\n記事を保存しますか？`;
 		}
 
 		setConfirmationMessage(message);
@@ -904,8 +904,8 @@ const ArticleEntry = () => {
 
 			<ConfirmModal
 				isOpen={showDeleteModal}
-				title="ブログ削除"
-				message={"このブログを削除しますか？"}
+				title="記事削除"
+				message={"この記事を削除しますか？"}
 				onConfirm={confirmDelete}
 				onCancel={cancelDelete}
 				messageColor="red"
@@ -919,7 +919,7 @@ const ArticleEntry = () => {
 				onConfirm={handleConfirmSubmit}
 				onCancel={() => setShowSaveModal(false)}
 				confirmText="確認"
-				messageColor="blue"
+				// messageColor="blue"
 			/>
 		</>
 	);
