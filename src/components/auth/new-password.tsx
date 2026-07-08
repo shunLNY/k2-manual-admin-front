@@ -20,6 +20,11 @@ const NewPassword = () => {
 	const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 	const [token, setToken] = useState<string | null>(null);
 
+	const passwordRegex =
+		/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$/;
+	const passwordErrorMessage =
+		"***パスワードは8文字以上で、大文字、小文字、数字をそれぞれ1文字以上含む必要があります。***";
+
 	useEffect(() => {
 		if (router.isReady) {
 			const t = router.query.token;
@@ -61,7 +66,7 @@ const NewPassword = () => {
 		let new_password: string;
 		console.log(data, "in new password form");
 		if (data.password !== data.confirmPassword) {
-			setError("パスワードが一致しません。");
+			setError("***パスワードが一致しません。***");
 			return;
 		} else {
 			new_password = data.password;
@@ -133,12 +138,13 @@ const NewPassword = () => {
 									name="password"
 									register={register}
 									type={showPassword ? "text" : "password"}
-									placeholder="6文字以上"
+									placeholder="8文字以上"
 									validation={{
-										required: "パスワードは必須です",
-										maxLength: {
-											value: 50,
-											message: "50文字まで入力できます。",
+										required:
+											"*** パスワードは必須です。***",
+										pattern: {
+											value: passwordRegex,
+											message: passwordErrorMessage,
 										},
 									}}
 									maxLength={50}
@@ -167,6 +173,14 @@ const NewPassword = () => {
 								</button>
 							</div>
 						</div>
+						{errors.password && (
+							<small
+								className="inputErrMsg"
+								style={{ color: "red", marginTop: "2px" }}
+							>
+								{errors.password.message?.toString()}
+							</small>
+						)}
 						<div className={styles.inputContainer}>
 							<p>パスワード（確認）</p>
 							<div className={styles.passwordInputWrapper}>
@@ -180,11 +194,11 @@ const NewPassword = () => {
 									}
 									placeholder="パスワード（確認）"
 									validation={{
-										required: "パスワードは必須です",
-										maxLength: {
-											value: 50,
-											message: "50文字まで入力できます。",
-										},
+										required:
+											"*** 確認用パスワードは必須です。***",
+										validate: (value: string) =>
+											value === getValues("password") ||
+											"パスワードが一致しません。",
 									}}
 									maxLength={50}
 								/>
@@ -212,6 +226,14 @@ const NewPassword = () => {
 								</button>
 							</div>
 						</div>
+						{errors.confirmPassword && (
+							<div
+								className="inputErrMsg"
+								style={{ color: "red", marginTop: "2px" }}
+							>
+								{errors.confirmPassword.message?.toString()}
+							</div>
+						)}
 						<div className={styles.btnContainer}>
 							<ButtonSave type="submit" text="パスワードを設定" />
 						</div>
