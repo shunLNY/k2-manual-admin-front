@@ -525,8 +525,61 @@ body.ReactModal__Body--open {
   left: 50% !important;
   transform: translate(-50%, -50%) !important;
   margin: 0 !important;
+  color: var(--header-foreground);
+  background: var(--header-background) !important;
+}
+
+.note-modal-title {
+  color: var(--header-foreground) !important;
+}
+
+.note-form-label {
+  color: var(--header-foreground) !important;
+}
+
+.note-btn-primary {
+  background: #3b82f6 !important;
+}
+
+.note-modal .note-modal-header .close {
+  opacity: 0.6 !important;
+  text-shadow: none !important;
+  transition: all 0.2s ease-in-out;
+}
+
+.note-modal .note-modal-header .close:hover {
+  opacity: 1 !important;
+}
+
+.dark .note-modal .note-modal-header .close {
+  color: #ffffff !important;
+}
+
+.dark.note-modal-content {
+  background: var(--header-background) !important;
+}
+
+.dark.note-modal-title {
+  color: var(--muted-foreground) !important;
+}
+
+.dark.note-form-label {
+  color: var(--muted-foreground) !important;
+}
+
+.dark.close {
+  color: var(--muted-foreground) !important;
+}
+
+.dark .note-modal .note-modal-header {
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.dark .note-modal .note-modal-footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
 
 .note-modal-footer {
+  padding-right: 30px !important;
   height: 55px !important;
 }
