@@ -155,7 +155,9 @@ const ListItem = (props: Props) => {
 					</span>
 				</div>
 
-				<div>{item?.article_count ?? 0}</div>
+				<div>
+					{item?.number_of_articles_used ?? item?.article_count ?? 0}
+				</div>
 				{level < 3 && (
 					<div onClick={(e) => e.stopPropagation()}>
 						<button

@@ -21,7 +21,6 @@ import { Controller, useForm, useWatch } from "react-hook-form";
 import { Category } from "@/utils/types";
 import { toast } from "react-toastify";
 import { fetcher } from "@/utils/fetcher";
-import { useRouter } from "next/navigation";
 import "react-datepicker/dist/react-datepicker.css";
 import Modal from "@/components/modals/modal";
 import { Checkbox } from "@/components/commons/inputs/checkbox";
@@ -31,7 +30,6 @@ import TextField from "@/components/commons/inputs/text-field";
 import ButtonSearch from "@/components/commons/buttons/btn-search";
 import { IconXMark } from "@/components/icons/icons";
 import dayjs from "dayjs";
-import MultiSelect from "@/components/commons/inputs/multi-select-box";
 import styles from "../entry/articles.entry.module.scss";
 import DateInput from "@/components/commons/inputs/date-input";
 import ReactDatepicker from "@/components/commons/datepicker/react-datepicker";
@@ -85,7 +83,6 @@ type DuplicateArticlesResponse = {
 };
 
 const ListPage = () => {
-	const router = useRouter();
 	const pageCtx = useListPage();
 	const articleCtx = useArticle();
 	const categoryListCtx = useCategoryList();
@@ -252,8 +249,9 @@ const ListPage = () => {
 				toast.error(`${failedIds.length}件の複製に失敗しました。`);
 			}
 			articleCtx.setCheckedItems([]);
+			articleCtx.setSelectedBlogs([]);
+			articleCtx.setIsAllChecked(false);
 			refreshArticleRows();
-			router.refresh();
 		} catch (error) {
 			console.error("記事の複製に失敗しました:", error);
 			toast.error("記事の複製中にエラーが発生しました。");
