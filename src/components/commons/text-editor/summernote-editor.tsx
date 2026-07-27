@@ -11,10 +11,14 @@ import 'summernote/dist/summernote-lite.css';
 // Extend the Window interface for jQuery globals
 declare global {
   interface Window {
-    $: any;
-    jQuery: any;
+    $: JQueryStatic;
+    jQuery: JQueryStatic;
   }
 }
+
+type SummernoteElement = JQuery<HTMLTextAreaElement> & {
+  summernote: (...args: unknown[]) => unknown;
+};
 
 interface Props {
   value?: string;
@@ -26,6 +30,7 @@ const SummernoteEditor = ({ value, onChange, toolbar }: Props) => {
   const editorRef = useRef<HTMLTextAreaElement>(null);
   const isInitialized = useRef(false);
   const onChangeRef = useRef(onChange);
+  const latestValueRef = useRef(value || '');
 
   // Keep the onChange callback reference up-to-date without re-initializing the editor
   useEffect(() => {
@@ -33,21 +38,25 @@ const SummernoteEditor = ({ value, onChange, toolbar }: Props) => {
   }, [onChange]);
 
   useEffect(() => {
+    latestValueRef.current = value || '';
+  }, [value]);
+
+  useEffect(() => {
+    const editorElement = editorRef.current;
+
     const loadSummernote = async () => {
       if (typeof window !== 'undefined') {
         const $ = (await import('jquery')).default;
         window.$ = window.jQuery = $;
 
         // Import Summernote Lite JS (Bootstrap 5 compatible)
-        // @ts-ignore
         await import('summernote/dist/summernote-lite.js');
-        // @ts-ignore
         await import('summernote/dist/lang/summernote-ja-JP.js');
 
-        if (editorRef.current && !isInitialized.current) {
-          const $editor = $(editorRef.current);
+        if (editorElement && !isInitialized.current) {
+          const $editor = $(editorElement) as SummernoteElement;
           
-          ($editor as any).summernote({
+          $editor.summernote({
             placeholder: '本文を入力してください',
             tabsize: 2,
             height: 300,
@@ -86,10 +95,12 @@ const SummernoteEditor = ({ value, onChange, toolbar }: Props) => {
             }
           });
 
-          if (value) {
-            $editor.summernote('code', resolveContentImageUrls(value));
-          }
           isInitialized.current = true;
+
+          const resolved = resolveContentImageUrls(latestValueRef.current);
+          if (resolved) {
+            $editor.summernote('code', resolved);
+          }
         }
       }
     };
@@ -97,8 +108,8 @@ const SummernoteEditor = ({ value, onChange, toolbar }: Props) => {
     loadSummernote();
 
     return () => {
-      if (isInitialized.current && editorRef.current && window.$) {
-        window.$(editorRef.current).summernote('destroy');
+      if (isInitialized.current && editorElement && window.$) {
+        (window.$(editorElement) as SummernoteElement).summernote('destroy');
         isInitialized.current = false;
       }
     };
