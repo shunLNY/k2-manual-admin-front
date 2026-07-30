@@ -57,7 +57,8 @@ function KeywordInput({ onSearch, ...props }: Props) {
           value={props.value}
           onChange={handleChange}
         />
-        <button onClick={clearInput} className={styles.search_clear}>
+        <button onClick={clearInput} 
+        className={`${styles.search_clear} ${styles.clearsize}`}>
           <IconXMark />
         </button>
       </div>

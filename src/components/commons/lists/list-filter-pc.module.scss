@@ -1,8 +1,8 @@
 /** @format */
 
-@use '../../../styles/variables.scss' as *;
-@use '../../../styles/functions' as fn;
-@use '../../../styles/mixins' as mixin;
+@use "../../../styles/variables.scss" as *;
+@use "../../../styles/functions" as fn;
+@use "../../../styles/mixins" as mixin;
 @use "sass:color";
 
 .list_search_container {
@@ -12,7 +12,7 @@
   padding: 20px;
   z-index: 3;
   white-space: nowrap;
-//   margin-bottom: 5px;
+  //   margin-bottom: 5px;
   border-radius: 6px;
   height: 100%;
   background: var(--subtle-foreground);
@@ -233,7 +233,7 @@
   display: flex;
   align-items: center;
 
-  >div {
+  > div {
     @include mixin.sm {
       flex: 1 1 0px;
     }
@@ -264,15 +264,15 @@
   //   width: fn.get-vw(40px);
   // }
 
-//   @include mixin.sm {
-//     width: unset;
-//     flex: 1;
-//     height: fn.get-vw(32px);
-//     padding: 0 fn.get-vw(10px) 0 fn.get-vw(10px);
-//     margin-left: fn.get-vw(10px);
-//     font-size: fn.get-vw(13px);
-//     border-radius: fn.get-vw(5px);
-//   }
+  //   @include mixin.sm {
+  //     width: unset;
+  //     flex: 1;
+  //     height: fn.get-vw(32px);
+  //     padding: 0 fn.get-vw(10px) 0 fn.get-vw(10px);
+  //     margin-left: fn.get-vw(10px);
+  //     font-size: fn.get-vw(13px);
+  //     border-radius: fn.get-vw(5px);
+  //   }
 
   span {
     line-height: 1;
@@ -702,20 +702,20 @@
 .construction_flex {
   display: grid;
   gap: 10px;
-  grid-template-columns: repeat(2,1fr);
+  grid-template-columns: repeat(2, 1fr);
 
   @include mixin.sm {
     display: block;
     gap: 20px;
   }
 
-  >div {
+  > div {
     width: 48%;
     display: flex;
     flex-direction: column;
 
     @include mixin.sm {
-        grid-template-columns: 1fr;
+      grid-template-columns: 1fr;
       width: 100%;
     }
   }
@@ -760,7 +760,8 @@
       border: 1px solid var(--border);
       outline: none;
 
-      @include mixin.xxl {}
+      @include mixin.xxl {
+      }
     }
   }
 }
@@ -771,7 +772,7 @@
   //     margin-top: fn.get-vw(20px);
   // }
 }
-.filter_buttons{
+.filter_buttons {
   width: 150px !important;
   height: 38px !important;
   font-size: 16px !important;
@@ -810,7 +811,6 @@
   @include mixin.sm {
     display: none;
   }
-
 }
 
 .modal_action_buttons {
@@ -819,16 +819,16 @@
   background-color: var(--filter-background);
   border-top: 1px solid var(--border);
 
-@include mixin.sm {
-    position: fixed;        
+  @include mixin.sm {
+    position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
     width: 100%;
-    padding: fn.get-vw(15px) fn.get-vw(20px);
-    z-index: 9999;            
-    // box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.05); 
-}
+    padding: fn.get-vw(50px) fn.get-vw(20px);
+    z-index: 9999;
+    // box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.05);
+  }
 }
 
 .modal_bg {
@@ -837,7 +837,7 @@
   height: 100%;
   top: 80px !important;
   left: 100px !important;
-//   background-color: rgba(#333333, 0.7);
+  //   background-color: rgba(#333333, 0.7);
 
   [data-theme="dark"] & {
     background-color: rgba(#ffffff, 0.7);
