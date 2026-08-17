@@ -44,22 +44,22 @@ const isLocalAuthHost =
   process.env.APP_ENV === "development" ||
   hostName === "localhost" ||
   isIpAddress(hostName);
-const sessionTokenDomain =
-  isLocalAuthHost
-    ? hostName
-    : "." + hostName;
+const shouldUseCookieDomain =
+  !isLocalAuthHost && !nextAuthUrl.includes(".vercel.app");
+const sessionTokenDomain = shouldUseCookieDomain ? "." + hostName : undefined;
+const sessionTokenCookieOptions = {
+  httpOnly: true,
+  sameSite: "lax",
+  path: "/",
+  secure: useSecureCookies,
+  ...(sessionTokenDomain ? { domain: sessionTokenDomain } : {}),
+};
 
 export const authOptions = {
   cookies: {
     sessionToken: {
       name: `${cookiePrefix}next-auth.session-token`,
-      options: {
-        domain: sessionTokenDomain,
-        httpOnly: true,
-        sameSite: "lax",
-        path: "/",
-        secure: useSecureCookies,
-      },
+      options: sessionTokenCookieOptions,
     },
   },
   pages: {
