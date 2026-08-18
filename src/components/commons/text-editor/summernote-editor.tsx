@@ -3,7 +3,7 @@
 import { useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { fetcher } from '@/utils/fetcher';
-import { buildFileUrl, resolveContentImageUrls } from '@/utils/article-content';
+import { buildImageFileUrl, resolveContentImageUrls } from '@/utils/article-content';
 
 // Summernote Lite is standalone and works best with Bootstrap 5
 import 'summernote/dist/summernote-lite.css';
@@ -86,7 +86,7 @@ const SummernoteEditor = ({ value, onChange, toolbar }: Props) => {
                   });
 
                   if (data?.path) {
-                    $editor.summernote('insertImage', buildFileUrl(data.path));
+                    $editor.summernote('insertImage', buildImageFileUrl(data.path));
                   }
                 } catch (err) {
                   console.error("Upload error", err);

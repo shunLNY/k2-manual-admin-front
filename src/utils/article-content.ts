@@ -2,7 +2,9 @@
 
 import { API_URL } from './constants';
 
-const FILES_PREFIX = `${API_URL.replace(/\/$/, '')}/files`;
+const API_BASE = API_URL.replace(/\/$/, '');
+const FILES_PREFIX = `${API_BASE}/files`;
+const IMAGE_FILES_PREFIX = `${API_BASE}/files/image`;
 
 /**
  * Resolve /storage/... image paths to full URLs for display in Summernote.
@@ -38,11 +40,10 @@ export function resolveImageSrc(src: string): string {
   if (!src) return src;
   if (src.startsWith('http://') || src.startsWith('https://') || src.startsWith('data:')) {
     // Fix URLs that point to API host without /files
-    const apiBase = API_URL.replace(/\/$/, '');
-    if (src.startsWith(apiBase) && !src.includes('/files/')) {
-      const path = src.slice(apiBase.length);
+    if (src.startsWith(API_BASE) && !src.includes('/files/')) {
+      const path = src.slice(API_BASE.length);
       if (path.startsWith('/storage/')) {
-        return `${FILES_PREFIX}${path}`;
+        return `${IMAGE_FILES_PREFIX}${path}`;
       }
     }
     // Already a full files URL
@@ -50,7 +51,7 @@ export function resolveImageSrc(src: string): string {
     return src;
   }
   if (src.startsWith('/storage/')) {
-    return `${FILES_PREFIX}${src}`;
+    return `${IMAGE_FILES_PREFIX}${src}`;
   }
   if (src.startsWith('/files/')) {
     return `${API_URL.replace(/\/$/, '')}${src}`;
@@ -62,9 +63,8 @@ export function normalizeImageSrc(src: string): string {
   if (!src) return src;
   if (src.startsWith('data:')) return src;
 
-  const apiBase = API_URL.replace(/\/$/, '');
-  if (src.startsWith(apiBase)) {
-    const path = src.slice(apiBase.length);
+  if (src.startsWith(API_BASE)) {
+    const path = src.slice(API_BASE.length);
     if (path.startsWith('/files/storage/')) {
       return path.replace('/files', '');
     }
@@ -93,4 +93,13 @@ export function buildFileUrl(path: string): string {
     return `${FILES_PREFIX}${path}`;
   }
   return `${FILES_PREFIX}${path.startsWith('/') ? path : `/${path}`}`;
+}
+
+export function buildImageFileUrl(path: string): string {
+  if (!path) return '';
+  if (path.startsWith('http://') || path.startsWith('https://')) return path;
+  if (path.startsWith('/storage/')) {
+    return `${IMAGE_FILES_PREFIX}${path}`;
+  }
+  return `${IMAGE_FILES_PREFIX}${path.startsWith('/') ? path : `/${path}`}`;
 }

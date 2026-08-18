@@ -13,7 +13,6 @@ import formStyles from "../../commons/inputs/form-element.module.scss";
 import { IconClose, IconDelete, SearchIcon } from "@/components/icons/icons";
 import { fetcher } from "@/utils/fetcher";
 import {
-  API_URL,
   ArticleStatus,
   createSuccessfulMessage,
   failMessage,
@@ -44,6 +43,7 @@ import Image from "next/image";
 import { resizeMainImage } from "@/utils/helpers";
 import { stripHtml } from "@/utils/strip-html";
 import {
+  buildImageFileUrl,
   normalizeContentImageUrls,
   resolveContentImageUrls,
 } from "@/utils/article-content";
@@ -659,7 +659,7 @@ const ArticleEntry = () => {
                     </button>
                     <Image
                       className={styles.img_relative}
-                      src={API_URL + "/files" + image}
+                      src={buildImageFileUrl(image || "")}
                       alt="Preview"
                       fill
                       sizes={"400px"}

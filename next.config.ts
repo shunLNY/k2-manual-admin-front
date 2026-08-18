@@ -14,6 +14,11 @@ const nextConfig: NextConfig = {
         port: '4000',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: '**.vercel.app',
+        pathname: '/files/image/**',
+      },
     ],
     unoptimized: true,
   },

@@ -16,7 +16,7 @@ import { IconArrowRight, IconMenuBuildingO } from '@/components/icons/icons';
 // Stylesheets imports
 import styles from '../../../styles/_list.module.scss';
 import blogListStyles from './article-list.module.scss';
-import { API_URL } from '@/utils/constants';
+import { buildImageFileUrl } from '@/utils/article-content';
 
 import { Checkbox } from '@/components/commons/inputs/checkbox';
 import Image from 'next/image';
@@ -112,7 +112,7 @@ const ListItem = (props: Props) => {
             style={{
               objectFit: 'cover',
             }}
-            src={item.thumbnail_path ? API_URL + '/files' + item.thumbnail_path : '/images/common/no-image.png'}
+            src={item.thumbnail_path ? buildImageFileUrl(item.thumbnail_path) : '/images/common/no-image.png'}
           />
         </div>
         <div className={styles.item_status}>
