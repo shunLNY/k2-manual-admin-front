@@ -58,6 +58,7 @@ const Login = () => {
 				redirect: false,
 				email: data.email,
 				password: data.password,
+				callbackUrl: "/",
 			});
 			// login succeed
 			if (res?.error) {
@@ -68,7 +69,9 @@ const Login = () => {
 			if (!res?.error && res?.url) {
 				sessionStorage.removeItem("user");
 
-				router.replace(res?.url);
+				const redirectUrl = new URL(res.url, window.location.origin);
+				const isSignInUrl = redirectUrl.pathname === "/auth/signin";
+				router.replace(isSignInUrl ? "/dashboard" : res.url);
 				return;
 			} else {
 				setDisable(false);
